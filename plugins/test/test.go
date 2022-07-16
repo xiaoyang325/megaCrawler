@@ -8,9 +8,8 @@ import (
 
 func init() {
 	s := megaCrawler.Register("go", "https://go.dev")
-	s.UrlGetter.OnHTML(".Hero-blurb", func(element *colly.HTMLElement) {
-		element.Request.Ctx.Put("url", "https://go.dev")
-		element.Request.Ctx.Put("lastMod", time.Now())
+	s.UrlProcessor.OnHTML(".Hero-blurb", func(element *colly.HTMLElement) {
+		s.AddUrl("https://go.dev", time.Now())
 	})
 	s.UrlProcessor.OnHTML(".Hero-gopherLadder", func(element *colly.HTMLElement) {
 		element.Request.Ctx.Put("title", element.Attr("alt"))

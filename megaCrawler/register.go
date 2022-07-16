@@ -2,19 +2,24 @@ package megaCrawler
 
 import (
 	"megaCrawler/megaCrawler/config"
+	"net/url"
 	"sync"
 	"time"
 )
 
 var (
 	WebMap    = make(map[string]*websiteEngine)
-	nextTime  = time.Now().Add(10 * time.Second)
+	nextTime  = time.Now().Add(1 * time.Hour)
 	timeMutex = sync.RWMutex{}
 )
 
 // Register 注册插件控制器
 func Register(service string, baseUrl string) *websiteEngine {
-	engine := NewEngine(service, baseUrl)
+	k, err := url.Parse(baseUrl)
+	if err != nil {
+		panic(err)
+	}
+	engine := NewEngine(service, *k)
 	if c, ok := config.Configs[service]; !ok {
 		engine.Config = &config.Config{
 			Id:       service,

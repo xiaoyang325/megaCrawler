@@ -48,7 +48,7 @@ func errorResponse(w http.ResponseWriter, statusCode int, msg string) (err error
 	if err != nil {
 		return err
 	}
-	err = L.Error(msg)
+	err = Logger.Error(msg)
 	if err != nil {
 		return err
 	}

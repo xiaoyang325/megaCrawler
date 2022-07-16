@@ -9,7 +9,7 @@ import (
 )
 
 //func Template(w http.ResponseWriter, r *http.Request) {
-//	L.Info("Receive"+r.Method + "websiteList Request from: " + r.RemoteAddr)
+//	Logger.Info("Receive"+r.Method + "websiteList Request from: " + r.RemoteAddr)
 //	var b []byte
 //	var err error
 //	switch r.Method {
@@ -21,7 +21,7 @@ import (
 //		return
 //	}
 //	if err != nil {
-//		_ = L.Error("Failed to serialize response:" + err.Error())
+//		_ = Logger.Error("Failed to serialize response:" + err.Error())
 //		_ = errorResponse(w, 500, "Failed to serialize response:"+err.Error())
 //		return
 //	}
@@ -30,7 +30,7 @@ import (
 //}
 
 func startHandler(w http.ResponseWriter, r *http.Request) {
-	_ = L.Info("Receive" + r.Method + "startHandler Request from: " + r.RemoteAddr)
+	_ = Logger.Info("Receive" + r.Method + "startHandler Request from: " + r.RemoteAddr)
 	var b []byte
 	var err error
 	switch r.Method {
@@ -56,7 +56,7 @@ func startHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != nil {
-		_ = L.Error("Failed to serialize response:" + err.Error())
+		_ = Logger.Error("Failed to serialize response:" + err.Error())
 		_ = errorResponse(w, 500, "Failed to serialize response:"+err.Error())
 		return
 	}
@@ -65,7 +65,7 @@ func startHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func websiteHandler(w http.ResponseWriter, r *http.Request) {
-	_ = L.Info("Receive" + r.Method + "websiteHandler Request from: " + r.RemoteAddr)
+	_ = Logger.Info("Receive" + r.Method + "websiteHandler Request from: " + r.RemoteAddr)
 	var b []byte
 	var err error
 	switch r.Method {
@@ -91,7 +91,7 @@ func websiteHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	_, _ = w.Write(b)
 	if err != nil {
-		_ = L.Error("Failed to serialize response:" + err.Error())
+		_ = Logger.Error("Failed to serialize response:" + err.Error())
 		_ = errorResponse(w, 500, "Internal Error : Failed to serialize response:"+err.Error())
 		return
 	}
@@ -101,7 +101,7 @@ func websiteHandler(w http.ResponseWriter, r *http.Request) {
 
 //websiteListHandler returns all registered websites
 func websiteListHandler(w http.ResponseWriter, r *http.Request) {
-	L.Info("Receive" + r.Method + "websiteList Request from: " + r.RemoteAddr)
+	Logger.Info("Receive" + r.Method + "websiteList Request from: " + r.RemoteAddr)
 	var b []byte
 	var err error
 	switch r.Method {
@@ -116,7 +116,7 @@ func websiteListHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != nil {
-		_ = L.Error("Failed to serialize response:" + err.Error())
+		_ = Logger.Error("Failed to serialize response:" + err.Error())
 		_ = errorResponse(w, 500, "Internal Error : Failed to serialize response:"+err.Error())
 		return
 	}
@@ -134,7 +134,7 @@ func StartWebServer() {
 	r.HandleFunc("/website/{id}/start/", startHandler)
 
 	http.Handle("/", r)
-	_ = L.Info("Listening on", config.Port)
+	_ = Logger.Info("Listening on", config.Port)
 	go func() {
 		http.ListenAndServe(config.Port, nil)
 	}()

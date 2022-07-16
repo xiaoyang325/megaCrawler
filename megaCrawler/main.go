@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var L service.Logger
+var Logger service.Logger
 
 // CrawlerManager Program structures.
 // Define Start and Stop methods.
@@ -17,14 +17,14 @@ type CrawlerManager struct {
 	exit chan struct{}
 }
 
-func (c *CrawlerManager) Start(s service.Service) error {
+func (c *CrawlerManager) Start(_ service.Service) error {
 	if service.Interactive() {
-		err := L.Info("Running in terminal.")
+		err := Logger.Info("Running in terminal.")
 		if err != nil {
 			return err
 		}
 	} else {
-		err := L.Info("Running under service manager.")
+		err := Logger.Info("Running under service manager.")
 		if err != nil {
 			return err
 		}
@@ -37,7 +37,7 @@ func (c *CrawlerManager) Start(s service.Service) error {
 }
 
 func (c *CrawlerManager) run() error {
-	err := L.Infof("I'm running %v.", service.Platform())
+	err := Logger.Infof("I'm running %v.", service.Platform())
 	StartWebServer()
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (c *CrawlerManager) run() error {
 
 func (c *CrawlerManager) Stop(s service.Service) error {
 	// Any work in Stop should be quick, usually a few seconds at most.
-	err := L.Info("CrawlerManager are Stopping!")
+	err := Logger.Info("CrawlerManager are Stopping!")
 	if err != nil {
 		return err
 	}
@@ -106,7 +106,7 @@ func Start() {
 		log.Fatal(err)
 	}
 	errs := make(chan error, 5)
-	L, err = s.Logger(errs)
+	Logger, err = s.Logger(errs)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -131,6 +131,6 @@ func Start() {
 
 	err = s.Run()
 	if err != nil {
-		L.Error(err)
+		Logger.Error(err)
 	}
 }

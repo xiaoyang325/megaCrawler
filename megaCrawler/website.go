@@ -2,30 +2,36 @@ package megaCrawler
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/go-co-op/gocron"
 	"github.com/gocolly/colly/v2"
+	"github.com/gocolly/colly/v2/extensions"
+	"math/rand"
 	"megaCrawler/megaCrawler/commandImpl"
 	"megaCrawler/megaCrawler/config"
+	"net/url"
+	"os"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 )
 
 type websiteEngine struct {
 	Id           string
-	BaseUrl      string
+	BaseUrl      url.URL
 	IsRunning    bool
+	TotalUrl     int64
+	DoneUrl      int64
 	Scheduler    *gocron.Scheduler
+	LastUpdate   time.Time
 	UrlProcessor CollectorConstructor
-	UrlGetter    CollectorConstructor
 	Config       *config.Config
 	ProgressBar  string
 }
 
-type urlData struct {
-	url     string
-	lastMod time.Time
+type UrlData struct {
+	Url     string
+	LastMod time.Time
 }
 
 type SiteInfo struct {
@@ -35,89 +41,153 @@ type SiteInfo struct {
 	LastMod time.Time
 }
 
-func (w *websiteEngine) collectUrl() (url []urlData, err error) {
-	url = []urlData{}
-	c, err := w.UrlGetter.GetCollector()
+func (w *websiteEngine) AddUrl(url string, lastMod time.Time) {
+	w.UrlProcessor.websiteData <- UrlData{Url: url, LastMod: lastMod}
+}
+
+func (w *websiteEngine) GetCollector() (c *colly.Collector, ok error) {
+	cc := w.UrlProcessor
+	c = colly.NewCollector(
+		colly.ParseHTTPErrorResponse(),
+		colly.Async(true),
+	)
+	extensions.RandomUserAgent(c)
+
+	err := c.Limit(&colly.LimitRule{
+		RandomDelay: 5 * time.Second,
+		DomainGlob:  cc.domainGlob,
+		Parallelism: 16,
+	})
 	if err != nil {
-		L.Info("Could not get URLGetter for " + w.Id)
-		return url, errors.New("could not get URLGetter for" + "w.Id")
+		return nil, err
 	}
 
-	c.OnRequest(func(request *colly.Request) {
-		request.Ctx.Put("lastMod", time.Now())
-	})
+	for selector, htmlCallback := range cc.htmlHandlers {
+		c.OnHTML(selector, htmlCallback)
+	}
+	for selector, xmlCallback := range cc.xmlHandlers {
+		c.OnXML(selector, xmlCallback)
+	}
 
-	c.OnScraped(func(response *colly.Response) {
-		data := urlData{
-			url:     response.Ctx.Get("url"),
-			lastMod: response.Ctx.GetAny("lastMod").(time.Time),
+	c.OnError(func(r *colly.Response, err error) {
+		if err.Error() == "Bad Gateway" || err.Error() == "Not Found" || err.Error() == "Forbidden" {
+			atomic.AddInt64(&w.DoneUrl, 1)
+			return
 		}
-		url = append(url, data)
+		if err.Error() == "Too many requests" {
+			time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
+		}
+		left := retryRequest(r.Request, 5)
+		if left == 0 {
+			atomic.AddInt64(&w.DoneUrl, 1)
+			Logger.Errorf("Max retries exceed for %s: %s", r.Request.URL.String(), err.Error())
+		}
 	})
-
-	err = c.Visit(w.BaseUrl)
-	if err != nil {
-		return url, errors.New("Error Visiting starting url: " + err.Error())
-	}
-	c.Wait()
 	return
 }
 
-func (w *websiteEngine) processUrl(url []urlData) (data []SiteInfo, err error) {
-	c, err := w.UrlProcessor.GetCollector()
+func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
+	c, err := w.GetCollector()
+	w.UrlProcessor.websiteData = make(chan UrlData)
 	timeMap := map[string]time.Time{}
 	data = []SiteInfo{}
 
 	c.OnScraped(func(response *colly.Response) {
+		atomic.AddInt64(&w.DoneUrl, 1)
+		if response.Ctx.Get("title") == "" || response.Ctx.Get("content") == "" {
+			return
+		}
+		timeMutex.RLock()
+		k := timeMap[response.Request.URL.String()]
+		timeMutex.RUnlock()
+		if k.Equal(time.Unix(0, 0)) && response.Ctx.GetAny("time") != nil {
+			k = response.Ctx.GetAny("time").(time.Time)
+		}
 		data = append(data, SiteInfo{
 			Title:   response.Ctx.Get("title"),
 			Content: standardizeSpaces(response.Ctx.Get("content")),
 			Author:  response.Ctx.Get("author"),
-			LastMod: timeMap[response.Request.URL.String()],
+			LastMod: k,
 		})
 	})
 
-	for _, k := range url {
-		c.Visit(k.url)
-		timeMap[k.url] = k.lastMod
+	c.OnError(func(response *colly.Response, err error) {
+
+	})
+
+	go func() {
+		for true {
+			k := <-w.UrlProcessor.websiteData
+
+			if k.Url == "" {
+				break
+			}
+
+			if w.LastUpdate.Before(k.LastMod) {
+				u, err := w.BaseUrl.Parse(k.Url)
+				if err != nil {
+					continue
+				}
+				err = c.Visit(u.String())
+				if err != nil {
+					continue
+				}
+				timeMutex.Lock()
+				timeMap[k.Url] = k.LastMod
+				timeMutex.Unlock()
+				atomic.AddInt64(&w.TotalUrl, 1)
+			}
+		}
+	}()
+
+	for _, startingUrl := range w.UrlProcessor.startingUrls {
+		u, err := w.BaseUrl.Parse(startingUrl)
+		if err != nil {
+			continue
+		}
+		err = c.Visit(u.String())
+		if err != nil {
+			continue
+		}
 	}
+
 	c.Wait()
+	close(w.UrlProcessor.websiteData)
 	return
 }
 
 func StartEngine(w *websiteEngine) {
 	if w.IsRunning {
-		L.Info("Already running id \"" + w.Id + "\"")
+		Logger.Info("Already running id \"" + w.Id + "\"")
 		return
 	}
-	L.Info("Starting engine \"" + w.Id + "\"")
+	Logger.Info("Starting engine \"" + w.Id + "\"")
 	w.IsRunning = true
-	url, err := w.collectUrl()
+	w.TotalUrl = 0
+	w.DoneUrl = 0
+	data, err := w.processUrl()
 	if err != nil {
-		L.Error("Error when collecting url for id \"" + w.Id + "\" :" + err.Error())
+		Logger.Error("Error when processing url for id \"" + w.Id + "\": " + err.Error())
 	}
-	L.Info("Collected " + strconv.Itoa(len(url)) + " url from \"" + w.Id + "\"")
-	data, err := w.processUrl(url)
-	if err != nil {
-		L.Error("Error when processing url for id \"" + w.Id + "\" :" + err.Error())
-	}
-	L.Info("Processed " + strconv.Itoa(len(url)) + " url to " + strconv.Itoa(len(data)) + " data from \"" + w.Id + "\"")
+	Logger.Info("Processed " + strconv.Itoa(len(data)) + " data from \"" + w.Id + "\"")
 	err = saveToDB(data)
 	if err != nil {
-		L.Error("Error when saving to database for id \"" + w.Id + "\" :" + err.Error())
+		Logger.Error("Error when saving to database for id \"" + w.Id + "\": " + err.Error())
 	}
 	w.IsRunning = false
-	L.Info("Finished engine \"" + w.Id + "\"")
+	Logger.Info("Finished engine \"" + w.Id + "\"")
 }
 
 func (w *websiteEngine) ToStatus() (s commandImpl.WebsiteStatus) {
 	_, next := w.Scheduler.NextRun()
 	return commandImpl.WebsiteStatus{
 		Id:          w.Id,
-		BaseUrl:     w.BaseUrl,
+		BaseUrl:     w.BaseUrl.String(),
 		IsRunning:   w.IsRunning,
 		NextIter:    next,
 		ProgressBar: w.ProgressBar,
+		DoneUrl:     w.DoneUrl,
+		TotalUrl:    w.TotalUrl,
 	}
 }
 
@@ -127,17 +197,11 @@ func (w *websiteEngine) ToJson() (b []byte, err error) {
 	return
 }
 
-func NewEngine(id string, baseUrl string) (we *websiteEngine) {
+func NewEngine(id string, baseUrl url.URL) (we *websiteEngine) {
 	we = &websiteEngine{
-		Id:      id,
-		BaseUrl: baseUrl,
-		UrlGetter: CollectorConstructor{
-			parallelLimit: 16,
-			domainGlob:    "*",
-			timeout:       10 * time.Second,
-			htmlHandlers:  map[string]colly.HTMLCallback{},
-			xmlHandlers:   map[string]colly.XMLCallback{},
-		},
+		Id:         id,
+		BaseUrl:    baseUrl,
+		LastUpdate: time.Unix(0, 0),
 		UrlProcessor: CollectorConstructor{
 			parallelLimit: 16,
 			domainGlob:    "*",
@@ -157,5 +221,14 @@ func standardizeSpaces(s string) string {
 }
 
 func saveToDB(data []SiteInfo) (err error) {
+	file, err := os.Create("./json/iiss.json")
+	if err != nil {
+		return err
+	}
+	decoder := json.NewEncoder(file)
+	err = decoder.Encode(&data)
+	if err != nil {
+		return err
+	}
 	return nil
 }
