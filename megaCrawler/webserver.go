@@ -3,8 +3,8 @@ package megaCrawler
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"megaCrawler/commandImpl"
-	"megaCrawler/config"
+	"megaCrawler/megaCrawler/commandImpl"
+	"megaCrawler/megaCrawler/config"
 	"net/http"
 )
 

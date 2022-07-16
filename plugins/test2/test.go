@@ -2,7 +2,7 @@ package test2
 
 import (
 	"github.com/gocolly/colly/v2"
-	"megaCrawler"
+	"megaCrawler/megaCrawler"
 	"time"
 )
 

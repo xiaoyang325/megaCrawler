@@ -4,8 +4,8 @@ import (
 	"flag"
 	"github.com/kardianos/service"
 	"log"
-	"megaCrawler/commandImpl"
-	"megaCrawler/config"
+	commandImpl2 "megaCrawler/megaCrawler/commandImpl"
+	"megaCrawler/megaCrawler/config"
 	"time"
 )
 
@@ -76,17 +76,17 @@ func Start() {
 	flag.Parse()
 
 	if *listFlag {
-		commandImpl.List()
+		commandImpl2.List()
 		return
 	}
 
 	if *getFlag != "" {
-		commandImpl.Get(*getFlag)
+		commandImpl2.Get(*getFlag)
 		return
 	}
 
 	if *startFlag != "" {
-		commandImpl.Start(*startFlag)
+		commandImpl2.Start(*startFlag)
 		return
 	}
 

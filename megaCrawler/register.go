@@ -1,7 +1,7 @@
 package megaCrawler
 
 import (
-	"megaCrawler/config"
+	"megaCrawler/megaCrawler/config"
 	"sync"
 	"time"
 )
