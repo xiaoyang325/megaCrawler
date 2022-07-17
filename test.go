@@ -3,8 +3,7 @@ package main
 import (
 	"megaCrawler/megaCrawler"
 )
-import _ "megaCrawler/plugins/test"
-import _ "megaCrawler/plugins/iiss"
+import _ "megaCrawler/plugins/hudson"
 
 func main() {
 	megaCrawler.Start()

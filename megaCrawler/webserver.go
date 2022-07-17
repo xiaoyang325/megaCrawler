@@ -30,7 +30,7 @@ import (
 //}
 
 func startHandler(w http.ResponseWriter, r *http.Request) {
-	_ = Logger.Info("Receive" + r.Method + "startHandler Request from: " + r.RemoteAddr)
+	_ = Logger.Info("Receive " + r.Method + " startHandler Request from: " + r.RemoteAddr)
 	var b []byte
 	var err error
 	switch r.Method {
@@ -65,7 +65,7 @@ func startHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func websiteHandler(w http.ResponseWriter, r *http.Request) {
-	_ = Logger.Info("Receive" + r.Method + "websiteHandler Request from: " + r.RemoteAddr)
+	_ = Logger.Info("Receive " + r.Method + " websiteHandler Request from: " + r.RemoteAddr)
 	var b []byte
 	var err error
 	switch r.Method {
@@ -101,7 +101,7 @@ func websiteHandler(w http.ResponseWriter, r *http.Request) {
 
 //websiteListHandler returns all registered websites
 func websiteListHandler(w http.ResponseWriter, r *http.Request) {
-	Logger.Info("Receive" + r.Method + "websiteList Request from: " + r.RemoteAddr)
+	Logger.Info("Receive " + r.Method + " websiteList Request from: " + r.RemoteAddr)
 	var b []byte
 	var err error
 	switch r.Method {

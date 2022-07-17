@@ -31,8 +31,7 @@ type WebsiteStatus struct {
 	IsRunning   bool      `json:"isRunning"`
 	NextIter    time.Time `json:"nextIter"`
 	ProgressBar string    `json:"progressBar"`
-	TotalUrl    int64     `json:"totalUrl"`
-	DoneUrl     int64     `json:"doneUrl"`
+	Bar         string    `json:"bar"`
 }
 
 type ErrorResp struct {

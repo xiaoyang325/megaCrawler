@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	s := megaCrawler.Register("iiss", "https://www.iiss.org/")
+	s := megaCrawler.Register("hudson", "https://www.iiss.org/")
 	s.UrlProcessor.OnXML("//urlset/url", func(e *colly.XMLElement) {
 		k, err := time.Parse("2006-01-02", e.ChildText("lastmod"))
 		if err != nil {
@@ -17,18 +17,18 @@ func init() {
 			}
 		}
 		s.AddUrl(e.ChildText("loc"), k)
-	}).SetStartingUrls([]string{"/sitemap.xml/"})
+	}).SetStartingUrls([]string{"/sitemap.xml"})
 
 	s.UrlProcessor.OnHTML("meta[property=\"og:title\"]", func(element *colly.HTMLElement) {
 		element.Request.Ctx.Put("title", element.Attr("content"))
 	})
 
-	s.UrlProcessor.OnHTML(".richtext > span > p > span", func(element *colly.HTMLElement) {
-		script := element.ChildText("script")
-		if script != "" {
-			return
-		}
-		str := element.Request.Ctx.Get("content")
+	s.UrlProcessor.OnHTML(".richtext", func(element *colly.HTMLElement) {
+		element.Request.Ctx.Put("content", element.Text)
+	})
+
+	s.UrlProcessor.OnHTML(".person__name", func(element *colly.HTMLElement) {
+		str := element.Request.Ctx.Get("author")
 		element.Request.Ctx.Put("content", str+"\n"+element.Text)
 	})
 }

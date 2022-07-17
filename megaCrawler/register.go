@@ -9,7 +9,7 @@ import (
 
 var (
 	WebMap    = make(map[string]*websiteEngine)
-	nextTime  = time.Now().Add(1 * time.Hour)
+	nextTime  = time.Now().Add(10 * time.Second)
 	timeMutex = sync.RWMutex{}
 )
 
@@ -37,6 +37,7 @@ func Register(service string, baseUrl string) *websiteEngine {
 		engine.Scheduler.StartAsync()
 		timeMutex.Unlock()
 	}()
+
 	WebMap[service] = engine
 	return engine
 }

@@ -5,14 +5,14 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/extensions"
+	"github.com/schollz/progressbar/v3"
+	"io/ioutil"
 	"math/rand"
 	"megaCrawler/megaCrawler/commandImpl"
 	"megaCrawler/megaCrawler/config"
 	"net/url"
 	"os"
-	"strconv"
 	"strings"
-	"sync/atomic"
 	"time"
 )
 
@@ -20,8 +20,7 @@ type websiteEngine struct {
 	Id           string
 	BaseUrl      url.URL
 	IsRunning    bool
-	TotalUrl     int64
-	DoneUrl      int64
+	bar          *progressbar.ProgressBar
 	Scheduler    *gocron.Scheduler
 	LastUpdate   time.Time
 	UrlProcessor CollectorConstructor
@@ -71,15 +70,15 @@ func (w *websiteEngine) GetCollector() (c *colly.Collector, ok error) {
 
 	c.OnError(func(r *colly.Response, err error) {
 		if err.Error() == "Bad Gateway" || err.Error() == "Not Found" || err.Error() == "Forbidden" {
-			atomic.AddInt64(&w.DoneUrl, 1)
+			w.bar.Add(1)
 			return
 		}
 		if err.Error() == "Too many requests" {
 			time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
 		}
-		left := retryRequest(r.Request, 5)
+		left := retryRequest(r.Request, 10)
 		if left == 0 {
-			atomic.AddInt64(&w.DoneUrl, 1)
+			w.bar.Add(1)
 			Logger.Errorf("Max retries exceed for %s: %s", r.Request.URL.String(), err.Error())
 		}
 	})
@@ -93,8 +92,14 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 	data = []SiteInfo{}
 
 	c.OnScraped(func(response *colly.Response) {
-		atomic.AddInt64(&w.DoneUrl, 1)
+		if strings.Contains(response.Ctx.Get("title"), "Internal server error") {
+			time.Sleep(10 * time.Second)
+			response.Request.Retry()
+			return
+		}
+		w.bar.Add(1)
 		if response.Ctx.Get("title") == "" || response.Ctx.Get("content") == "" {
+			println(response.Request.URL.String(), response.Ctx.Get("title"), response.Ctx.Get("content"))
 			return
 		}
 		timeMutex.RLock()
@@ -104,9 +109,9 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 			k = response.Ctx.GetAny("time").(time.Time)
 		}
 		data = append(data, SiteInfo{
-			Title:   response.Ctx.Get("title"),
+			Title:   standardizeSpaces(response.Ctx.Get("title")),
 			Content: standardizeSpaces(response.Ctx.Get("content")),
-			Author:  response.Ctx.Get("author"),
+			Author:  standardizeSpaces(response.Ctx.Get("author")),
 			LastMod: k,
 		})
 	})
@@ -135,17 +140,13 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 				timeMutex.Lock()
 				timeMap[k.Url] = k.LastMod
 				timeMutex.Unlock()
-				atomic.AddInt64(&w.TotalUrl, 1)
+				w.bar.ChangeMax64(w.bar.GetMax64() + 1)
 			}
 		}
 	}()
 
 	for _, startingUrl := range w.UrlProcessor.startingUrls {
-		u, err := w.BaseUrl.Parse(startingUrl)
-		if err != nil {
-			continue
-		}
-		err = c.Visit(u.String())
+		err = c.Visit(startingUrl)
 		if err != nil {
 			continue
 		}
@@ -163,13 +164,14 @@ func StartEngine(w *websiteEngine) {
 	}
 	Logger.Info("Starting engine \"" + w.Id + "\"")
 	w.IsRunning = true
-	w.TotalUrl = 0
-	w.DoneUrl = 0
+	w.bar.Set(0)
+	w.bar.ChangeMax(0)
+	w.bar.Reset()
 	data, err := w.processUrl()
 	if err != nil {
 		Logger.Error("Error when processing url for id \"" + w.Id + "\": " + err.Error())
 	}
-	Logger.Info("Processed " + strconv.Itoa(len(data)) + " data from \"" + w.Id + "\"")
+	Logger.Infof("Processed %d data from \"%s\" in %s", len(data), w.Id, shortDur(time.Duration(w.bar.State().SecondsSince)*time.Second))
 	err = saveToDB(data)
 	if err != nil {
 		Logger.Error("Error when saving to database for id \"" + w.Id + "\": " + err.Error())
@@ -186,8 +188,7 @@ func (w *websiteEngine) ToStatus() (s commandImpl.WebsiteStatus) {
 		IsRunning:   w.IsRunning,
 		NextIter:    next,
 		ProgressBar: w.ProgressBar,
-		DoneUrl:     w.DoneUrl,
-		TotalUrl:    w.TotalUrl,
+		Bar:         w.bar.String(),
 	}
 }
 
@@ -212,6 +213,21 @@ func NewEngine(id string, baseUrl url.URL) (we *websiteEngine) {
 		IsRunning:   false,
 		ProgressBar: "",
 		Scheduler:   gocron.NewScheduler(time.Local),
+		bar: progressbar.NewOptions(
+			0,
+			progressbar.OptionSetWriter(ioutil.Discard),
+			progressbar.OptionEnableColorCodes(true),
+			progressbar.OptionShowIts(),
+			progressbar.OptionShowCount(),
+			progressbar.OptionSetDescription("[progress] scrapping the internet..."),
+			progressbar.OptionSetTheme(progressbar.Theme{
+				Saucer:        "[green]=[reset]",
+				SaucerHead:    "[green]>[reset]",
+				SaucerPadding: " ",
+				BarStart:      "[",
+				BarEnd:        "]",
+			}),
+		),
 	}
 	return
 }
@@ -222,8 +238,12 @@ func standardizeSpaces(s string) string {
 
 func saveToDB(data []SiteInfo) (err error) {
 	file, err := os.Create("./json/iiss.json")
-	if err != nil {
-		return err
+	if os.IsNotExist(err) {
+		err = os.MkdirAll("./json/", 0700)
+		if err != nil {
+			return err
+		}
+		return saveToDB(data)
 	}
 	decoder := json.NewEncoder(file)
 	err = decoder.Encode(&data)

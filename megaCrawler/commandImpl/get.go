@@ -1,7 +1,6 @@
 package commandImpl
 
 import (
-	"github.com/schollz/progressbar/v3"
 	"time"
 )
 
@@ -16,9 +15,7 @@ func Get(id string) {
 	println("Running?   :", website.IsRunning)
 	println("Next Run at:", website.NextIter.Format(time.RFC3339))
 	if website.IsRunning {
-		bar := progressbar.Default(website.TotalUrl)
-		bar.Add64(website.DoneUrl)
+		println(website.Bar)
 	}
-	println(website.TotalUrl, website.DoneUrl)
 	return
 }
