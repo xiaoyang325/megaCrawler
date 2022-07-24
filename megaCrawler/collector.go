@@ -10,13 +10,19 @@ type CollectorConstructor struct {
 	domainGlob    string
 	timeout       time.Duration
 	startingUrls  []string
+	robotTxt      string
 	htmlHandlers  map[string]colly.HTMLCallback
 	xmlHandlers   map[string]colly.XMLCallback
-	websiteData   chan UrlData
+	UrlData       chan UrlData
 }
 
 func (cc *CollectorConstructor) SetStartingUrls(urls []string) *CollectorConstructor {
 	cc.startingUrls = urls
+	return cc
+}
+
+func (cc *CollectorConstructor) FromRobotTxt(url string) *CollectorConstructor {
+	cc.robotTxt = url
 	return cc
 }
 
@@ -47,7 +53,7 @@ func retryRequest(r *colly.Request, maxRetries int) int {
 	}
 	if retriesLeft > 0 {
 		r.Ctx.Put("retriesLeft", retriesLeft-1)
-		r.Retry()
+		_ = r.Retry()
 	}
 	return retriesLeft
 }

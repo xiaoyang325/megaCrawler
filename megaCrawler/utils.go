@@ -22,7 +22,7 @@ func contain[T comparable](slice []T, check T) bool {
 }
 
 func mapToKeySlice[T any](m map[string]T) (slice []string) {
-	for s, _ := range m {
+	for s := range m {
 		slice = append(slice, s)
 	}
 	return
@@ -66,4 +66,8 @@ func shortDur(d time.Duration) string {
 		s = s[:len(s)-2]
 	}
 	return s
+}
+
+func StandardizeSpaces(s string) string {
+	return strings.Join(strings.Fields(s), " ")
 }

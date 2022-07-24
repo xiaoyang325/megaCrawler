@@ -10,6 +10,7 @@ import (
 )
 
 var Logger service.Logger
+var Debug = false
 
 // CrawlerManager Program structures.
 // Define Start and Stop methods.
@@ -32,7 +33,12 @@ func (c *CrawlerManager) Start(_ service.Service) error {
 	c.exit = make(chan struct{})
 
 	// Start should not block. Do the actual work async.
-	go c.run()
+	go func() {
+		err := c.run()
+		if err != nil {
+			panic(err)
+		}
+	}()
 	return nil
 }
 
@@ -53,7 +59,7 @@ func (c *CrawlerManager) run() error {
 	}
 }
 
-func (c *CrawlerManager) Stop(s service.Service) error {
+func (c *CrawlerManager) Stop(_ service.Service) error {
 	// Any work in Stop should be quick, usually a few seconds at most.
 	err := Logger.Info("CrawlerManager are Stopping!")
 	if err != nil {
@@ -73,7 +79,10 @@ func Start() {
 	listFlag := flag.Bool("list", false, "List all current registered websites.")
 	getFlag := flag.String("get", "", "Get the status of the selected website.")
 	startFlag := flag.String("start", "", "Launch the selected website now.")
+	debugFlag := flag.Bool("debug", false, "Show debug log that will spam console")
 	flag.Parse()
+
+	Debug = *debugFlag
 
 	if *listFlag {
 		commandImpl2.List()
@@ -131,6 +140,6 @@ func Start() {
 
 	err = s.Run()
 	if err != nil {
-		Logger.Error(err)
+		_ = Logger.Error(err)
 	}
 }
