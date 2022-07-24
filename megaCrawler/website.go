@@ -164,7 +164,7 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 
 			if w.LastUpdate.Before(k.LastMod) {
 				u, err := w.BaseUrl.Parse(k.Url)
-				if err != nil {
+				if err != nil || u.Host != w.BaseUrl.Host {
 					continue
 				}
 				err = c.Visit(u.String())
