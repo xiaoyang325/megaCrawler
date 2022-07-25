@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	s := megaCrawler.Register("brooking", "https://www.brookings.edu/").
+	s := megaCrawler.Register("brooking", "布鲁金斯学会", "https://www.brookings.edu/").
 		FromRobotTxt("https://www.brookings.edu/robots.txt").
 		SetTimeout(20 * time.Second)
 

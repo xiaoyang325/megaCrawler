@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	s := megaCrawler.Register("hudson", "https://www.iiss.org/")
+	s := megaCrawler.Register("iiss", "国际战略研究所", "https://www.iiss.org/")
 	s.UrlProcessor.OnXML("//urlset/url", func(e *colly.XMLElement) {
 		k, err := time.Parse("2006-01-02", e.ChildText("lastmod"))
 		if err != nil {

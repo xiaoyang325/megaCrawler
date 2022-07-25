@@ -6,14 +6,15 @@ import (
 )
 
 type CollectorConstructor struct {
-	parallelLimit int
-	domainGlob    string
-	timeout       time.Duration
-	startingUrls  []string
-	robotTxt      string
-	htmlHandlers  map[string]colly.HTMLCallback
-	xmlHandlers   map[string]colly.XMLCallback
-	UrlData       chan UrlData
+	parallelLimit    int
+	domainGlob       string
+	timeout          time.Duration
+	startingUrls     []string
+	robotTxt         string
+	htmlHandlers     map[string]colly.HTMLCallback
+	xmlHandlers      map[string]colly.XMLCallback
+	responseHandlers []colly.ResponseCallback
+	UrlData          chan UrlData
 }
 
 func (cc *CollectorConstructor) SetStartingUrls(urls []string) *CollectorConstructor {
@@ -43,6 +44,11 @@ func (cc *CollectorConstructor) OnHTML(querySelector string, callback colly.HTML
 
 func (cc *CollectorConstructor) OnXML(querySelector string, callback colly.XMLCallback) *CollectorConstructor {
 	cc.xmlHandlers[querySelector] = callback
+	return cc
+}
+
+func (cc *CollectorConstructor) OnResponse(callback colly.ResponseCallback) *CollectorConstructor {
+	cc.responseHandlers = append(cc.responseHandlers, callback)
 	return cc
 }
 

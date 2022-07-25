@@ -6,6 +6,7 @@ import (
 	"megaCrawler/megaCrawler/commandImpl"
 	"megaCrawler/megaCrawler/config"
 	"net/http"
+	"sort"
 )
 
 //func Template(w http.ResponseWriter, r *http.Request) {
@@ -113,7 +114,19 @@ func websiteListHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
 		var k []commandImpl.WebsiteStatus
-		for _, engine := range WebMap {
+		s := make([]*websiteEngine, 0, len(WebMap))
+
+		for _, d := range WebMap {
+			s = append(s, d)
+		}
+
+		sort.Slice(s, func(i, j int) bool {
+			_, nextI := s[i].Scheduler.NextRun()
+			_, nextJ := s[j].Scheduler.NextRun()
+			return nextJ.After(nextI)
+		})
+
+		for _, engine := range s {
 			k = append(k, engine.ToStatus())
 		}
 		b, err = json.Marshal(k)

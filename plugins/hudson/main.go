@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	s := megaCrawler.Register("hudson", "https://www.hudson.org/").
+	s := megaCrawler.Register("hudson", "哈德森研究所", "https://www.hudson.org/").
 		SetStartingUrls([]string{"https://www.hudson.org/sitemap.xml"}).
 		SetTimeout(20 * time.Second)
 

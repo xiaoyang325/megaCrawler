@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	s := megaCrawler.Register("cfr", "https://www.cfr.org/").
+	s := megaCrawler.Register("cfr", "美国外交关系协会", "https://www.cfr.org/").
 		SetStartingUrls([]string{"https://www.cfr.org/sitemap.xml"}).
 		SetTimeout(20 * time.Second)
 

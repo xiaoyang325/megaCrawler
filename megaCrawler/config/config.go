@@ -12,6 +12,7 @@ type Config struct {
 	Id       string    `json:"id"`
 	LastIter time.Time `json:"lastIter"`
 	Disabled bool      `json:"disabled"`
+	Name     string    `json:"name"`
 }
 
 type CfgMap map[string]Config

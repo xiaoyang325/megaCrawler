@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	s := megaCrawler.Register("cnas", "https://www.cnas.org/").
+	s := megaCrawler.Register("cnas", "新美国安全中心", "https://www.cnas.org/").
 		SetStartingUrls([]string{"https://www.cnas.org/sitemap.xml"}).
 		SetTimeout(20 * time.Second)
 
@@ -16,7 +16,7 @@ func init() {
 	})
 
 	s.OnXML("//sitemapindex/sitemap", func(e *colly.XMLElement) {
-		s.AddUrl(e.ChildText("loc"), time.Now())
+		s.AddUrl(e.Text, time.Now())
 	})
 
 	s.OnHTML("meta[property=\"og:title\"]", func(element *colly.HTMLElement) {
@@ -27,8 +27,12 @@ func init() {
 		element.Request.Ctx.Put("title", element.Text)
 	})
 
-	s.OnHTML(".mainbar", func(element *colly.HTMLElement) {
-		element.Request.Ctx.Put("content", element.Text)
+	s.OnHTML("div[id=\"mainbar\"]", func(element *colly.HTMLElement) {
+		megaCrawler.SetContent(element, element.Text)
+	})
+
+	s.OnHTML(".margin-vertical", func(element *colly.HTMLElement) {
+		megaCrawler.SetContent(element, element.Text)
 	})
 
 	s.OnHTML(".margin-bottom-1em", func(element *colly.HTMLElement) {

@@ -37,14 +37,17 @@ type UrlData struct {
 }
 
 type SiteInfo struct {
-	Title   string
-	Content string
-	Author  string
-	LastMod time.Time
+	Title   string    `json:"title"`
+	Content string    `json:"content"`
+	Author  string    `json:"author"`
+	LastMod time.Time `json:"lastMod"`
+	Url     string    `json:"url"`
 }
 
 func (w *websiteEngine) AddUrl(url string, lastMod time.Time) {
-	w.UrlProcessor.UrlData <- UrlData{Url: url, LastMod: lastMod}
+	if url != "" {
+		w.UrlProcessor.UrlData <- UrlData{Url: StandardizeSpaces(url), LastMod: lastMod}
+	}
 }
 
 func (w *websiteEngine) OnHTML(querySelector string, callback colly.HTMLCallback) *websiteEngine {
@@ -54,6 +57,11 @@ func (w *websiteEngine) OnHTML(querySelector string, callback colly.HTMLCallback
 
 func (w *websiteEngine) OnXML(querySelector string, callback colly.XMLCallback) *websiteEngine {
 	w.UrlProcessor.xmlHandlers[querySelector] = callback
+	return w
+}
+
+func (w *websiteEngine) OnResponse(callback colly.ResponseCallback) *websiteEngine {
+	w.UrlProcessor.responseHandlers = append(w.UrlProcessor.responseHandlers, callback)
 	return w
 }
 
@@ -99,6 +107,9 @@ func (w *websiteEngine) GetCollector() (c *colly.Collector, ok error) {
 	for selector, xmlCallback := range cc.xmlHandlers {
 		c.OnXML(selector, xmlCallback)
 	}
+	for _, handler := range cc.responseHandlers {
+		c.OnResponse(handler)
+	}
 
 	c.OnError(func(r *colly.Response, err error) {
 		if err.Error() == "Bad Gateway" || err.Error() == "Not Found" || err.Error() == "Forbidden" {
@@ -109,9 +120,12 @@ func (w *websiteEngine) GetCollector() (c *colly.Collector, ok error) {
 			time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
 		}
 		left := retryRequest(r.Request, 10)
+
 		if left == 0 {
 			_ = w.bar.Add(1)
 			_ = Logger.Errorf("Max retries exceed for %s: %s", r.Request.URL.String(), err.Error())
+		} else if Debug {
+			_ = Logger.Errorf("Website error tries %d for %s: %s", left, r.Request.URL.String(), err.Error())
 		}
 	})
 	return
@@ -132,7 +146,7 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 		_ = w.bar.Add(1)
 		if response.Ctx.Get("title") == "" || response.Ctx.Get("content") == "" {
 			if Debug {
-				_ = Logger.Infof("Missing Data from %s, title: %s, content length: %d", response.Request.URL.String(), response.Ctx.Get("title"), len(response.Ctx.Get("content")))
+				_ = Logger.Infof("Missing Data from %s, title: %s, content length: %d", response.Request.URL.String(), StandardizeSpaces(response.Ctx.Get("title")), len(response.Ctx.Get("content")))
 			}
 			return
 		}
@@ -146,12 +160,9 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 			Title:   StandardizeSpaces(response.Ctx.Get("title")),
 			Content: StandardizeSpaces(response.Ctx.Get("content")),
 			Author:  StandardizeSpaces(response.Ctx.Get("author")),
+			Url:     response.Request.URL.String(),
 			LastMod: k,
 		})
-	})
-
-	c.OnError(func(response *colly.Response, err error) {
-
 	})
 
 	go func() {
@@ -249,6 +260,8 @@ func (w *websiteEngine) ToStatus() (s commandImpl.WebsiteStatus) {
 		NextIter:    next,
 		ProgressBar: w.ProgressBar,
 		Bar:         w.bar.String(),
+		Name:        w.Config.Name,
+		IterPerSec:  w.bar.State().KBsPerSecond * 1024,
 	}
 }
 

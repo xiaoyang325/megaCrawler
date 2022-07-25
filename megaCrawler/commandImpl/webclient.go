@@ -32,6 +32,8 @@ type WebsiteStatus struct {
 	NextIter    time.Time `json:"nextIter"`
 	ProgressBar string    `json:"progressBar"`
 	Bar         string    `json:"bar"`
+	Name        string    `json:"name"`
+	IterPerSec  float64   `json:"iterPerSec"`
 }
 
 type ErrorResp struct {

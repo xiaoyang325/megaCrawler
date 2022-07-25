@@ -14,7 +14,7 @@ var (
 )
 
 // Register 注册插件控制器
-func Register(service string, baseUrl string) *websiteEngine {
+func Register(service string, name string, baseUrl string) *websiteEngine {
 	k, err := url.Parse(baseUrl)
 	if err != nil {
 		panic(err)
@@ -25,6 +25,7 @@ func Register(service string, baseUrl string) *websiteEngine {
 			Id:       service,
 			LastIter: time.Time{},
 			Disabled: false,
+			Name:     name,
 		}
 		config.Configs[service] = *engine.Config
 	} else {
@@ -33,7 +34,7 @@ func Register(service string, baseUrl string) *websiteEngine {
 	go func() {
 		timeMutex.Lock()
 		engine.Scheduler.Every(168).Hour().StartAt(nextTime).Do(StartEngine, engine)
-		nextTime = nextTime.Add(10 * time.Minute)
+		nextTime = nextTime.Add(1 * time.Minute)
 		engine.Scheduler.StartAsync()
 		timeMutex.Unlock()
 	}()

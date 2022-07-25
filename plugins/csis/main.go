@@ -7,8 +7,8 @@ import (
 )
 
 func init() {
-	s := megaCrawler.Register("csis", "https://www.csis.org/").
-		SetStartingUrls([]string{"https://www.csis.org/analysis"}).
+	s := megaCrawler.Register("csis", "战略与国际研究中心", "https://www.csis.org/").
+		SetStartingUrls([]string{"https://www.csis.org/analysis?&field_categories_field_regions%5B0%5D=797"}).
 		SetTimeout(20 * time.Second)
 
 	s.OnHTML(".ds-right", func(element *colly.HTMLElement) {
@@ -18,6 +18,10 @@ func init() {
 			t = time.Now()
 		}
 		s.AddUrl(element.ChildAttr(".teaser__title > a", "href"), t)
+	})
+
+	s.OnHTML(".pager__link", func(element *colly.HTMLElement) {
+		s.AddUrl(element.Attr("href"), time.Now())
 	})
 
 	s.OnHTML("meta[property=\"og:title\"]", func(element *colly.HTMLElement) {

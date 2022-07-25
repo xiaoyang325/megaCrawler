@@ -10,6 +10,7 @@ func Get(id string) {
 		println("Service not launched or Invalid :" + err.Error())
 		return
 	}
+	println("Website Name:", website.Name)
 	println("Website  id:", website.Id)
 	println("Website Url:", website.BaseUrl)
 	println("Running?   :", website.IsRunning)

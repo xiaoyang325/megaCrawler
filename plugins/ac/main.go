@@ -1,4 +1,4 @@
-package atlanticcouncil
+package ac
 
 import (
 	"github.com/gocolly/colly/v2"
@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	s := megaCrawler.Register("atlanticcouncil", "https://www.atlanticcouncil.org/").
+	s := megaCrawler.Register("ac", "大西洋理事会", "https://www.atlanticcouncil.org/").
 		SetStartingUrls([]string{"https://www.atlanticcouncil.org/sitemap_index.xml"}).
 		SetTimeout(20 * time.Second)
 

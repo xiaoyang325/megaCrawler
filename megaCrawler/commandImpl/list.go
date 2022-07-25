@@ -14,23 +14,40 @@ func List() {
 		return
 	}
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Num", "ID", "Next Iter", "Running?"})
-	table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
-	table.SetAlignment(tablewriter.ALIGN_LEFT)
+	iter := 0.0
 	for i, website := range websites {
 		if website.IsRunning {
 			table.Rich(
 				[]string{strconv.Itoa(i), website.Id, website.NextIter.Format(time.RFC3339), strconv.FormatBool(website.IsRunning)},
 				[]tablewriter.Colors{
-					{tablewriter.Bold, tablewriter.FgGreenColor},
-					{tablewriter.Bold, tablewriter.FgGreenColor},
-					{tablewriter.Bold, tablewriter.FgGreenColor},
-					{tablewriter.Bold, tablewriter.FgGreenColor},
+					{},
+					{},
+					{},
+					{tablewriter.Bold, tablewriter.FgHiGreenColor, tablewriter.UnderlineSingle},
 				},
 			)
+			iter += website.IterPerSec
 		} else {
-			table.Append([]string{strconv.Itoa(i), website.Id, website.NextIter.Format(time.RFC3339), strconv.FormatBool(website.IsRunning)})
+			table.Rich(
+				[]string{strconv.Itoa(i), website.Id, website.NextIter.Format(time.RFC3339), strconv.FormatBool(website.IsRunning)},
+				[]tablewriter.Colors{
+					{},
+					{},
+					{},
+					{tablewriter.Bold, tablewriter.FgHiRedColor, tablewriter.UnderlineSingle},
+				},
+			)
 		}
 	}
+	table.SetHeader([]string{"Num", "ID", "Next Iter", "Running?"})
+	table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
+	table.SetAlignment(tablewriter.ALIGN_LEFT)
+	table.SetFooter([]string{"", "", "Total Iter/s", strconv.FormatFloat(iter, 'E', -1, 64)})
+	table.SetBorder(false)
+	table.SetCenterSeparator(" ")
+	table.SetColumnSeparator(" ")
+	table.SetHeaderColor(tablewriter.Color(tablewriter.FgHiWhiteColor), tablewriter.Color(tablewriter.FgHiWhiteColor), tablewriter.Color(tablewriter.FgHiWhiteColor), tablewriter.Color(tablewriter.FgHiWhiteColor))
+	table.SetColumnColor(tablewriter.Color(tablewriter.FgHiYellowColor), tablewriter.Color(tablewriter.FgHiWhiteColor), tablewriter.Color(tablewriter.FgHiWhiteColor), tablewriter.Color(tablewriter.FgHiWhiteColor))
+	table.SetFooterColor(tablewriter.Color(), tablewriter.Color(), tablewriter.Color(tablewriter.BgHiWhiteColor, tablewriter.FgHiBlackColor), tablewriter.Color(tablewriter.BgHiWhiteColor, tablewriter.FgHiBlackColor))
 	table.Render()
 }
