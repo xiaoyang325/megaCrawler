@@ -91,12 +91,15 @@ func (w *websiteEngine) GetCollector() (c *colly.Collector, ok error) {
 		colly.Async(true),
 	)
 	extensions.RandomUserAgent(c)
+	extensions.Referer(c)
 
 	err := c.Limit(&colly.LimitRule{
 		RandomDelay: 5 * time.Second,
 		DomainGlob:  cc.domainGlob,
 		Parallelism: 16,
 	})
+
+	c.SetRequestTimeout(cc.timeout)
 	if err != nil {
 		return nil, err
 	}
@@ -173,20 +176,18 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 				break
 			}
 
-			if w.LastUpdate.Before(k.LastMod) {
-				u, err := w.BaseUrl.Parse(k.Url)
-				if err != nil || u.Host != w.BaseUrl.Host {
-					continue
-				}
-				err = c.Visit(u.String())
-				if err != nil {
-					continue
-				}
-				timeMutex.Lock()
-				timeMap[k.Url] = k.LastMod
-				timeMutex.Unlock()
-				w.bar.ChangeMax64(w.bar.GetMax64() + 1)
+			u, err := w.BaseUrl.Parse(k.Url)
+			if err != nil || u.Host != w.BaseUrl.Host {
+				continue
 			}
+			err = c.Visit(u.String())
+			if err != nil {
+				continue
+			}
+			timeMutex.Lock()
+			timeMap[k.Url] = k.LastMod
+			timeMutex.Unlock()
+			w.bar.ChangeMax64(w.bar.GetMax64() + 1)
 		}
 	}()
 

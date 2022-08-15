@@ -8,11 +8,12 @@ import (
 
 func init() {
 	s := megaCrawler.Register("iiss", "国际战略研究所", "https://www.iiss.org/")
+
 	s.UrlProcessor.OnXML("//urlset/url", func(e *colly.XMLElement) {
 		k, err := time.Parse("2006-01-02", e.ChildText("lastmod"))
 		if err != nil {
 			if err != nil {
-				megaCrawler.Logger.Errorf("Error when parsing %s to time: %s", e.ChildText("lastmod"), err.Error())
+				_ = megaCrawler.Logger.Errorf("Error when parsing %s to time: %s", e.ChildText("lastmod"), err.Error())
 				k = time.Unix(0, 0)
 			}
 		}

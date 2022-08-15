@@ -23,6 +23,14 @@ func SetAuthor(h *colly.HTMLElement, author string) {
 	h.Request.Ctx.Put("author", author)
 }
 
+func AppendAuthor(h *colly.HTMLElement, author string) {
+	if h.Request.Ctx.Get("author") == "" {
+		h.Request.Ctx.Put("author", author)
+	} else {
+		h.Request.Ctx.Put("author", h.Request.Ctx.Get("author")+", "+author)
+	}
+}
+
 func SetTime(h *colly.HTMLElement, t time.Time) {
 	h.Request.Ctx.Put("time", t)
 }
