@@ -37,6 +37,10 @@ func init() {
 		megaCrawler.SetContent(element, element.Text)
 	})
 
+	s.OnHTML(".containerInner", func(element *colly.HTMLElement) {
+		megaCrawler.SetContent(element, element.Text)
+	})
+
 	s.OnHTML(".remove-p", func(element *colly.HTMLElement) {
 		megaCrawler.AppendAuthor(element, strings.Replace(element.Text, "Publisher:", "", 1))
 	})

@@ -14,7 +14,7 @@ func init() {
 		if err != nil {
 			if err != nil {
 				_ = megaCrawler.Logger.Errorf("Error when parsing %s to time: %s", e.ChildText("lastmod"), err.Error())
-				k = time.Unix(0, 0)
+				k = time.Now()
 			}
 		}
 		s.AddUrl(e.ChildText("loc"), k)

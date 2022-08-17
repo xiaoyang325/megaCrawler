@@ -50,6 +50,11 @@ func (w *websiteEngine) AddUrl(url string, lastMod time.Time) {
 	}
 }
 
+func (w *websiteEngine) OnLaunch(callback func()) *websiteEngine {
+	w.UrlProcessor.launchHandler = callback
+	return w
+}
+
 func (w *websiteEngine) OnHTML(querySelector string, callback colly.HTMLCallback) *websiteEngine {
 	w.UrlProcessor.htmlHandlers[querySelector] = callback
 	return w
@@ -156,7 +161,7 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 		timeMutex.RLock()
 		k := timeMap[response.Request.URL.String()]
 		timeMutex.RUnlock()
-		if k.Equal(time.Unix(0, 0)) && response.Ctx.GetAny("time") != nil {
+		if response.Ctx.GetAny("time") != nil {
 			k = response.Ctx.GetAny("time").(time.Time)
 		}
 		data = append(data, SiteInfo{
@@ -191,12 +196,17 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 		}
 	}()
 
+	if w.UrlProcessor.launchHandler != nil {
+		go w.UrlProcessor.launchHandler()
+	}
+
 	for _, startingUrl := range w.UrlProcessor.startingUrls {
 		err = c.Visit(startingUrl)
 		if err != nil {
 			continue
 		}
 	}
+
 	if w.UrlProcessor.robotTxt != "" {
 		resp, err := http.Get(w.UrlProcessor.robotTxt)
 		if err != nil {

@@ -1,7 +1,18 @@
 package main
 
 import (
-	_ "megaCrawler/plugins/spf"
+	_ "megaCrawler/plugins/ecfr"
+	//_ "megaCrawler/plugins/amnesty"
+	//_ "megaCrawler/plugins/chh"
+	//_ "megaCrawler/plugins/cgai"
+	//_ "megaCrawler/plugins/thecic"
+	//_ "megaCrawler/plugins/idrc"
+	//_ "megaCrawler/plugins/cftni"
+	//_ "megaCrawler/plugins/cigi"
+	//_ "megaCrawler/plugins/p2049"
+	//_ "megaCrawler/plugins/pile"
+	//_ "megaCrawler/plugins/nrl"
+	//_ "megaCrawler/plugins/spf"
 	//_ "megaCrawler/plugins/amti"
 	//_ "megaCrawler/plugins/cimsec"
 	//_ "megaCrawler/plugins/ewc"

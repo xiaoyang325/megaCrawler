@@ -14,6 +14,7 @@ type CollectorConstructor struct {
 	htmlHandlers     map[string]colly.HTMLCallback
 	xmlHandlers      map[string]colly.XMLCallback
 	responseHandlers []colly.ResponseCallback
+	launchHandler    func()
 	UrlData          chan UrlData
 }
 
