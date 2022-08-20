@@ -12,13 +12,11 @@ func init() {
 	s.UrlProcessor.OnXML("//urlset/url", func(e *colly.XMLElement) {
 		k, err := time.Parse("2006-01-02", e.ChildText("lastmod"))
 		if err != nil {
-			if err != nil {
-				_ = megaCrawler.Logger.Errorf("Error when parsing %s to time: %s", e.ChildText("lastmod"), err.Error())
-				k = time.Now()
-			}
+			_ = megaCrawler.Logger.Errorf("Error when parsing %s to time: %s", e.ChildText("lastmod"), err.Error())
+			k = time.Now()
 		}
 		s.AddUrl(e.ChildText("loc"), k)
-	}).SetStartingUrls([]string{"/sitemap.xml"})
+	}).SetStartingUrls([]string{"https://www.iiss.org/sitemap.xml"})
 
 	s.UrlProcessor.OnHTML("meta[property=\"og:title\"]", func(element *colly.HTMLElement) {
 		element.Request.Ctx.Put("title", element.Attr("content"))

@@ -1,7 +1,12 @@
 package main
 
 import (
-	_ "megaCrawler/plugins/ecfr"
+	_ "megaCrawler/working/cd"
+	//_ "megaCrawler/plugins/kas"
+	//_ "megaCrawler/plugins/rusi"
+	//_ "megaCrawler/plugins/tp"
+	//_ "megaCrawler/plugins/iiss"
+	//_ "megaCrawler/plugins/ecfr"
 	//_ "megaCrawler/plugins/amnesty"
 	//_ "megaCrawler/plugins/chh"
 	//_ "megaCrawler/plugins/cgai"

@@ -16,6 +16,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -23,12 +24,14 @@ type websiteEngine struct {
 	Id           string
 	BaseUrl      url.URL
 	IsRunning    bool
+	Disabled     bool
 	bar          *progressbar.ProgressBar
 	Scheduler    *gocron.Scheduler
 	LastUpdate   time.Time
 	UrlProcessor CollectorConstructor
 	Config       *config.Config
 	ProgressBar  string
+	WG           *sync.WaitGroup
 }
 
 type UrlData struct {
@@ -197,7 +200,12 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 	}()
 
 	if w.UrlProcessor.launchHandler != nil {
-		go w.UrlProcessor.launchHandler()
+		w.WG = &sync.WaitGroup{}
+		w.WG.Add(1)
+		go func() {
+			w.UrlProcessor.launchHandler()
+			w.WG.Done()
+		}()
 	}
 
 	for _, startingUrl := range w.UrlProcessor.startingUrls {
@@ -232,6 +240,10 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 				}
 			}
 		}
+	}
+
+	if w.WG != nil {
+		w.WG.Wait()
 	}
 
 	c.Wait()
