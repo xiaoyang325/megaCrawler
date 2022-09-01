@@ -1,11 +1,15 @@
 package megaCrawler
 
 import (
+	"encoding/json"
 	"flag"
+	"fmt"
 	"github.com/kardianos/service"
 	"log"
 	commandImpl2 "megaCrawler/megaCrawler/commandImpl"
 	"megaCrawler/megaCrawler/config"
+	"net/http"
+	"sync"
 	"time"
 )
 
@@ -80,9 +84,48 @@ func Start() {
 	getFlag := flag.String("get", "", "Get the status of the selected website.")
 	startFlag := flag.String("start", "", "Launch the selected website now.")
 	debugFlag := flag.Bool("debug", false, "Show debug log that will spam console")
+	testFlag := flag.Bool("test", false, "Test connection for every website registered")
+
 	flag.Parse()
 
 	Debug = *debugFlag
+
+	if *testFlag {
+		gp := sync.WaitGroup{}
+		var n int
+		errorMap := map[string]string{}
+
+		TestAndPrintWebsite := func(engine *websiteEngine) {
+			for _, url := range engine.UrlProcessor.startingUrls {
+				n++
+				resp, err := http.Get(url)
+				var reason string
+				if err != nil {
+					reason = fmt.Sprintf("Error: %s", err.Error())
+				} else if resp.StatusCode != 200 {
+					reason = fmt.Sprintf("Status Code: %d", resp.StatusCode)
+				}
+				if reason != "" {
+					println("[Error] Website:", url, ",", reason)
+					errorMap[url] = reason
+				}
+				gp.Done()
+			}
+		}
+
+		for _, engine := range WebMap {
+			engine.Scheduler.Stop()
+			gp.Add(len(engine.UrlProcessor.startingUrls))
+			go TestAndPrintWebsite(engine)
+		}
+		gp.Wait()
+
+		println("\nFinished testing,", len(errorMap), "site received error out of", n, "site")
+		println()
+		j, _ := json.MarshalIndent(errorMap, "", "    ")
+		println(string(j))
+		return
+	}
 
 	if *listFlag {
 		commandImpl2.List()
