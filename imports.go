@@ -1,6 +1,7 @@
 package main
 
 import (
+	//_ "megaCrawler/working/ifans"
 	_ "megaCrawler/plugins/ac"
 	_ "megaCrawler/plugins/amnesty"
 	_ "megaCrawler/plugins/amti"
