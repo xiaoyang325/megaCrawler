@@ -26,6 +26,7 @@ type websiteEngine struct {
 	IsRunning    bool
 	Disabled     bool
 	bar          *progressbar.ProgressBar
+	doneLaunch   bool
 	Scheduler    *gocron.Scheduler
 	LastUpdate   time.Time
 	UrlProcessor CollectorConstructor
@@ -176,6 +177,15 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 		})
 	})
 
+	if w.UrlProcessor.launchHandler != nil {
+		c.OnRequest(func(request *colly.Request) {
+			if w.doneLaunch {
+				w.doneLaunch = true
+				w.UrlProcessor.launchHandler()
+			}
+		})
+	}
+
 	go func() {
 		for true {
 			k := <-w.UrlProcessor.UrlData
@@ -198,15 +208,6 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 			w.bar.ChangeMax64(w.bar.GetMax64() + 1)
 		}
 	}()
-
-	if w.UrlProcessor.launchHandler != nil {
-		w.WG = &sync.WaitGroup{}
-		w.WG.Add(1)
-		go func() {
-			w.UrlProcessor.launchHandler()
-			w.WG.Done()
-		}()
-	}
 
 	for _, startingUrl := range w.UrlProcessor.startingUrls {
 		err = c.Visit(startingUrl)
@@ -240,10 +241,6 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 				}
 			}
 		}
-	}
-
-	if w.WG != nil {
-		w.WG.Wait()
 	}
 
 	c.Wait()
