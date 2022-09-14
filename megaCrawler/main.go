@@ -5,10 +5,13 @@ import (
 	"flag"
 	"fmt"
 	"github.com/kardianos/service"
+	"github.com/mouuff/go-rocket-update/pkg/provider"
+	"github.com/mouuff/go-rocket-update/pkg/updater"
 	"log"
 	commandImpl2 "megaCrawler/megaCrawler/commandImpl"
 	"megaCrawler/megaCrawler/config"
 	"net/http"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -85,10 +88,54 @@ func Start() {
 	startFlag := flag.String("start", "", "Launch the selected website now.")
 	debugFlag := flag.Bool("debug", false, "Show debug log that will spam console")
 	testFlag := flag.Bool("test", false, "Test connection for every website registered")
+	updateFlag := flag.Bool("update", false, "Update the program to the latest release version")
 
 	flag.Parse()
 
 	Debug = *debugFlag
+
+	if *updateFlag {
+		var Updater *updater.Updater
+
+		if runtime.GOOS == "linux" {
+			Updater = &updater.Updater{
+				Provider: &provider.Github{
+					RepositoryURL: "github.com/foxwhite25/megaCrawler",
+					ArchiveName:   fmt.Sprintf("megaCrawler_%s_%s.tar.gz", runtime.GOOS, runtime.GOARCH),
+				},
+				ExecutableName: "megaCrawler",
+				Version:        "v1.1.2",
+			}
+		} else if runtime.GOOS == "windows" {
+			Updater = &updater.Updater{
+				Provider: &provider.Github{
+					RepositoryURL: "github.com/foxwhite25/megaCrawler",
+					ArchiveName:   fmt.Sprintf("megaCrawler_%s_%s.zip", runtime.GOOS, runtime.GOARCH),
+				},
+				ExecutableName: "megaCrawler.exe",
+				Version:        "v1.1.2",
+			}
+		}
+
+		update, err := Updater.Update()
+		if err != nil {
+			log.Fatal(err.Error())
+			return
+		}
+
+		switch update {
+		case updater.Updated:
+			version, err := Updater.GetLatestVersion()
+			if err != nil {
+				log.Fatal(err.Error())
+				return
+			}
+			log.Printf("Sucessfully Update to version %s.", version)
+		case updater.UpToDate:
+			log.Printf("Program is already up to date.")
+		}
+		return
+	}
 
 	if *testFlag {
 		gp := sync.WaitGroup{}
