@@ -1,5 +1,5 @@
 ## Purpose
-MegaCrawler is a scrapper that is based on colly, and updates information in database periodically. 
+MegaCrawler is a scraper that is based in colly, and updates information in database periodically. 
 
 ## Feature
 * Service powered auto restart, can also run in clt.
@@ -17,5 +17,8 @@ When the crawler is listening, you can use these flag to check or change the ser
 * `--start string` Launch the selected website now.
 * `--get string` Get the status of the selected website.
 * `--list` List all current registered websites.
+* `--debug` To enable verbose output
+* `--test` Test Connection to all plugins
+* `--update` Update the program to the latest version in GitHub Release Page.
 
 Note: `megaCrawler.Start()` is a blocking call.
