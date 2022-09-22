@@ -8,7 +8,7 @@ MegaCrawler is a scraper that is based in colly, and updates information in data
 * Built in webclient on clt to run task and check task at runtime.
 
 ## Example
-In this scrapper it is intended to built plugins and do an empty import on them. Using `init()` to register website.
+In this scraper it is intended to built plugins and do an empty import on them. Using `init()` to register website.
 
 Then use `megaCrawler.Start()` to launch the crawler.
 

@@ -145,6 +145,9 @@ func (w *websiteEngine) GetCollector() (c *colly.Collector, ok error) {
 
 func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 	c, err := w.GetCollector()
+	if err != nil {
+		return
+	}
 	w.UrlProcessor.UrlData = make(chan UrlData)
 	timeMap := map[string]time.Time{}
 	data = []SiteInfo{}
@@ -298,14 +301,11 @@ func NewEngine(id string, baseUrl url.URL) (we *websiteEngine) {
 		LastUpdate: time.Unix(0, 0),
 		UrlProcessor: CollectorConstructor{
 			parallelLimit: 16,
-			domainGlob:    "*",
 			timeout:       10 * time.Second,
 			htmlHandlers:  map[string]colly.HTMLCallback{},
 			xmlHandlers:   map[string]colly.XMLCallback{},
 		},
-		IsRunning:   false,
-		ProgressBar: "",
-		Scheduler:   gocron.NewScheduler(time.Local),
+		Scheduler: gocron.NewScheduler(time.Local),
 		bar: progressbar.NewOptions(
 			0,
 			progressbar.OptionSetWriter(ioutil.Discard),
