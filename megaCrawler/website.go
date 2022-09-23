@@ -54,26 +54,6 @@ func (w *websiteEngine) AddUrl(url string, lastMod time.Time) {
 	}
 }
 
-func (w *websiteEngine) OnLaunch(callback func()) *websiteEngine {
-	w.UrlProcessor.launchHandler = callback
-	return w
-}
-
-func (w *websiteEngine) OnHTML(querySelector string, callback colly.HTMLCallback) *websiteEngine {
-	w.UrlProcessor.htmlHandlers[querySelector] = callback
-	return w
-}
-
-func (w *websiteEngine) OnXML(querySelector string, callback colly.XMLCallback) *websiteEngine {
-	w.UrlProcessor.xmlHandlers[querySelector] = callback
-	return w
-}
-
-func (w *websiteEngine) OnResponse(callback colly.ResponseCallback) *websiteEngine {
-	w.UrlProcessor.responseHandlers = append(w.UrlProcessor.responseHandlers, callback)
-	return w
-}
-
 func (w *websiteEngine) SetStartingUrls(urls []string) *websiteEngine {
 	w.UrlProcessor.startingUrls = urls
 	return w
@@ -93,6 +73,7 @@ func (w *websiteEngine) SetDomain(domain string) *websiteEngine {
 	w.UrlProcessor.domainGlob = domain
 	return w
 }
+
 func (w *websiteEngine) GetCollector() (c *colly.Collector, ok error) {
 	cc := w.UrlProcessor
 	c = colly.NewCollector(
@@ -114,13 +95,21 @@ func (w *websiteEngine) GetCollector() (c *colly.Collector, ok error) {
 	}
 
 	for selector, htmlCallback := range cc.htmlHandlers {
-		c.OnHTML(selector, htmlCallback)
+		c.OnHTML(selector, func(element *colly.HTMLElement) {
+			htmlCallback(element, element.Request.Ctx.GetAny("ctx").(*Context))
+		})
 	}
+
 	for selector, xmlCallback := range cc.xmlHandlers {
-		c.OnXML(selector, xmlCallback)
+		c.OnXML(selector, func(element *colly.XMLElement) {
+			xmlCallback(element, element.Request.Ctx.GetAny("ctx").(*Context))
+		})
 	}
+
 	for _, handler := range cc.responseHandlers {
-		c.OnResponse(handler)
+		c.OnResponse(func(response *colly.Response) {
+			handler(response, response.Ctx.GetAny("ctx").(*Context))
+		})
 	}
 
 	c.OnError(func(r *colly.Response, err error) {
@@ -302,8 +291,8 @@ func NewEngine(id string, baseUrl url.URL) (we *websiteEngine) {
 		UrlProcessor: CollectorConstructor{
 			parallelLimit: 16,
 			timeout:       10 * time.Second,
-			htmlHandlers:  map[string]colly.HTMLCallback{},
-			xmlHandlers:   map[string]colly.XMLCallback{},
+			htmlHandlers:  map[string]func(element *colly.HTMLElement, ctx *Context){},
+			xmlHandlers:   map[string]func(element *colly.XMLElement, ctx *Context){},
 		},
 		Scheduler: gocron.NewScheduler(time.Local),
 		bar: progressbar.NewOptions(
