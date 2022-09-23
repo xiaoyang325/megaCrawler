@@ -81,7 +81,7 @@ func websiteHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if website, ok := WebMap[id]; ok {
-			b, err = website.ToJson()
+			b, err = website.toJson()
 		} else {
 			err = errorResponse(w, 400, "Bad Request : Invalid argument, id does not exist")
 			return
@@ -127,7 +127,7 @@ func websiteListHandler(w http.ResponseWriter, r *http.Request) {
 		})
 
 		for _, engine := range s {
-			k = append(k, engine.ToStatus())
+			k = append(k, engine.toStatus())
 		}
 		b, err = json.Marshal(k)
 	default:

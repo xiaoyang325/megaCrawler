@@ -15,7 +15,6 @@ type CollectorConstructor struct {
 	xmlHandlers      map[string]func(element *colly.XMLElement, ctx *Context)
 	responseHandlers []func(response *colly.Response, ctx *Context)
 	launchHandler    func()
-	UrlData          chan UrlData
 }
 
 func retryRequest(r *colly.Request, maxRetries int) int {

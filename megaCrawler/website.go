@@ -33,24 +33,17 @@ type websiteEngine struct {
 	Config       *config.Config
 	ProgressBar  string
 	WG           *sync.WaitGroup
+	UrlData      chan urlData
 }
 
-type UrlData struct {
+type urlData struct {
 	Url      *url.URL
 	PageType PageType
 }
 
-type SiteInfo struct {
-	Title   string    `json:"title"`
-	Content string    `json:"content"`
-	Author  string    `json:"author"`
-	LastMod time.Time `json:"lastMod"`
-	Url     string    `json:"url"`
-}
-
 func (w *websiteEngine) Visit(url string, pageType PageType) {
 	if url == "" {
-		w.UrlProcessor.UrlData <- UrlData{Url: nil, PageType: pageType}
+		w.UrlData <- urlData{Url: nil, PageType: pageType}
 	}
 
 	u, err := w.BaseUrl.Parse(url)
@@ -58,7 +51,7 @@ func (w *websiteEngine) Visit(url string, pageType PageType) {
 		return
 	}
 
-	w.UrlProcessor.UrlData <- UrlData{Url: u, PageType: pageType}
+	w.UrlData <- urlData{Url: u, PageType: pageType}
 }
 
 func (w *websiteEngine) SetStartingUrls(urls []string) *websiteEngine {
@@ -81,7 +74,7 @@ func (w *websiteEngine) SetDomain(domain string) *websiteEngine {
 	return w
 }
 
-func (w *websiteEngine) GetCollector() (c *colly.Collector, ok error) {
+func (w *websiteEngine) getCollector() (c *colly.Collector, ok error) {
 	cc := w.UrlProcessor
 	c = colly.NewCollector(
 		colly.ParseHTTPErrorResponse(),
@@ -136,16 +129,25 @@ func (w *websiteEngine) GetCollector() (c *colly.Collector, ok error) {
 			_ = Logger.Errorf("Website error tries %d for %s: %s", left, r.Request.URL.String(), err.Error())
 		}
 	})
+
+	if w.UrlProcessor.launchHandler != nil {
+		c.OnRequest(func(request *colly.Request) {
+			if w.doneLaunch {
+				w.doneLaunch = true
+				w.UrlProcessor.launchHandler()
+			}
+		})
+	}
 	return
 }
 
-func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
-	c, err := w.GetCollector()
+func (w *websiteEngine) processUrl() (data []*Context, err error) {
+	c, err := w.getCollector()
 	if err != nil {
 		return
 	}
-	w.UrlProcessor.UrlData = make(chan UrlData)
-	data = []SiteInfo{}
+	w.UrlData = make(chan urlData)
+	data = []*Context{}
 
 	c.OnScraped(func(response *colly.Response) {
 		if strings.Contains(response.Ctx.Get("title"), "Internal server error") {
@@ -160,20 +162,12 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 			}
 			return
 		}
+		data = append(data, response.Ctx.GetAny("ctx").(*Context))
 	})
-
-	if w.UrlProcessor.launchHandler != nil {
-		c.OnRequest(func(request *colly.Request) {
-			if w.doneLaunch {
-				w.doneLaunch = true
-				w.UrlProcessor.launchHandler()
-			}
-		})
-	}
 
 	go func() {
 		for true {
-			k := <-w.UrlProcessor.UrlData
+			k := <-w.UrlData
 			if k.Url == nil {
 				break
 			}
@@ -216,11 +210,11 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 	}
 
 	c.Wait()
-	close(w.UrlProcessor.UrlData)
+	close(w.UrlData)
 	return
 }
 
-func StartEngine(w *websiteEngine) {
+func startEngine(w *websiteEngine) {
 	if w.IsRunning {
 		_ = Logger.Info("Already running id \"" + w.Id + "\"")
 		return
@@ -243,7 +237,7 @@ func StartEngine(w *websiteEngine) {
 	_ = Logger.Info("Finished engine \"" + w.Id + "\"")
 }
 
-func (w *websiteEngine) ToStatus() (s commandImpl.WebsiteStatus) {
+func (w *websiteEngine) toStatus() (s commandImpl.WebsiteStatus) {
 	_, next := w.Scheduler.NextRun()
 	return commandImpl.WebsiteStatus{
 		Id:          w.Id,
@@ -257,8 +251,8 @@ func (w *websiteEngine) ToStatus() (s commandImpl.WebsiteStatus) {
 	}
 }
 
-func (w *websiteEngine) ToJson() (b []byte, err error) {
-	k := w.ToStatus()
+func (w *websiteEngine) toJson() (b []byte, err error) {
+	k := w.toStatus()
 	b, err = json.Marshal(k)
 	return
 }
@@ -294,7 +288,7 @@ func NewEngine(id string, baseUrl url.URL) (we *websiteEngine) {
 	return
 }
 
-func saveToDB(data []SiteInfo, websiteId string) (err error) {
+func saveToDB(data []*Context, websiteId string) (err error) {
 	file, err := os.Create(fmt.Sprintf("./json/%s.json", websiteId))
 	if os.IsNotExist(err) {
 		err = os.MkdirAll("./json/", 0700)
