@@ -36,8 +36,8 @@ type websiteEngine struct {
 }
 
 type UrlData struct {
-	Url     string
-	LastMod time.Time
+	Url      *url.URL
+	PageType PageType
 }
 
 type SiteInfo struct {
@@ -48,10 +48,17 @@ type SiteInfo struct {
 	Url     string    `json:"url"`
 }
 
-func (w *websiteEngine) AddUrl(url string, lastMod time.Time) {
-	if url != "" {
-		w.UrlProcessor.UrlData <- UrlData{Url: StandardizeSpaces(url), LastMod: lastMod}
+func (w *websiteEngine) Visit(url string, pageType PageType) {
+	if url == "" {
+		w.UrlProcessor.UrlData <- UrlData{Url: nil, PageType: pageType}
 	}
+
+	u, err := w.BaseUrl.Parse(url)
+	if err != nil || u.Host != w.BaseUrl.Host {
+		return
+	}
+
+	w.UrlProcessor.UrlData <- UrlData{Url: u, PageType: pageType}
 }
 
 func (w *websiteEngine) SetStartingUrls(urls []string) *websiteEngine {
@@ -138,7 +145,6 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 		return
 	}
 	w.UrlProcessor.UrlData = make(chan UrlData)
-	timeMap := map[string]time.Time{}
 	data = []SiteInfo{}
 
 	c.OnScraped(func(response *colly.Response) {
@@ -154,19 +160,6 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 			}
 			return
 		}
-		timeMutex.RLock()
-		k := timeMap[response.Request.URL.String()]
-		timeMutex.RUnlock()
-		if response.Ctx.GetAny("time") != nil {
-			k = response.Ctx.GetAny("time").(time.Time)
-		}
-		data = append(data, SiteInfo{
-			Title:   StandardizeSpaces(response.Ctx.Get("title")),
-			Content: StandardizeSpaces(response.Ctx.Get("content")),
-			Author:  StandardizeSpaces(response.Ctx.Get("author")),
-			Url:     response.Request.URL.String(),
-			LastMod: k,
-		})
 	})
 
 	if w.UrlProcessor.launchHandler != nil {
@@ -181,31 +174,21 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 	go func() {
 		for true {
 			k := <-w.UrlProcessor.UrlData
-
-			if k.Url == "" {
+			if k.Url == nil {
 				break
 			}
-
-			u, err := w.BaseUrl.Parse(k.Url)
-			if err != nil || u.Host != w.BaseUrl.Host {
-				continue
-			}
-			err = c.Visit(u.String())
+			ctx := colly.NewContext()
+			ctx.Put("ctx", &Context{PageType: k.PageType})
+			err = c.Request("GET", k.Url.String(), nil, ctx, nil)
 			if err != nil {
 				continue
 			}
-			timeMutex.Lock()
-			timeMap[k.Url] = k.LastMod
-			timeMutex.Unlock()
 			w.bar.ChangeMax64(w.bar.GetMax64() + 1)
 		}
 	}()
 
 	for _, startingUrl := range w.UrlProcessor.startingUrls {
-		err = c.Visit(startingUrl)
-		if err != nil {
-			continue
-		}
+		w.Visit(startingUrl, Index)
 	}
 
 	if w.UrlProcessor.robotTxt != "" {
@@ -227,10 +210,7 @@ func (w *websiteEngine) processUrl() (data []SiteInfo, err error) {
 				if err != nil {
 					continue
 				}
-				err = c.Visit(u.String())
-				if err != nil {
-					continue
-				}
+				w.Visit(u.String(), Index)
 			}
 		}
 	}
