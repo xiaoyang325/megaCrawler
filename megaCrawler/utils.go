@@ -31,9 +31,9 @@ func mapToKeySlice[T any](m map[string]T) (slice []string) {
 	return
 }
 
-func combineMap[T any](bottom map[string]T, top map[string]T) map[string]T {
-	for s, t := range top {
-		bottom[s] = t
+func combineSlice[T any](bottom []T, top []T) []T {
+	for _, t := range top {
+		bottom = append(bottom, t)
 	}
 	return bottom
 }

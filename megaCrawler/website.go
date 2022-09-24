@@ -75,12 +75,12 @@ func (w *websiteEngine) SetDomain(domain string) *websiteEngine {
 }
 
 func (w *websiteEngine) OnHTML(selector string, callback func(element *colly.HTMLElement, ctx *Context)) *websiteEngine {
-	w.UrlProcessor.htmlHandlers[selector] = callback
+	w.UrlProcessor.htmlHandlers = append(w.UrlProcessor.htmlHandlers, HTMLPair{callback, selector})
 	return w
 }
 
 func (w *websiteEngine) OnXML(selector string, callback func(element *colly.XMLElement, ctx *Context)) *websiteEngine {
-	w.UrlProcessor.xmlHandlers[selector] = callback
+	w.UrlProcessor.xmlHandlers = append(w.UrlProcessor.xmlHandlers, XMLPair{callback, selector})
 	return w
 }
 
@@ -90,8 +90,8 @@ func (w *websiteEngine) OnResponse(callback func(response *colly.Response, ctx *
 }
 
 func (w *websiteEngine) ApplyTemplate(template Template) *websiteEngine {
-	w.UrlProcessor.htmlHandlers = combineMap(w.UrlProcessor.htmlHandlers, template.htmlHandlers)
-	w.UrlProcessor.xmlHandlers = combineMap(w.UrlProcessor.xmlHandlers, template.xmlHandlers)
+	w.UrlProcessor.htmlHandlers = combineSlice(w.UrlProcessor.htmlHandlers, template.htmlHandlers)
+	w.UrlProcessor.xmlHandlers = combineSlice(w.UrlProcessor.xmlHandlers, template.xmlHandlers)
 	return w
 }
 
@@ -115,15 +115,15 @@ func (w *websiteEngine) getCollector() (c *colly.Collector, ok error) {
 		return nil, err
 	}
 
-	for selector, htmlCallback := range cc.htmlHandlers {
-		c.OnHTML(selector, func(element *colly.HTMLElement) {
-			htmlCallback(element, element.Request.Ctx.GetAny("ctx").(*Context))
+	for _, htmlCallback := range cc.htmlHandlers {
+		c.OnHTML(htmlCallback.selector, func(element *colly.HTMLElement) {
+			htmlCallback.HTMLCallback(element, element.Request.Ctx.GetAny("ctx").(*Context))
 		})
 	}
 
-	for selector, xmlCallback := range cc.xmlHandlers {
-		c.OnXML(selector, func(element *colly.XMLElement) {
-			xmlCallback(element, element.Request.Ctx.GetAny("ctx").(*Context))
+	for _, xmlCallback := range cc.xmlHandlers {
+		c.OnXML(xmlCallback.selector, func(element *colly.XMLElement) {
+			xmlCallback.XMLCallback(element, element.Request.Ctx.GetAny("ctx").(*Context))
 		})
 	}
 
@@ -286,8 +286,8 @@ func NewEngine(id string, baseUrl url.URL) (we *websiteEngine) {
 		UrlProcessor: CollectorConstructor{
 			parallelLimit: 16,
 			timeout:       10 * time.Second,
-			htmlHandlers:  map[string]func(element *colly.HTMLElement, ctx *Context){},
-			xmlHandlers:   map[string]func(element *colly.XMLElement, ctx *Context){},
+			htmlHandlers:  []HTMLPair{},
+			xmlHandlers:   []XMLPair{},
 		},
 		Scheduler: gocron.NewScheduler(time.Local),
 		bar: progressbar.NewOptions(
