@@ -31,6 +31,13 @@ func mapToKeySlice[T any](m map[string]T) (slice []string) {
 	return
 }
 
+func combineMap[T any](bottom map[string]T, top map[string]T) map[string]T {
+	for s, t := range top {
+		bottom[s] = t
+	}
+	return bottom
+}
+
 func successResponse(msg string) (b []byte, err error) {
 	errorJson := errorResp{
 		StatusCode: 200,

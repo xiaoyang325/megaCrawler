@@ -74,6 +74,27 @@ func (w *websiteEngine) SetDomain(domain string) *websiteEngine {
 	return w
 }
 
+func (w *websiteEngine) OnHTML(selector string, callback func(element *colly.HTMLElement, ctx *Context)) *websiteEngine {
+	w.UrlProcessor.htmlHandlers[selector] = callback
+	return w
+}
+
+func (w *websiteEngine) OnXML(selector string, callback func(element *colly.XMLElement, ctx *Context)) *websiteEngine {
+	w.UrlProcessor.xmlHandlers[selector] = callback
+	return w
+}
+
+func (w *websiteEngine) OnResponse(callback func(response *colly.Response, ctx *Context)) *websiteEngine {
+	w.UrlProcessor.responseHandlers = append(w.UrlProcessor.responseHandlers, callback)
+	return w
+}
+
+func (w *websiteEngine) ApplyTemplate(template Template) *websiteEngine {
+	w.UrlProcessor.htmlHandlers = combineMap(w.UrlProcessor.htmlHandlers, template.htmlHandlers)
+	w.UrlProcessor.xmlHandlers = combineMap(w.UrlProcessor.xmlHandlers, template.xmlHandlers)
+	return w
+}
+
 func (w *websiteEngine) getCollector() (c *colly.Collector, ok error) {
 	cc := w.UrlProcessor
 	c = colly.NewCollector(
