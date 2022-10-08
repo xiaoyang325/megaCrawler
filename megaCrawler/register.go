@@ -8,13 +8,13 @@ import (
 )
 
 var (
-	WebMap    = make(map[string]*websiteEngine)
+	WebMap    = make(map[string]*WebsiteEngine)
 	nextTime  = time.Now().Add(10 * time.Second)
 	timeMutex = sync.RWMutex{}
 )
 
 // Register 注册插件控制器
-func Register(service string, name string, baseUrl string) *websiteEngine {
+func Register(service string, name string, baseUrl string) *WebsiteEngine {
 	k, err := url.Parse(baseUrl)
 	if err != nil {
 		panic(err)

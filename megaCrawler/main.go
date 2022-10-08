@@ -142,7 +142,7 @@ func Start() {
 		var n int
 		errorMap := map[string]string{}
 
-		TestAndPrintWebsite := func(engine *websiteEngine) {
+		TestAndPrintWebsite := func(engine *WebsiteEngine) {
 			for _, url := range engine.UrlProcessor.startingUrls {
 				n++
 				resp, err := http.Get(url)

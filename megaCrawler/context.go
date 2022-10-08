@@ -13,6 +13,7 @@ type Context struct {
 	PageType           PageType
 	Id                 string
 	Title              string
+	Name               string
 	SubTitle           string
 	Url                string
 	Host               string
@@ -28,6 +29,8 @@ type Context struct {
 	Content            string
 	Image              []string
 	Video              []string
+	Audio              []string
+	File               []string
 	Link               []string
 	ViewCount          int
 	LikeCount          int

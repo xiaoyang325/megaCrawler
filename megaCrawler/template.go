@@ -3,13 +3,15 @@ package megaCrawler
 import "github.com/gocolly/colly/v2"
 
 type Template struct {
-	htmlHandlers     []HTMLPair
+	htmlHandlers     []CollyHTMLPair
 	xmlHandlers      []XMLPair
 	responseHandlers []func(response *colly.Response, ctx *Context)
 }
 
 func (t *Template) OnHTML(selector string, callback func(element *colly.HTMLElement, ctx *Context)) *Template {
-	t.htmlHandlers = append(t.htmlHandlers, HTMLPair{callback, selector})
+	t.htmlHandlers = append(t.htmlHandlers, CollyHTMLPair{func(element *colly.HTMLElement) {
+		callback(element, element.Request.Ctx.GetAny("ctx").(*Context))
+	}, selector})
 	return t
 }
 

@@ -114,7 +114,7 @@ func websiteListHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
 		var k []commandImpl.WebsiteStatus
-		s := make([]*websiteEngine, 0, len(WebMap))
+		s := make([]*WebsiteEngine, 0, len(WebMap))
 
 		for _, d := range WebMap {
 			s = append(s, d)

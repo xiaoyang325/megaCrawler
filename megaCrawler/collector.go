@@ -8,11 +8,15 @@ import (
 type HTMLCallback func(element *colly.HTMLElement, ctx *Context)
 type XMLCallback func(element *colly.XMLElement, ctx *Context)
 type HTMLPair struct {
-	HTMLCallback
+	callback HTMLCallback
+	selector string
+}
+type CollyHTMLPair struct {
+	callback colly.HTMLCallback
 	selector string
 }
 type XMLPair struct {
-	XMLCallback
+	callback XMLCallback
 	selector string
 }
 type CollectorConstructor struct {
@@ -21,7 +25,7 @@ type CollectorConstructor struct {
 	timeout          time.Duration
 	startingUrls     []string
 	robotTxt         string
-	htmlHandlers     []HTMLPair
+	htmlHandlers     []CollyHTMLPair
 	xmlHandlers      []XMLPair
 	responseHandlers []func(response *colly.Response, ctx *Context)
 	launchHandler    func()

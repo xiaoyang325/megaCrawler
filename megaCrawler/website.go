@@ -20,7 +20,7 @@ import (
 	"time"
 )
 
-type websiteEngine struct {
+type WebsiteEngine struct {
 	Id           string
 	BaseUrl      url.URL
 	IsRunning    bool
@@ -41,7 +41,7 @@ type urlData struct {
 	PageType PageType
 }
 
-func (w *websiteEngine) Visit(url string, pageType PageType) {
+func (w *WebsiteEngine) Visit(url string, pageType PageType) {
 	if url == "" {
 		w.UrlData <- urlData{Url: nil, PageType: pageType}
 	}
@@ -54,48 +54,50 @@ func (w *websiteEngine) Visit(url string, pageType PageType) {
 	w.UrlData <- urlData{Url: u, PageType: pageType}
 }
 
-func (w *websiteEngine) SetStartingUrls(urls []string) *websiteEngine {
+func (w *WebsiteEngine) SetStartingUrls(urls []string) *WebsiteEngine {
 	w.UrlProcessor.startingUrls = urls
 	return w
 }
 
-func (w *websiteEngine) FromRobotTxt(url string) *websiteEngine {
+func (w *WebsiteEngine) FromRobotTxt(url string) *WebsiteEngine {
 	w.UrlProcessor.robotTxt = url
 	return w
 }
 
-func (w *websiteEngine) SetTimeout(timeout time.Duration) *websiteEngine {
+func (w *WebsiteEngine) SetTimeout(timeout time.Duration) *WebsiteEngine {
 	w.UrlProcessor.timeout = timeout
 	return w
 }
 
-func (w *websiteEngine) SetDomain(domain string) *websiteEngine {
+func (w *WebsiteEngine) SetDomain(domain string) *WebsiteEngine {
 	w.UrlProcessor.domainGlob = domain
 	return w
 }
 
-func (w *websiteEngine) OnHTML(selector string, callback func(element *colly.HTMLElement, ctx *Context)) *websiteEngine {
-	w.UrlProcessor.htmlHandlers = append(w.UrlProcessor.htmlHandlers, HTMLPair{callback, selector})
+func (w *WebsiteEngine) OnHTML(selector string, callback func(element *colly.HTMLElement, ctx *Context)) *WebsiteEngine {
+	w.UrlProcessor.htmlHandlers = append(w.UrlProcessor.htmlHandlers, CollyHTMLPair{func(element *colly.HTMLElement) {
+		callback(element, element.Request.Ctx.GetAny("ctx").(*Context))
+	}, selector})
 	return w
 }
 
-func (w *websiteEngine) OnXML(selector string, callback func(element *colly.XMLElement, ctx *Context)) *websiteEngine {
+func (w *WebsiteEngine) OnXML(selector string, callback func(element *colly.XMLElement, ctx *Context)) *WebsiteEngine {
 	w.UrlProcessor.xmlHandlers = append(w.UrlProcessor.xmlHandlers, XMLPair{callback, selector})
 	return w
 }
 
-func (w *websiteEngine) OnResponse(callback func(response *colly.Response, ctx *Context)) *websiteEngine {
+func (w *WebsiteEngine) OnResponse(callback func(response *colly.Response, ctx *Context)) *WebsiteEngine {
 	w.UrlProcessor.responseHandlers = append(w.UrlProcessor.responseHandlers, callback)
 	return w
 }
 
-func (w *websiteEngine) ApplyTemplate(template Template) *websiteEngine {
+func (w *WebsiteEngine) ApplyTemplate(template Template) *WebsiteEngine {
 	w.UrlProcessor.htmlHandlers = combineSlice(w.UrlProcessor.htmlHandlers, template.htmlHandlers)
 	w.UrlProcessor.xmlHandlers = combineSlice(w.UrlProcessor.xmlHandlers, template.xmlHandlers)
 	return w
 }
 
-func (w *websiteEngine) getCollector() (c *colly.Collector, ok error) {
+func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 	cc := w.UrlProcessor
 	c = colly.NewCollector(
 		colly.ParseHTTPErrorResponse(),
@@ -116,14 +118,12 @@ func (w *websiteEngine) getCollector() (c *colly.Collector, ok error) {
 	}
 
 	for _, htmlCallback := range cc.htmlHandlers {
-		c.OnHTML(htmlCallback.selector, func(element *colly.HTMLElement) {
-			htmlCallback.HTMLCallback(element, element.Request.Ctx.GetAny("ctx").(*Context))
-		})
+		c.OnHTML(htmlCallback.selector, htmlCallback.callback)
 	}
 
 	for _, xmlCallback := range cc.xmlHandlers {
 		c.OnXML(xmlCallback.selector, func(element *colly.XMLElement) {
-			xmlCallback.XMLCallback(element, element.Request.Ctx.GetAny("ctx").(*Context))
+			xmlCallback.callback(element, element.Request.Ctx.GetAny("ctx").(*Context))
 		})
 	}
 
@@ -136,6 +136,7 @@ func (w *websiteEngine) getCollector() (c *colly.Collector, ok error) {
 	c.OnError(func(r *colly.Response, err error) {
 		if err.Error() == "Bad Gateway" || err.Error() == "Not Found" || err.Error() == "Forbidden" {
 			_ = w.bar.Add(1)
+			w.WG.Done()
 			return
 		}
 		if err.Error() == "Too many requests" {
@@ -145,6 +146,7 @@ func (w *websiteEngine) getCollector() (c *colly.Collector, ok error) {
 
 		if left == 0 {
 			_ = w.bar.Add(1)
+			w.WG.Done()
 			_ = Logger.Errorf("Max retries exceed for %s: %s", r.Request.URL.String(), err.Error())
 		} else if Debug {
 			_ = Logger.Errorf("Website error tries %d for %s: %s", left, r.Request.URL.String(), err.Error())
@@ -162,7 +164,7 @@ func (w *websiteEngine) getCollector() (c *colly.Collector, ok error) {
 	return
 }
 
-func (w *websiteEngine) processUrl() (data []*Context, err error) {
+func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 	c, err := w.getCollector()
 	if err != nil {
 		return
@@ -177,13 +179,8 @@ func (w *websiteEngine) processUrl() (data []*Context, err error) {
 			return
 		}
 		_ = w.bar.Add(1)
-		if response.Ctx.Get("title") == "" || response.Ctx.Get("content") == "" {
-			if Debug {
-				_ = Logger.Infof("Missing Data from %s, title: %s, content length: %d", response.Request.URL.String(), StandardizeSpaces(response.Ctx.Get("title")), len(response.Ctx.Get("content")))
-			}
-			return
-		}
 		data = append(data, response.Ctx.GetAny("ctx").(*Context))
+		w.WG.Done()
 	})
 
 	go func() {
@@ -193,9 +190,11 @@ func (w *websiteEngine) processUrl() (data []*Context, err error) {
 				break
 			}
 			ctx := colly.NewContext()
-			ctx.Put("ctx", &Context{PageType: k.PageType})
-			err = c.Request("GET", k.Url.String(), nil, ctx, nil)
+			ctx.Put("ctx", &Context{PageType: k.PageType, Url: k.Url.String(), Host: k.Url.Host, Website: w.Id})
+			w.WG.Add(1)
+			err := c.Request("GET", k.Url.String(), nil, ctx, nil)
 			if err != nil {
+				w.WG.Done()
 				continue
 			}
 			w.bar.ChangeMax64(w.bar.GetMax64() + 1)
@@ -230,12 +229,13 @@ func (w *websiteEngine) processUrl() (data []*Context, err error) {
 		}
 	}
 
-	c.Wait()
+	time.Sleep(5 * time.Second)
+	w.WG.Wait()
 	close(w.UrlData)
 	return
 }
 
-func startEngine(w *websiteEngine) {
+func startEngine(w *WebsiteEngine) {
 	if w.IsRunning {
 		_ = Logger.Info("Already running id \"" + w.Id + "\"")
 		return
@@ -258,7 +258,7 @@ func startEngine(w *websiteEngine) {
 	_ = Logger.Info("Finished engine \"" + w.Id + "\"")
 }
 
-func (w *websiteEngine) toStatus() (s commandImpl.WebsiteStatus) {
+func (w *WebsiteEngine) toStatus() (s commandImpl.WebsiteStatus) {
 	_, next := w.Scheduler.NextRun()
 	return commandImpl.WebsiteStatus{
 		Id:          w.Id,
@@ -272,21 +272,23 @@ func (w *websiteEngine) toStatus() (s commandImpl.WebsiteStatus) {
 	}
 }
 
-func (w *websiteEngine) toJson() (b []byte, err error) {
+func (w *WebsiteEngine) toJson() (b []byte, err error) {
 	k := w.toStatus()
 	b, err = json.Marshal(k)
 	return
 }
 
-func NewEngine(id string, baseUrl url.URL) (we *websiteEngine) {
-	we = &websiteEngine{
+func NewEngine(id string, baseUrl url.URL) (we *WebsiteEngine) {
+	we = &WebsiteEngine{
+		WG:         &sync.WaitGroup{},
 		Id:         id,
 		BaseUrl:    baseUrl,
 		LastUpdate: time.Unix(0, 0),
 		UrlProcessor: CollectorConstructor{
+			domainGlob:    baseUrl.String(),
 			parallelLimit: 16,
 			timeout:       10 * time.Second,
-			htmlHandlers:  []HTMLPair{},
+			htmlHandlers:  []CollyHTMLPair{},
 			xmlHandlers:   []XMLPair{},
 		},
 		Scheduler: gocron.NewScheduler(time.Local),
