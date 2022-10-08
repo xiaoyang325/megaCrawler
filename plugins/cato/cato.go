@@ -6,14 +6,8 @@ import (
 	"strings"
 )
 
-var w *megaCrawler.WebsiteEngine
-
-func handler(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-	w.Visit(element.Attr("href"), megaCrawler.Expert)
-}
-
 func init() {
-	w := megaCrawler.Register("cato", "卡托研究所", "https://www.csis.org/")
+	w := megaCrawler.Register("csis", "卡托研究所", "https://www.csis.org/")
 
 	w.SetStartingUrls([]string{"https://www.csis.org/experts"})
 
@@ -31,7 +25,9 @@ func init() {
 		w.Visit(element.Attr("href"), megaCrawler.Index)
 	})
 
-	w.OnHTML(".teaser--portrait-image > .teaser__title > a", handler)
+	w.OnHTML(".teaser--portrait-image > .teaser__title > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+		w.Visit(element.Attr("href"), megaCrawler.Expert)
+	})
 
 	w.OnHTML("h1", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		if ctx.PageType == megaCrawler.Expert {
@@ -41,15 +37,19 @@ func init() {
 		}
 	})
 
-	w.OnHTML("#main > div > div.layout-constrain > div.layout-focus-page__main > div.subtitle", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+	w.OnHTML(".layout-constrain > .layout-focus-page__main > .subtitle", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		ctx.Title = megaCrawler.StandardizeSpaces(element.Text)
 	})
 
-	w.OnHTML("#main > div > div.layout-constrain > div.layout-focus-page__main > p", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+	w.OnHTML(".layout-constrain > .layout-focus-page__main > p", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		ctx.Description = element.Text
 	})
 
 	w.OnHTML(".layout-focus-page__main > .field field--inline field--spaced > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		ctx.Area += element.Text + " "
+	})
+
+	w.OnHTML("div.pane.pane--csis-contributor-contact-expert.pane--details > div.pane__content", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+		println(element.Text)
 	})
 }
