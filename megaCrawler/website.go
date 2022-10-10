@@ -321,6 +321,7 @@ func saveToDB(data []*Context, websiteId string) (err error) {
 		return saveToDB(data, websiteId)
 	}
 	decoder := json.NewEncoder(file)
+	decoder.SetIndent("  ", "  ")
 	err = decoder.Encode(&data)
 	if err != nil {
 		return err
