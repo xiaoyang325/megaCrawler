@@ -1,5 +1,5 @@
 package main
 
 import (
-	_ "megaCrawler/plugins/cato"
+	_ "megaCrawler/plugins/csis"
 )

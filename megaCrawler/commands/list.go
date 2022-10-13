@@ -1,4 +1,4 @@
-package commandImpl
+package commands
 
 import (
 	"github.com/olekukonko/tablewriter"

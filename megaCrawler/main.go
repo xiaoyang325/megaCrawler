@@ -7,8 +7,10 @@ import (
 	"github.com/kardianos/service"
 	"github.com/mouuff/go-rocket-update/pkg/provider"
 	"github.com/mouuff/go-rocket-update/pkg/updater"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"log"
-	commandImpl2 "megaCrawler/megaCrawler/commandImpl"
+	"megaCrawler/megaCrawler/commands"
 	"megaCrawler/megaCrawler/config"
 	"net/http"
 	"runtime"
@@ -16,8 +18,7 @@ import (
 	"time"
 )
 
-var Logger service.Logger
-var Debug = false
+var sugar *zap.SugaredLogger
 
 // CrawlerManager Program structures.
 // Define Start and Stop methods.
@@ -27,15 +28,9 @@ type CrawlerManager struct {
 
 func (c *CrawlerManager) Start(_ service.Service) error {
 	if service.Interactive() {
-		err := Logger.Info("Running in terminal.")
-		if err != nil {
-			return err
-		}
+		sugar.Info("Running in terminal.")
 	} else {
-		err := Logger.Info("Running under service manager.")
-		if err != nil {
-			return err
-		}
+		sugar.Info("Running under service manager.")
 	}
 	c.exit = make(chan struct{})
 
@@ -50,11 +45,8 @@ func (c *CrawlerManager) Start(_ service.Service) error {
 }
 
 func (c *CrawlerManager) run() error {
-	err := Logger.Infof("I'm running %v.", service.Platform())
+	sugar.Infof("I'm running %v.", service.Platform())
 	StartWebServer()
-	if err != nil {
-		return err
-	}
 
 	ticker := time.NewTicker(2 * time.Second)
 	for {
@@ -68,12 +60,9 @@ func (c *CrawlerManager) run() error {
 
 func (c *CrawlerManager) Stop(_ service.Service) error {
 	// Any work in Stop should be quick, usually a few seconds at most.
-	err := Logger.Info("CrawlerManager are Stopping!")
-	if err != nil {
-		return err
-	}
+	sugar.Info("CrawlerManager are Stopping!")
 	close(c.exit)
-	err = config.Configs.Save()
+	err := config.Configs.Save()
 	if err != nil {
 		return err
 	}
@@ -82,7 +71,6 @@ func (c *CrawlerManager) Stop(_ service.Service) error {
 
 // Start is a blocking function that starts the crawler
 func Start() {
-	svcFlag := flag.String("service", "", "Control the system service.")
 	listFlag := flag.Bool("list", false, "List all current registered websites.")
 	getFlag := flag.String("get", "", "Get the status of the selected website.")
 	startFlag := flag.String("start", "", "Launch the selected website now.")
@@ -91,8 +79,6 @@ func Start() {
 	updateFlag := flag.Bool("update", false, "Update the program to the latest release version")
 
 	flag.Parse()
-
-	Debug = *debugFlag
 
 	if *updateFlag {
 		var Updater *updater.Updater
@@ -175,29 +161,39 @@ func Start() {
 	}
 
 	if *listFlag {
-		commandImpl2.List()
+		commands.List()
 		return
 	}
 
 	if *getFlag != "" {
-		commandImpl2.Get(*getFlag)
+		commands.Get(*getFlag)
 		return
 	}
 
 	if *startFlag != "" {
-		commandImpl2.Start(*startFlag)
+		commands.Start(*startFlag)
 		return
 	}
 
-	options := make(service.KeyValue)
-	options["Restart"] = "on-success"
-	options["SuccessExitStatus"] = "1 2 8 SIGKILL"
 	svcConfig := &service.Config{
 		Name:        "MegaCrawler",
 		DisplayName: "A crawler that update resources periodically",
 		Description: "This is a crawler that update resources periodically",
-		Option:      options,
 	}
+
+	loggerConfig := zap.NewProductionConfig()
+	if *debugFlag {
+		loggerConfig.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
+	}
+	loggerConfig.EncoderConfig.TimeKey = "timestamp"
+	loggerConfig.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.RFC3339)
+
+	logger, err := loggerConfig.Build()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	sugar = logger.Sugar()
 
 	prg := &CrawlerManager{}
 	s, err := service.New(prg, svcConfig)
@@ -205,10 +201,6 @@ func Start() {
 		log.Fatal(err)
 	}
 	errs := make(chan error, 5)
-	Logger, err = s.Logger(errs)
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	go func() {
 		for {
@@ -219,17 +211,5 @@ func Start() {
 		}
 	}()
 
-	if len(*svcFlag) != 0 {
-		err := service.Control(s, *svcFlag)
-		if err != nil {
-			log.Printf("Valid actions: %q\n", service.ControlAction)
-			log.Fatal(err)
-		}
-		return
-	}
-
 	err = s.Run()
-	if err != nil {
-		_ = Logger.Error(err)
-	}
 }
