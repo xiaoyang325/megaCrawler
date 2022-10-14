@@ -198,7 +198,7 @@ func Start() {
 	sugar = logger.Sugar()
 	newsChannel, reportChannel, expertChannel = getProducer()
 
-	newsChannel <- "Baboo"
+	newsChannel <- "Babo"
 
 	prg := &CrawlerManager{}
 	s, err := service.New(prg, svcConfig)
