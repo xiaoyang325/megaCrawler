@@ -195,7 +195,11 @@ func (c Context) process() {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		})
-		newsChannel <- string(marshal)
+		if Debug {
+			sugar.Debug(string(marshal))
+		} else {
+			newsChannel <- string(marshal)
+		}
 	case Report:
 		marshal, err = json.Marshal(report{
 			Id:              c.Website,
@@ -226,7 +230,11 @@ func (c Context) process() {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		})
-		reportChannel <- string(marshal)
+		if Debug {
+			sugar.Debugf(string(marshal))
+		} else {
+			reportChannel <- string(marshal)
+		}
 	case Expert:
 		marshal, err = json.Marshal(expert{
 			Id:              c.Id,
@@ -259,7 +267,11 @@ func (c Context) process() {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		})
-		expertChannel <- string(marshal)
+		if Debug {
+			sugar.Debug(string(marshal))
+		} else {
+			expertChannel <- string(marshal)
+		}
 	}
 	if err != nil {
 		sugar.Error(err.Error())

@@ -19,6 +19,7 @@ import (
 )
 
 var sugar *zap.SugaredLogger
+var Debug bool
 
 // CrawlerManager Program structures.
 // Define Start and Stop methods.
@@ -80,7 +81,7 @@ func Start() {
 	passwordFlag := flag.String("password", "", "The password for kafka server")
 
 	flag.Parse()
-
+	Debug = *debugFlag
 	if *updateFlag {
 		var Updater *updater.Updater
 
