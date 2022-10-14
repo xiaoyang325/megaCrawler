@@ -77,6 +77,7 @@ func Start() {
 	debugFlag := flag.Bool("debug", false, "Show debug log that will spam console")
 	testFlag := flag.Bool("test", false, "Test connection for every website registered")
 	updateFlag := flag.Bool("update", false, "Update the program to the latest release version")
+	passwordFlag := flag.String("password", "", "The password for kafka server")
 
 	flag.Parse()
 
@@ -181,6 +182,7 @@ func Start() {
 		Description: "This is a crawler that update resources periodically",
 	}
 
+	passwd = *passwordFlag
 	loggerConfig := zap.NewProductionConfig()
 	if *debugFlag {
 		loggerConfig.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
@@ -194,6 +196,9 @@ func Start() {
 	}
 
 	sugar = logger.Sugar()
+	newsChannel, reportChannel, expertChannel = getProducer()
+
+	newsChannel <- "Baboo"
 
 	prg := &CrawlerManager{}
 	s, err := service.New(prg, svcConfig)
