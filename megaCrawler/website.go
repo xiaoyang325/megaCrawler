@@ -2,7 +2,6 @@ package megaCrawler
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/go-co-op/gocron"
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/extensions"
@@ -10,11 +9,10 @@ import (
 	"github.com/temoto/robotstxt"
 	"io/ioutil"
 	"math/rand"
-	"megaCrawler/megaCrawler/commandImpl"
+	"megaCrawler/megaCrawler/commands"
 	"megaCrawler/megaCrawler/config"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -147,9 +145,9 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 		if left == 0 {
 			_ = w.bar.Add(1)
 			w.WG.Done()
-			_ = Logger.Errorf("Max retries exceed for %s: %s", r.Request.URL.String(), err.Error())
-		} else if Debug {
-			_ = Logger.Errorf("Website error tries %d for %s: %s", left, r.Request.URL.String(), err.Error())
+			sugar.Errorf("Max retries exceed for %s: %s", r.Request.URL.String(), err.Error())
+		} else {
+			sugar.Debugf("Website error tries %d for %s: %s", left, r.Request.URL.String(), err.Error())
 		}
 	})
 
@@ -179,7 +177,10 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 			return
 		}
 		_ = w.bar.Add(1)
-		data = append(data, response.Ctx.GetAny("ctx").(*Context))
+		ctx := response.Ctx.GetAny("ctx").(*Context)
+		ctx.CrawlTime = time.Now()
+		go ctx.process()
+		data = append(data, ctx)
 		w.WG.Done()
 	})
 
@@ -237,30 +238,26 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 
 func startEngine(w *WebsiteEngine) {
 	if w.IsRunning {
-		_ = Logger.Info("Already running id \"" + w.Id + "\"")
+		sugar.Info("Already running id \"" + w.Id + "\"")
 		return
 	}
-	_ = Logger.Info("Starting engine \"" + w.Id + "\"")
+	sugar.Info("Starting engine ", w.Id)
 	w.IsRunning = true
 	_ = w.bar.Set(0)
 	w.bar.ChangeMax(0)
 	w.bar.Reset()
 	data, err := w.processUrl()
 	if err != nil {
-		_ = Logger.Error("Error when processing url for id \"" + w.Id + "\": " + err.Error())
+		sugar.Error("Error when processing url for id \"" + w.Id + "\": " + err.Error())
 	}
-	_ = Logger.Infof("Processed %d data from \"%s\" in %s", len(data), w.Id, shortDur(time.Duration(w.bar.State().SecondsSince)*time.Second))
-	err = saveToDB(data, w.Id)
-	if err != nil {
-		_ = Logger.Error("Error when saving to database for id \"" + w.Id + "\": " + err.Error())
-	}
+	sugar.Infof("Processed %d data from \"%s\" in %s", len(data), w.Id, shortDur(time.Duration(w.bar.State().SecondsSince)*time.Second))
 	w.IsRunning = false
-	_ = Logger.Info("Finished engine \"" + w.Id + "\"")
+	sugar.Info("Finished engine \"" + w.Id + "\"")
 }
 
-func (w *WebsiteEngine) toStatus() (s commandImpl.WebsiteStatus) {
+func (w *WebsiteEngine) toStatus() (s commands.WebsiteStatus) {
 	_, next := w.Scheduler.NextRun()
-	return commandImpl.WebsiteStatus{
+	return commands.WebsiteStatus{
 		Id:          w.Id,
 		BaseUrl:     w.BaseUrl.String(),
 		IsRunning:   w.IsRunning,
@@ -309,22 +306,4 @@ func NewEngine(id string, baseUrl url.URL) (we *WebsiteEngine) {
 		),
 	}
 	return
-}
-
-func saveToDB(data []*Context, websiteId string) (err error) {
-	file, err := os.Create(fmt.Sprintf("./json/%s.json", websiteId))
-	if os.IsNotExist(err) {
-		err = os.MkdirAll("./json/", 0700)
-		if err != nil {
-			return err
-		}
-		return saveToDB(data, websiteId)
-	}
-	decoder := json.NewEncoder(file)
-	decoder.SetIndent("  ", "  ")
-	err = decoder.Encode(&data)
-	if err != nil {
-		return err
-	}
-	return nil
 }
