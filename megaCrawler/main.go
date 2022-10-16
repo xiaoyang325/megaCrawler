@@ -197,9 +197,13 @@ func Start() {
 	}
 
 	sugar = logger.Sugar()
-	newsChannel, reportChannel, expertChannel = getProducer()
-
-	newsChannel <- "Babo"
+	if Debug {
+		if *passwordFlag == "" {
+			panic("Either turn on debug mode or enter the password for kafka")
+		}
+	} else {
+		newsChannel, reportChannel, expertChannel = getProducer()
+	}
 
 	prg := &CrawlerManager{}
 	s, err := service.New(prg, svcConfig)

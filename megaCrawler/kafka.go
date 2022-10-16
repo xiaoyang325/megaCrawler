@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
+	"sync"
 	"time"
 )
 
@@ -84,8 +85,10 @@ func getProducer() (newsChannel chan string, reportChannel chan string, expertCh
 	if err != nil {
 		sugar.Error("Failed to create producer: ", err)
 	}
+	wg := sync.WaitGroup{}
 
 	f := func(topic string, channel chan string) {
+		wg.Add(1)
 		sugar.Info("Created producer for ", topic)
 		signals := make(chan os.Signal, 1)
 		signal.Notify(signals, os.Interrupt)
@@ -109,10 +112,16 @@ func getProducer() (newsChannel chan string, reportChannel chan string, expertCh
 				break ProducerLoop
 			}
 		}
+		wg.Done()
 	}
+
 	go f("hykj_news", newsChannel)
 	go f("hykj_expert", expertChannel)
 	go f("hykj_report", reportChannel)
+	go func() {
+		wg.Wait()
+		_ = syncProducer.Close()
+	}()
 
 	return
 }
