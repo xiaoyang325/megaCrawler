@@ -74,8 +74,8 @@ func init() {
 	})
 
 	// 人物地区到ctx
-	w.OnHTML(".layout-focus-page__main > .field field--inline field--spaced > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-		ctx.Area += element.Text + " "
+	w.OnHTML(".layout-focus-page__main > .field > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+		ctx.Area += element.Text + ", "
 	})
 
 	// 正则匹配邮箱和电话号码
