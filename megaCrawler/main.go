@@ -197,11 +197,11 @@ func Start() {
 	}
 
 	sugar = logger.Sugar()
-	if Debug {
-		if *passwordFlag == "" {
-			panic("Either turn on debug mode or enter the password for kafka")
-		}
-	} else {
+	if !Debug && *passwordFlag == "" {
+		panic("Either turn on debug mode or enter the password for kafka")
+	}
+
+	if *passwordFlag != "" {
 		newsChannel, reportChannel, expertChannel = getProducer()
 	}
 
