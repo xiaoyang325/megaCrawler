@@ -215,7 +215,10 @@ func Start() {
 		return lvl >= zapcore.ErrorLevel
 	})
 	lowPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl < zapcore.ErrorLevel
+		if Debug {
+			return lvl < zapcore.ErrorLevel
+		}
+		return lvl < zapcore.ErrorLevel && lvl > zapcore.DebugLevel
 	})
 
 	consoleDebugging := zapcore.Lock(os.Stdout)
