@@ -236,6 +236,10 @@ func (c Context) process() {
 			reportChannel <- string(marshal)
 		}
 	case Expert:
+		image := ""
+		if len(c.Image) > 0 {
+			image = c.Image[0]
+		}
 		marshal, err = json.Marshal(expert{
 			Id:              c.Id,
 			Title:           c.Title,
@@ -249,7 +253,7 @@ func (c Context) process() {
 			CityISO:         c.CityISO,
 			Language:        c.Language,
 			Description:     c.Description,
-			Image:           c.Location,
+			Image:           image,
 			Keywords:        c.Keywords,
 			Type:            c.Type,
 			Area:            c.Area,
