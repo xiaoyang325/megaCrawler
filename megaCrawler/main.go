@@ -9,10 +9,12 @@ import (
 	"github.com/mouuff/go-rocket-update/pkg/updater"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"log"
 	"megaCrawler/megaCrawler/commands"
 	"megaCrawler/megaCrawler/config"
 	"net/http"
+	"os"
 	"runtime"
 	"sync"
 	"time"
@@ -184,17 +186,47 @@ func Start() {
 	}
 
 	passwd = *passwordFlag
-	loggerConfig := zap.NewProductionConfig()
-	if *debugFlag {
-		loggerConfig.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
-	}
-	loggerConfig.EncoderConfig.TimeKey = "timestamp"
-	loggerConfig.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.RFC3339)
 
-	logger, err := loggerConfig.Build()
-	if err != nil {
-		log.Fatal(err)
+	w := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   "./log/debug.json",
+		MaxSize:    500, // megabytes
+		MaxBackups: 3,
+		MaxAge:     28, // days
+	})
+	var fileCore zapcore.Core
+	ProductionEncoder := zap.NewProductionEncoderConfig()
+	DevEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+
+	if *debugFlag {
+		fileCore = zapcore.NewCore(
+			zapcore.NewJSONEncoder(ProductionEncoder),
+			w,
+			zap.DebugLevel,
+		)
+	} else {
+		fileCore = zapcore.NewCore(
+			zapcore.NewJSONEncoder(ProductionEncoder),
+			w,
+			zap.InfoLevel,
+		)
 	}
+
+	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		return lvl >= zapcore.ErrorLevel
+	})
+	lowPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		return lvl < zapcore.ErrorLevel
+	})
+
+	consoleDebugging := zapcore.Lock(os.Stdout)
+	consoleErrors := zapcore.Lock(os.Stderr)
+
+	tree := zapcore.NewTee(
+		fileCore,
+		zapcore.NewCore(DevEncoder, consoleDebugging, lowPriority),
+		zapcore.NewCore(DevEncoder, consoleErrors, highPriority),
+	)
+	logger := zap.New(tree)
 
 	sugar = logger.Sugar()
 	if !Debug && *passwordFlag == "" {
