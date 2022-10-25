@@ -41,7 +41,7 @@ type urlData struct {
 
 func (w *WebsiteEngine) Visit(url string, pageType PageType) {
 	if url == "" {
-		w.UrlData <- urlData{Url: nil, PageType: pageType}
+		return
 	}
 
 	u, err := w.BaseUrl.Parse(url)
