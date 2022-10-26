@@ -107,7 +107,7 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 	err := c.Limit(&colly.LimitRule{
 		RandomDelay: 5 * time.Second,
 		DomainGlob:  cc.domainGlob,
-		Parallelism: 16,
+		Parallelism: Threads,
 	})
 
 	c.SetRequestTimeout(cc.timeout)

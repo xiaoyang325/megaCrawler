@@ -22,6 +22,7 @@ import (
 
 var sugar *zap.SugaredLogger
 var Debug bool
+var Threads int
 
 // CrawlerManager Program structures.
 // Define Start and Stop methods.
@@ -81,9 +82,11 @@ func Start() {
 	testFlag := flag.Bool("test", false, "Test connection for every website registered")
 	updateFlag := flag.Bool("update", false, "Update the program to the latest release version")
 	passwordFlag := flag.String("password", "", "The password for kafka server")
+	threadFlag := flag.Int("thread", 16, "Number of networking thread")
 
 	flag.Parse()
 	Debug = *debugFlag
+	Threads = *threadFlag
 	if *updateFlag {
 		var Updater *updater.Updater
 
