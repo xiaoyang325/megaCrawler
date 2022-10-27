@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -99,4 +100,17 @@ func downloadFile(filepath string, url string) (err error) {
 	}
 
 	return nil
+}
+
+func spread(args interface{}) (k []interface{}) {
+	s := reflect.ValueOf(args)
+	st := s.Type()
+
+	for i := 0; i < st.NumField(); i++ {
+		iField := s.Field(i)
+		tField := st.Field(i)
+		k = append(k, tField.Tag.Get("json"))
+		k = append(k, iField.Interface())
+	}
+	return
 }
