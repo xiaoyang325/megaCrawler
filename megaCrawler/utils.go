@@ -16,7 +16,7 @@ type errorResp struct {
 	Message    string `json:"msg"`
 }
 
-func contain[T comparable](slice []T, check T) bool {
+func Contain[T comparable](slice []T, check T) bool {
 	for _, a := range slice {
 		if a == check {
 			return true
