@@ -12,6 +12,12 @@ func init() {
 	w.SetStartingUrls([]string{"http://www.ipcs.org/commentaries.php", "http://www.ipcs.org/issue_briefs.php",
 		"http://www.ipcs.org/special_reports.php", "http://www.ipcs.org/discussion_reports.php", "http://www.ipcs.org/expert_media.php", "http://www.ipcs.org/research_paper.php"})
 
+	w.OnResponse(func(response *colly.Response, ctx *megaCrawler.Context) {
+		if strings.Contains(string(response.Body), "connection unsuccessful") {
+			megaCrawler.RetryRequest(response.Request, 10)
+		}
+	})
+
 	// 尝试寻找下载pdf的按钮，并如果存在则将页面类型转换为报告
 	w.OnHTML("a.button", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		if strings.Contains(element.Attr("href"), ".pdf") {
@@ -168,5 +174,4 @@ func init() {
 		w.Visit(element.Attr("href"), megaCrawler.News)
 		ctx.CategoryText = "IPCS EXPERTS IN THE MEDIA"
 	})
-
 }

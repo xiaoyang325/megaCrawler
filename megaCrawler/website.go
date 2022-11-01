@@ -140,7 +140,7 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 		if err.Error() == "Too many requests" {
 			time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
 		}
-		left := retryRequest(r.Request, 10)
+		left := RetryRequest(r.Request, 10)
 
 		if left == 0 {
 			_ = w.bar.Add(1)
