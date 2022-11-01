@@ -179,9 +179,15 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 		_ = w.bar.Add(1)
 		ctx := response.Ctx.GetAny("ctx").(*Context)
 		ctx.CrawlTime = time.Now()
-		go ctx.process()
+		go func() {
+			if !ctx.process() {
+				sugar.Debugw("Empty Page", spread(*ctx)...)
+				RetryRequest(response.Request, 10)
+			} else {
+				w.WG.Done()
+			}
+		}()
 		data = append(data, ctx)
-		w.WG.Done()
 	})
 
 	go func() {
