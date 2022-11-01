@@ -155,13 +155,13 @@ type expert struct {
 	StoredTimestamp int64     `json:"stored_timestamp"`
 }
 
-func (c Context) process() {
+func (c Context) process() (success bool) {
 	var err error
 	var marshal []byte
 	now := time.Now()
 	switch c.PageType {
 	case Index:
-		return
+		return true
 	case News:
 		n := news{
 			Id:              c.Id,
@@ -195,12 +195,16 @@ func (c Context) process() {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		}
+		if n.Title == "" || n.Content == "" {
+			return false
+		}
 		marshal, err = json.Marshal(n)
 		if Debug {
 			sugar.Debugw("Got News Type", spread(n)...)
 		} else {
 			newsChannel <- string(marshal)
 		}
+		return true
 	case Report:
 		n := report{
 			Id:              c.Website,
@@ -231,12 +235,16 @@ func (c Context) process() {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		}
+		if n.Title == "" || n.Content == "" {
+			return false
+		}
 		marshal, err = json.Marshal(n)
 		if Debug {
 			sugar.Debugw("Got Report type", spread(n)...)
 		} else {
 			reportChannel <- string(marshal)
 		}
+		return true
 	case Expert:
 		image := ""
 		if len(c.Image) > 0 {
@@ -273,14 +281,19 @@ func (c Context) process() {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		}
+		if n.Name == "" {
+			return false
+		}
 		marshal, err = json.Marshal(n)
 		if Debug {
 			sugar.Debugw("Got Expert type", spread(n)...)
 		} else {
 			expertChannel <- string(marshal)
 		}
+		return true
 	}
 	if err != nil {
 		sugar.Error(err.Error())
 	}
+	return false
 }

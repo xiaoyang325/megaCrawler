@@ -43,16 +43,9 @@ func init() {
 	})
 	//new.title
 	w.OnHTML("div.col-md-9 > p:nth-child(2)", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-		text := strings.TrimSpace(element.Text)
-		if text != "" {
-			ctx.Title = element.Text
-		}
-
-	})
-	w.OnHTML("#main_wrapper > section > div > div:nth-child(2) > div.col-md-9 > p:nth-child(4)", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-		text := strings.TrimSpace(element.Text)
-		if text != "" {
-			ctx.Title = element.Text
+		text := strings.Replace(element.Text, " ", "", 1000)
+		if text != "" && ctx.PageType == megaCrawler.News {
+			ctx.Title = text
 		}
 	})
 
@@ -96,9 +89,9 @@ func init() {
 
 	//reort.title
 	w.OnHTML("#main_wrapper > section > div > div.main_title.upper > h5", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-		text := strings.TrimSpace(element.Text)
-		if text != "" {
-			ctx.Title = element.Text
+		text := strings.Replace(element.Text, " ", "", 1000)
+		if text != "" && ctx.PageType == megaCrawler.Report {
+			ctx.Title = text
 		}
 	})
 
@@ -148,10 +141,7 @@ func init() {
 
 	//new.title
 	w.OnHTML("#main_wrapper > section > div > div.col-md-9", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-		text := strings.TrimSpace(element.Text)
-		if text != "" {
-			ctx.Title = element.Text
-		}
+		ctx.Title = element.Text
 	})
 	//new.anthor
 	w.OnHTML("#main_wrapper > section > div:nth-child(2) > div > span > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
