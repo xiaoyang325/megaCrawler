@@ -43,11 +43,19 @@ func init() {
 	})
 	//new.title
 	w.OnHTML("div.col-md-9 > p:nth-child(2)", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-		ctx.Title = element.Text
+		text := strings.Replace(element.Text, " ", "", 1000)
+		if text != "" {
+			ctx.Title = text
+		}
+
 	})
 	w.OnHTML("#main_wrapper > section > div > div:nth-child(2) > div.col-md-9 > p:nth-child(4)", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-		ctx.Title = element.Text
+		text := strings.Replace(element.Text, " ", "", 1000)
+		if text != "" {
+			ctx.Title = text
+		}
 	})
+
 	//new .publish time [time中含有评论，是否删除？]
 	w.OnHTML("#main_wrapper > section > div > div:nth-child(2) > div.col-md-9 > p:nth-child(3)", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		ctx.PublicationTime = element.Text
@@ -71,26 +79,6 @@ func init() {
 		ctx.Content = element.Text
 	})
 
-	////new 访问author
-	//w.OnHTML("#main_wrapper > section > div > div:nth-child(3) > div.col-md-9 > div > div.col-md-3 > div > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-	//	w.Visit(element.Attr("href"), megaCrawler.Index)
-	//})
-	//
-	////new .author.link
-	//w.OnHTML("#ps > div > div:nth-child(2) > div:nth-child(1) > div > div > div > div > a.twitter", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-	//	ctx.Authors = append(ctx.Authors, element.Text)
-	//})
-	//w.OnHTML("#ps > div > div:nth-child(2) > div:nth-child(1) > div > div > div > div > a.facebook", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-	//	ctx.Authors = append(ctx.Authors, element.Text)
-	//})
-	////new. author.information
-	//w.OnHTML("#ps > div > div:nth-child(2) > div:nth-child(1) > p", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-	//	ctx.Authors = append(ctx.Authors, element.Text)
-	//})
-	//w.OnHTML("#ps > div > div:nth-child(2) > div:nth-child(1) > div > div > div > span > font > font", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-	//	ctx.Authors = append(ctx.Authors, element.Text)
-	//})
-
 	//https://www.csis.org/analysis -> report  http://www.ipcs.org/special_reports.php->report http://www.ipcs.org/discussion_reports.php->report http://www.ipcs.org/discussion_reports.php->report http://www.ipcs.org/research_paper.php->report
 	// 从翻页器获取链接并访问
 	w.OnHTML("#pagination > ul > li:nth-child > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
@@ -108,7 +96,10 @@ func init() {
 
 	//reort.title
 	w.OnHTML("#main_wrapper > section > div > div.main_title.upper > h5", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-		ctx.Title = element.Text
+		text := strings.Replace(element.Text, " ", "", 1000)
+		if text != "" {
+			ctx.Title = text
+		}
 	})
 
 	//reort .author .publish time . catagory
