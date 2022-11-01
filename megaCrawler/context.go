@@ -203,7 +203,7 @@ func (c Context) process() {
 		}
 	case Report:
 		n := report{
-			Id:              c.Website,
+			Id:              c.Id,
 			Title:           c.Title,
 			SubTitle:        c.SubTitle,
 			Url:             c.Url,

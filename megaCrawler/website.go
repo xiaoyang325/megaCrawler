@@ -132,7 +132,7 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 	}
 
 	c.OnError(func(r *colly.Response, err error) {
-		if err.Error() == "Bad Gateway" || err.Error() == "Not Found" || err.Error() == "Forbidden" {
+		if err.Error() == "Not Found" || err.Error() == "Forbidden" {
 			_ = w.bar.Add(1)
 			w.WG.Done()
 			return
