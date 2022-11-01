@@ -9,10 +9,12 @@ import (
 	"github.com/mouuff/go-rocket-update/pkg/updater"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"log"
 	"megaCrawler/megaCrawler/commands"
 	"megaCrawler/megaCrawler/config"
 	"net/http"
+	"os"
 	"runtime"
 	"sync"
 	"time"
@@ -20,6 +22,7 @@ import (
 
 var sugar *zap.SugaredLogger
 var Debug bool
+var Threads int
 
 // CrawlerManager Program structures.
 // Define Start and Stop methods.
@@ -79,9 +82,11 @@ func Start() {
 	testFlag := flag.Bool("test", false, "Test connection for every website registered")
 	updateFlag := flag.Bool("update", false, "Update the program to the latest release version")
 	passwordFlag := flag.String("password", "", "The password for kafka server")
+	threadFlag := flag.Int("thread", 16, "Number of networking thread")
 
 	flag.Parse()
 	Debug = *debugFlag
+	Threads = *threadFlag
 	if *updateFlag {
 		var Updater *updater.Updater
 
@@ -184,24 +189,57 @@ func Start() {
 	}
 
 	passwd = *passwordFlag
-	loggerConfig := zap.NewProductionConfig()
-	if *debugFlag {
-		loggerConfig.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
-	}
-	loggerConfig.EncoderConfig.TimeKey = "timestamp"
-	loggerConfig.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.RFC3339)
 
-	logger, err := loggerConfig.Build()
-	if err != nil {
-		log.Fatal(err)
+	w := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   "./log/debug.json",
+		MaxSize:    500, // megabytes
+		MaxBackups: 3,
+		MaxAge:     28, // days
+	})
+	var fileCore zapcore.Core
+	ProductionEncoder := zap.NewProductionEncoderConfig()
+	DevEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+
+	if *debugFlag {
+		fileCore = zapcore.NewCore(
+			zapcore.NewJSONEncoder(ProductionEncoder),
+			w,
+			zap.DebugLevel,
+		)
+	} else {
+		fileCore = zapcore.NewCore(
+			zapcore.NewJSONEncoder(ProductionEncoder),
+			w,
+			zap.InfoLevel,
+		)
 	}
+
+	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		return lvl >= zapcore.ErrorLevel
+	})
+	lowPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		if Debug {
+			return lvl < zapcore.ErrorLevel
+		}
+		return lvl < zapcore.ErrorLevel && lvl > zapcore.DebugLevel
+	})
+
+	consoleDebugging := zapcore.Lock(os.Stdout)
+	consoleErrors := zapcore.Lock(os.Stderr)
+
+	tree := zapcore.NewTee(
+		fileCore,
+		zapcore.NewCore(DevEncoder, consoleDebugging, lowPriority),
+		zapcore.NewCore(DevEncoder, consoleErrors, highPriority),
+	)
+	logger := zap.New(tree)
 
 	sugar = logger.Sugar()
-	if Debug {
-		if *passwordFlag == "" {
-			panic("Either turn on debug mode or enter the password for kafka")
-		}
-	} else {
+	if !Debug && *passwordFlag == "" {
+		panic("Either turn on debug mode or enter the password for kafka")
+	}
+
+	if *passwordFlag != "" {
 		newsChannel, reportChannel, expertChannel = getProducer()
 	}
 
