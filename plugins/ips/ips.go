@@ -54,4 +54,7 @@ func init() {
 		ctx.Content = element.Text
 	})
 
+	w.OnHTML("meta[property=\"article:published_time\"]", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+		ctx.PublicationTime = element.Text
+	})
 }
