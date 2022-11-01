@@ -28,11 +28,11 @@ func init() {
 	})
 
 	//访问报告
-	w.OnHTML("h3.slide-entry-title.entry-title", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+	w.OnHTML(" div > header > h3 > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		w.Visit(element.Attr("href"), megaCrawler.Report)
 	})
 
-	w.OnHTML("figure > div ", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+	w.OnHTML(" div.av-masonry-container.isotope>a ", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		w.Visit(element.Attr("href"), megaCrawler.Report)
 	})
 
