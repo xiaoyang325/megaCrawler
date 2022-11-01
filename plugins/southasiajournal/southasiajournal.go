@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	w := megaCrawler.Register("SOUTH ASIA JOURNAL", "南亚分析集团", "http://southasiajournal.net")
+	w := megaCrawler.Register("southasiajournal", "南亚分析集团", "http://southasiajournal.net")
 
 	w.SetStartingUrls([]string{
 		"http://southasiajournal.net/category/events/",
@@ -88,6 +88,14 @@ func init() {
 	// 从文章中（/events, /e-saj-features, /blog, /reviews中的）添加标题(title)到ctx。
 	w.OnHTML("h1[class=\"entry-title\"]", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		ctx.Title = element.Text
+	})
+
+	w.OnHTML(".td-post-date", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+		ctx.PublicationTime = element.Text
+	})
+
+	w.OnHTML("meta[property=\"og:description\"]", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+		ctx.Description = element.Attr("content")
 	})
 
 	// 从文章中（/events, /e-saj-features, /blog, /reviews中的）添加作者(author)到ctx。

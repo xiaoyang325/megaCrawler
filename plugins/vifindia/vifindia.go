@@ -8,7 +8,7 @@ import (
 )
 
 // 用于把名字从职务中分离的函数。
-func cut_out_name(name string) string {
+func cutOutName(name string) string {
 	// 将名字从职位中分割出来。
 	name = strings.Split(name, ",")[0]
 	// 去掉名字前后的空格。
@@ -18,7 +18,7 @@ func cut_out_name(name string) string {
 }
 
 func init() {
-	w := megaCrawler.Register("Vivekananda International Foundation",
+	w := megaCrawler.Register("vifindia",
 		"维韦卡南达国际基金会", "https://www.vifindia.org/")
 
 	w.SetStartingUrls([]string{
@@ -115,14 +115,14 @@ func init() {
 	w.OnHTML("div[class=\"article_meta story_detail_meta\"]>span[class=\"user article_author\"]>a",
 		func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 			// 从“名字, 职务”中获取名字。
-			ctx.Authors = append(ctx.Authors, cut_out_name(element.Text))
+			ctx.Authors = append(ctx.Authors, cutOutName(element.Text))
 		})
 
 	// 从Report文章中添加作者（Authors）到ctx。
 	w.OnHTML("div[class=\"author_name\"]",
 		func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 			// 从“名字, 职务”中获取名字。
-			ctx.Authors = append(ctx.Authors, cut_out_name(element.Text))
+			ctx.Authors = append(ctx.Authors, cutOutName(element.Text))
 		})
 
 	// 从/question-for-expert文章中添加作者（Authors）到ctx。
@@ -131,7 +131,7 @@ func init() {
 			// 去除掉名字前面的 "Replied by "。
 			out_name := strings.Replace(element.Text, "Replied by ", "", 1)
 			// 从“名字, 职务”中获取名字。
-			ctx.Authors = append(ctx.Authors, cut_out_name(out_name))
+			ctx.Authors = append(ctx.Authors, cutOutName(out_name))
 		})
 
 	// 从文章中添加正文（Content）到ctx。
@@ -160,4 +160,8 @@ func init() {
 			ctx.ViewCount, _ = strconv.Atoi(element.ChildText(".article_view>strong"))
 			ctx.CommentCount, _ = strconv.Atoi(element.ChildText(".article_comment>strong"))
 		})
+
+	w.OnHTML(".post_date", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+		ctx.PublicationTime = element.Text
+	})
 }
