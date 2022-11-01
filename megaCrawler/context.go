@@ -163,7 +163,7 @@ func (c Context) process() {
 	case Index:
 		return
 	case News:
-		marshal, err = json.Marshal(news{
+		n := news{
 			Id:              c.Id,
 			Title:           c.Title,
 			SubTitle:        c.SubTitle,
@@ -194,14 +194,15 @@ func (c Context) process() {
 			CrawlTimestamp:  c.CrawlTime.Unix(),
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
-		})
+		}
+		marshal, err = json.Marshal(n)
 		if Debug {
-			sugar.Debug(string(marshal))
+			sugar.Debugw("Got News Type", spread(n)...)
 		} else {
 			newsChannel <- string(marshal)
 		}
 	case Report:
-		marshal, err = json.Marshal(report{
+		n := report{
 			Id:              c.Website,
 			Title:           c.Title,
 			SubTitle:        c.SubTitle,
@@ -229,9 +230,10 @@ func (c Context) process() {
 			CrawlTimestamp:  c.CrawlTime.Unix(),
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
-		})
+		}
+		marshal, err = json.Marshal(n)
 		if Debug {
-			sugar.Debugf(string(marshal))
+			sugar.Debugw("Got Report type", spread(n)...)
 		} else {
 			reportChannel <- string(marshal)
 		}
@@ -240,7 +242,7 @@ func (c Context) process() {
 		if len(c.Image) > 0 {
 			image = c.Image[0]
 		}
-		marshal, err = json.Marshal(expert{
+		n := expert{
 			Id:              c.Id,
 			Title:           c.Title,
 			Name:            c.Name,
@@ -270,9 +272,10 @@ func (c Context) process() {
 			CrawlTimestamp:  c.CrawlTime.Unix(),
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
-		})
+		}
+		marshal, err = json.Marshal(n)
 		if Debug {
-			sugar.Debug(string(marshal))
+			sugar.Debugw("Got Expert type", spread(n)...)
 		} else {
 			expertChannel <- string(marshal)
 		}
