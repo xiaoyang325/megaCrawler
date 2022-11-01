@@ -45,14 +45,14 @@ func init() {
 	w.OnHTML("div.col-md-9 > p:nth-child(2)", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		text := strings.Replace(element.Text, " ", "", 1000)
 		if text != "" {
-			ctx.Title = text
+			ctx.Title = element.Text
 		}
 
 	})
 	w.OnHTML("#main_wrapper > section > div > div:nth-child(2) > div.col-md-9 > p:nth-child(4)", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		text := strings.Replace(element.Text, " ", "", 1000)
 		if text != "" {
-			ctx.Title = text
+			ctx.Title = element.Text
 		}
 	})
 
@@ -98,7 +98,7 @@ func init() {
 	w.OnHTML("#main_wrapper > section > div > div.main_title.upper > h5", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		text := strings.Replace(element.Text, " ", "", 1000)
 		if text != "" {
-			ctx.Title = text
+			ctx.Title = element.Text
 		}
 	})
 
