@@ -134,7 +134,7 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 		if err.Error() == "Too many requests" {
 			time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
 		}
-		left := retryRequest(r.Request, 10)
+		left := RetryRequest(r.Request, 10)
 
 		if left == 0 {
 			_ = w.bar.Add(1)
@@ -177,9 +177,15 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 			sugar.Debugw("Empty Page", "Body", string(response.Body), "Status", response.StatusCode, "Url", ctx.Url)
 		}
 		ctx.CrawlTime = time.Now()
-		go ctx.process()
+		go func() {
+			if !ctx.process() {
+				sugar.Debugw("Empty Page", spread(*ctx)...)
+				RetryRequest(response.Request, 10)
+			} else {
+				w.WG.Done()
+			}
+		}()
 		data = append(data, ctx)
-		w.WG.Done()
 	})
 
 	go func() {
