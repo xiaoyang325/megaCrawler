@@ -41,13 +41,6 @@ func init() {
 	w.OnHTML(".clearfix>a:nth-child(1)", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		w.Visit(element.Attr("href"), megaCrawler.News)
 	})
-	//new.title
-	w.OnHTML("div.col-md-9 > p:nth-child(2)", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-		text := strings.TrimSpace(element.Text)
-		if text != "" && ctx.PageType == megaCrawler.News {
-			ctx.Title = element.Text
-		}
-	})
 
 	//new .publish time [time中含有评论，是否删除？]
 	w.OnHTML("#main_wrapper > section > div > div:nth-child(2) > div.col-md-9 > p:nth-child(3)", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
@@ -85,14 +78,6 @@ func init() {
 	//访问report -http://www.ipcs.org/research_paper.php
 	w.OnHTML("#main_wrapper > section > div > div > div.col-md-9 > div:nth-child(2) > div > ul > li:nth-child > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		w.Visit(element.Attr("href"), megaCrawler.Report)
-	})
-
-	//reort.title
-	w.OnHTML("#main_wrapper > section > div > div.main_title.upper > h5", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-		text := strings.TrimSpace(element.Text)
-		if text != "" && ctx.PageType == megaCrawler.Report {
-			ctx.Title = element.Text
-		}
 	})
 
 	//reort .author .publish time . catagory
@@ -139,13 +124,14 @@ func init() {
 		w.Visit(element.Attr("href"), megaCrawler.News)
 	})
 
-	//new.title
-	w.OnHTML("#main_wrapper > section > div > div.col-md-9", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-		text := strings.TrimSpace(element.Text)
-		if text != "" && ctx.PageType == megaCrawler.News {
-			ctx.Title = element.Text
-		}
+	w.OnHTML(".main_title > h5", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+		ctx.Title = strings.TrimSpace(element.Text)
 	})
+
+	w.OnHTML("div.rows_container > div.col-md-9 > p:nth-child(2)", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+		ctx.Title = strings.TrimSpace(element.Text)
+	})
+
 	//new.anthor
 	w.OnHTML("#main_wrapper > section > div:nth-child(2) > div > span > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		ctx.Authors = append(ctx.Authors, element.Text)
