@@ -97,7 +97,7 @@ func Start() {
 					ArchiveName:   fmt.Sprintf("megaCrawler_%s_%s.tar.gz", runtime.GOOS, runtime.GOARCH),
 				},
 				ExecutableName: "megaCrawler",
-				Version:        "v1.1.2",
+				Version:        "v2.0.0",
 			}
 		} else if runtime.GOOS == "windows" {
 			Updater = &updater.Updater{
@@ -106,7 +106,7 @@ func Start() {
 					ArchiveName:   fmt.Sprintf("megaCrawler_%s_%s.zip", runtime.GOOS, runtime.GOARCH),
 				},
 				ExecutableName: "megaCrawler.exe",
-				Version:        "v1.1.2",
+				Version:        "v2.0.0",
 			}
 		}
 
