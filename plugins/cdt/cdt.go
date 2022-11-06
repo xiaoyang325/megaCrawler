@@ -55,6 +55,7 @@ func init() {
 			ctx.Content = strings.TrimSpace(element.Text)
 		})
 
+	// 添加 PublicationTime 到 ctx
 	w.OnHTML(".the-date", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		ctx.PublicationTime = element.Attr("datetime")
 	})

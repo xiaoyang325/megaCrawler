@@ -69,10 +69,12 @@ func init() {
 			ctx.File = append(ctx.File, element.Attr("href"))
 		})
 
+	// 添加 PublicationTime 到 ctx
 	w.OnHTML(".research-post__about > p > time", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		ctx.PublicationTime = element.Text
 	})
 
+	// 添加 Description 到 ctx
 	w.OnHTML(".research-post__intro-text", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		ctx.Description = element.Text
 	})

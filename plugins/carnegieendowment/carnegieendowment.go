@@ -28,15 +28,13 @@ func init() {
 	// 从子频道入口访问 All Program Publications
 	w.OnHTML("div[class=\"section research\"]>.foreground>.center>a[class=\"button teal\"]",
 		func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-			url := "https://carnegieendowment.org/" + element.Attr("href")
-			w.Visit(url, megaCrawler.Index)
+			w.Visit(element.Attr("href"), megaCrawler.Index)
 		})
 
 	// 从翻页器获取下一页 Index 并访问
 	w.OnHTML("div[class=\"center section\"]>div>a[class=\"page-links__next tag uppercase\"]",
 		func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-			url := "https://carnegieendowment.org/" + element.Attr("href")
-			w.Visit(url, megaCrawler.Index)
+			w.Visit(element.Attr("href"), megaCrawler.Index)
 		})
 
 	// 尝试寻找下载pdf的按钮，并如果存在则将页面类型转换为报告
@@ -59,13 +57,13 @@ func init() {
 			ctx.Title = strings.TrimSpace(element.Text)
 		})
 
-	// 添加 Author 到 ctx
+	// 添加 Author 到 ctx （第二种情况）
 	w.OnHTML("div[class=\"post-author col col-75\"]>a",
 		func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 			ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
 		})
 
-	// 添加 Author 到 ctx
+	// 添加 Author 到 ctx （第一种情况）
 	w.OnHTML("div[class=\"post-author col col-75\"]",
 		func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 			ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))

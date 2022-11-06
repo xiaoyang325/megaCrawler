@@ -53,6 +53,7 @@ func init() {
 			ctx.File = append(ctx.File, element.Attr("href"))
 		})
 
+	// 添加 PublicationTime 到 ctx
 	w.OnHTML(".articleDate", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		ctx.PublicationTime = element.Text
 	})
