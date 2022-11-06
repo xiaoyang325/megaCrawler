@@ -8,7 +8,7 @@ import (
 
 func init() {
 	w := megaCrawler.Register("carnegieendowment", "卡内基国际和平基金会",
-									  "https://carnegieendowment.org/")
+		"https://carnegieendowment.org/")
 
 	w.SetStartingUrls([]string{
 		"https://carnegieendowment.org/programs/africa",
@@ -39,7 +39,6 @@ func init() {
 			w.Visit(url, megaCrawler.Index)
 		})
 
-
 	// 尝试寻找下载pdf的按钮，并如果存在则将页面类型转换为报告
 	w.OnHTML("a.button", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		if strings.Contains(element.Attr("href"), ".pdf") {
@@ -61,13 +60,13 @@ func init() {
 		})
 
 	// 添加 Author 到 ctx
-	w.OnHTML("div[class=\"post-author col col-75\"]>a", 
+	w.OnHTML("div[class=\"post-author col col-75\"]>a",
 		func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 			ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
 		})
 
 	// 添加 Author 到 ctx
-	w.OnHTML("div[class=\"post-author col col-75\"]", 
+	w.OnHTML("div[class=\"post-author col col-75\"]",
 		func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 			ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
 		})
@@ -79,7 +78,7 @@ func init() {
 
 	// 添加 Tag 到 ctx
 	w.OnHTML(".show-tag", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-			ctx.Tags = append(ctx.Authors, strings.TrimSpace(element.Text))
-		})
+		ctx.Tags = append(ctx.Authors, strings.TrimSpace(element.Text))
+	})
 
 }

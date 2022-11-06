@@ -1,55 +1,59 @@
 package cartercenter
 
 import (
-   "github.com/gocolly/colly/v2"
-   "megaCrawler/megaCrawler"
-   "strings"
+	"github.com/gocolly/colly/v2"
+	"megaCrawler/megaCrawler"
+	"strings"
 )
 
 func init() {
-   w := megaCrawler.Register("cartercenter", "卡特中心", 
-      "https://www.cartercenter.org/")
+	w := megaCrawler.Register("cartercenter", "卡特中心",
+		"https://www.cartercenter.org/")
 
-   w.SetStartingUrls([]string{
-      "https://www.cartercenter.org/peace/conflict_resolution/press-releases.html",
-      "https://www.cartercenter.org/peace/conflict_resolution/index.html",
-      "https://www.cartercenter.org/peace/conflict_resolution/press-releases.html",
-      "https://www.cartercenter.org/peace/democracy/press-releases.html",
-      "https://www.cartercenter.org/peace/americas/press-releases.html",
-      "https://www.cartercenter.org/peace/ati/rule-of-law-press-releases.html",
-      "https://www.cartercenter.org/health/index.html",
-   })
+	w.SetStartingUrls([]string{
+		"https://www.cartercenter.org/peace/conflict_resolution/press-releases.html",
+		"https://www.cartercenter.org/peace/conflict_resolution/index.html",
+		"https://www.cartercenter.org/peace/conflict_resolution/press-releases.html",
+		"https://www.cartercenter.org/peace/democracy/press-releases.html",
+		"https://www.cartercenter.org/peace/americas/press-releases.html",
+		"https://www.cartercenter.org/peace/ati/rule-of-law-press-releases.html",
+		"https://www.cartercenter.org/health/index.html",
+	})
 
-   // 从 Index 访问 News
-   w.OnHTML(".articleTitle>a",
-      func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-         path := strings.Replace(element.Attr("href"), "../../", "", 1)
-         url := "https://www.cartercenter.org/" + path
-         w.Visit(url, megaCrawler.News)
-      })
+	// 从 Index 访问 News
+	w.OnHTML(".articleTitle>a",
+		func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+			path := strings.Replace(element.Attr("href"), "../../", "", 1)
+			url := "https://www.cartercenter.org/" + path
+			w.Visit(url, megaCrawler.News)
+		})
 
-   // 从 /health/index.html 访问 Report
-   w.OnHTML("div[class=\"columns four\"]>a[target=\"_self\"]",
-      func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-         url := "https://www.cartercenter.org/health/" + element.Attr("href")
-         w.Visit(url, megaCrawler.Report)
-      })
+	// 从 /health/index.html 访问 Report
+	w.OnHTML("div[class=\"columns four\"]>a[target=\"_self\"]",
+		func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+			url := "https://www.cartercenter.org/health/" + element.Attr("href")
+			w.Visit(url, megaCrawler.Report)
+		})
 
-   // 添加 Title 到 ctx
-   w.OnHTML("#brand>h1",
-      func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-         ctx.Title = strings.TrimSpace(element.Text)
-      })
+	// 添加 Title 到 ctx
+	w.OnHTML("#brand>h1",
+		func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+			ctx.Title = strings.TrimSpace(element.Text)
+		})
 
-   // 添加 Content 到 ctx
-   w.OnHTML(".wysiwyg",
-      func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-         ctx.Content = strings.TrimSpace(element.Text)
-      })
+	// 添加 Content 到 ctx
+	w.OnHTML(".wysiwyg",
+		func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+			ctx.Content = strings.TrimSpace(element.Text)
+		})
 
-   // 添加 File 到 ctx
-   w.OnHTML(".imageWidget>a",
-      func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-         ctx.File = append(ctx.File, element.Attr("href"))
-      })
+	// 添加 File 到 ctx
+	w.OnHTML(".imageWidget>a",
+		func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+			ctx.File = append(ctx.File, element.Attr("href"))
+		})
+
+	w.OnHTML(".articleDate", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+		ctx.PublicationTime = element.Text
+	})
 }
