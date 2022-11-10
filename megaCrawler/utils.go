@@ -61,7 +61,7 @@ func errorResponse(w http.ResponseWriter, statusCode int, msg string) (err error
 	if err != nil {
 		return err
 	}
-	sugar.Error(msg)
+	Sugar.Error(msg)
 	return nil
 }
 

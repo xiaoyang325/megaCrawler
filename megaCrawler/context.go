@@ -199,8 +199,8 @@ func (c Context) process() (success bool) {
 			return false
 		}
 		marshal, err = json.Marshal(n)
-		if Debug {
-			sugar.Debugw("Got News Type", spread(n)...)
+		if !Kafka {
+			Sugar.Debugw("Got News Type", spread(n)...)
 		} else {
 			newsChannel <- string(marshal)
 		}
@@ -239,8 +239,8 @@ func (c Context) process() (success bool) {
 			return false
 		}
 		marshal, err = json.Marshal(n)
-		if Debug {
-			sugar.Debugw("Got Report type", spread(n)...)
+		if !Kafka {
+			Sugar.Debugw("Got Report type", spread(n)...)
 		} else {
 			reportChannel <- string(marshal)
 		}
@@ -285,15 +285,15 @@ func (c Context) process() (success bool) {
 			return false
 		}
 		marshal, err = json.Marshal(n)
-		if Debug {
-			sugar.Debugw("Got Expert type", spread(n)...)
+		if !Kafka {
+			Sugar.Debugw("Got Expert type", spread(n)...)
 		} else {
 			expertChannel <- string(marshal)
 		}
 		return true
 	}
 	if err != nil {
-		sugar.Error(err.Error())
+		Sugar.Error(err.Error())
 	}
 	return false
 }

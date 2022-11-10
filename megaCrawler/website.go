@@ -139,10 +139,10 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 		if left == 0 {
 			_ = w.bar.Add(1)
 			w.WG.Done()
-			sugar.Errorf("Max retries exceed for %s: %s", r.Request.URL.String(), err.Error())
+			Sugar.Errorf("Max retries exceed for %s: %s", r.Request.URL.String(), err.Error())
 		} else {
 			time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
-			sugar.Debugf("Website error tries %d for %s: %s", left, r.Request.URL.String(), err.Error())
+			Sugar.Debugf("Website error tries %d for %s: %s", left, r.Request.URL.String(), err.Error())
 		}
 	})
 
@@ -174,12 +174,12 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 		_ = w.bar.Add(1)
 		ctx := response.Ctx.GetAny("ctx").(*Context)
 		if ctx.Title == "" && ctx.PageType != Index {
-			sugar.Debugw("Empty Page", "Body", string(response.Body), "Status", response.StatusCode, "Url", ctx.Url)
+			Sugar.Debugw("Empty Page", "Body", string(response.Body), "Status", response.StatusCode, "Url", ctx.Url)
 		}
 		ctx.CrawlTime = time.Now()
 		go func() {
 			if !ctx.process() {
-				sugar.Debugw("Empty Page", spread(*ctx)...)
+				Sugar.Debugw("Empty Page", spread(*ctx)...)
 				RetryRequest(response.Request, 10)
 			} else {
 				w.WG.Done()
@@ -257,21 +257,21 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 
 func startEngine(w *WebsiteEngine) {
 	if w.IsRunning {
-		sugar.Info("Already running id \"" + w.Id + "\"")
+		Sugar.Info("Already running id \"" + w.Id + "\"")
 		return
 	}
-	sugar.Info("Starting engine ", w.Id)
+	Sugar.Info("Starting engine ", w.Id)
 	w.IsRunning = true
 	_ = w.bar.Set(0)
 	w.bar.ChangeMax(0)
 	w.bar.Reset()
 	data, err := w.processUrl()
 	if err != nil {
-		sugar.Error("Error when processing url for id \"" + w.Id + "\": " + err.Error())
+		Sugar.Error("Error when processing url for id \"" + w.Id + "\": " + err.Error())
 	}
-	sugar.Infof("Processed %d data from \"%s\" in %s", len(data), w.Id, shortDur(time.Duration(w.bar.State().SecondsSince)*time.Second))
+	Sugar.Infof("Processed %d data from \"%s\" in %s", len(data), w.Id, shortDur(time.Duration(w.bar.State().SecondsSince)*time.Second))
 	w.IsRunning = false
-	sugar.Info("Finished engine \"" + w.Id + "\"")
+	Sugar.Info("Finished engine \"" + w.Id + "\"")
 }
 
 func (w *WebsiteEngine) toStatus() (s commands.WebsiteStatus) {

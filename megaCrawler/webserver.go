@@ -22,7 +22,7 @@ import (
 //		return
 //	}
 //	if err != nil {
-//		sugar.Error("Failed to serialize response:" + err.Error())
+//		Sugar.Error("Failed to serialize response:" + err.Error())
 //		_ = errorResponse(w, 500, "Failed to serialize response:"+err.Error())
 //		return
 //	}
@@ -31,7 +31,7 @@ import (
 //}
 
 func startHandler(w http.ResponseWriter, r *http.Request) {
-	sugar.Debug("Receive " + r.Method + " startHandler Request from: " + r.RemoteAddr)
+	Sugar.Debug("Receive " + r.Method + " startHandler Request from: " + r.RemoteAddr)
 	var b []byte
 	var err error
 	switch r.Method {
@@ -57,7 +57,7 @@ func startHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != nil {
-		sugar.Error("Failed to serialize response:" + err.Error())
+		Sugar.Error("Failed to serialize response:" + err.Error())
 		_ = errorResponse(w, 500, "Failed to serialize response:"+err.Error())
 		return
 	}
@@ -66,7 +66,7 @@ func startHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func websiteHandler(w http.ResponseWriter, r *http.Request) {
-	sugar.Debug("Receive " + r.Method + " websiteHandler Request from: " + r.RemoteAddr)
+	Sugar.Debug("Receive " + r.Method + " websiteHandler Request from: " + r.RemoteAddr)
 	var b []byte
 	var err error
 	switch r.Method {
@@ -92,7 +92,7 @@ func websiteHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	_, _ = w.Write(b)
 	if err != nil {
-		sugar.Error("Failed to serialize response:" + err.Error())
+		Sugar.Error("Failed to serialize response:" + err.Error())
 		_ = errorResponse(w, 500, "Internal Error : Failed to serialize response:"+err.Error())
 		return
 	}
@@ -102,7 +102,7 @@ func websiteHandler(w http.ResponseWriter, r *http.Request) {
 
 //websiteListHandler returns all registered websites
 func websiteListHandler(w http.ResponseWriter, r *http.Request) {
-	sugar.Debug("Receive ", r.Method, " websiteList Request from: ", r.RemoteAddr)
+	Sugar.Debug("Receive ", r.Method, " websiteList Request from: ", r.RemoteAddr)
 	var b []byte
 	var err error
 	switch r.Method {
@@ -129,7 +129,7 @@ func websiteListHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != nil {
-		sugar.Error("Failed to serialize response:" + err.Error())
+		Sugar.Error("Failed to serialize response:" + err.Error())
 		_ = errorResponse(w, 500, "Internal Error : Failed to serialize response:"+err.Error())
 		return
 	}
@@ -147,7 +147,7 @@ func StartWebServer() {
 	r.HandleFunc("/website/{id}/start/", startHandler)
 
 	http.Handle("/", r)
-	sugar.Info("Listening on", config.Port)
+	Sugar.Info("Listening on", config.Port)
 	go func() {
 		err := http.ListenAndServe(config.Port, nil)
 		if err != nil {

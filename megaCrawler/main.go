@@ -20,9 +20,10 @@ import (
 	"time"
 )
 
-var sugar *zap.SugaredLogger
+var Sugar *zap.SugaredLogger
 var Debug bool
 var Threads int
+var Kafka bool
 
 // CrawlerManager Program structures.
 // Define Start and Stop methods.
@@ -32,9 +33,9 @@ type CrawlerManager struct {
 
 func (c *CrawlerManager) Start(_ service.Service) error {
 	if service.Interactive() {
-		sugar.Info("Running in terminal.")
+		Sugar.Info("Running in terminal.")
 	} else {
-		sugar.Info("Running under service manager.")
+		Sugar.Info("Running under service manager.")
 	}
 	c.exit = make(chan struct{})
 
@@ -49,7 +50,7 @@ func (c *CrawlerManager) Start(_ service.Service) error {
 }
 
 func (c *CrawlerManager) run() error {
-	sugar.Infof("I'm running %v.", service.Platform())
+	Sugar.Infof("I'm running %v.", service.Platform())
 	StartWebServer()
 
 	ticker := time.NewTicker(2 * time.Second)
@@ -64,7 +65,7 @@ func (c *CrawlerManager) run() error {
 
 func (c *CrawlerManager) Stop(_ service.Service) error {
 	// Any work in Stop should be quick, usually a few seconds at most.
-	sugar.Info("CrawlerManager are Stopping!")
+	Sugar.Info("CrawlerManager are Stopping!")
 	close(c.exit)
 	err := config.Configs.Save()
 	if err != nil {
@@ -234,13 +235,14 @@ func Start() {
 	)
 	logger := zap.New(tree)
 
-	sugar = logger.Sugar()
+	Sugar = logger.Sugar()
 	if !Debug && *passwordFlag == "" {
-		panic("Either turn on debug mode or enter the password for kafka")
+		Sugar.Warn("Debug mode and kafka is both not on, you might not see some output.")
 	}
 
 	if *passwordFlag != "" {
 		newsChannel, reportChannel, expertChannel = getProducer()
+		Kafka = true
 	}
 
 	prg := &CrawlerManager{}

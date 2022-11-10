@@ -9,7 +9,7 @@ import (
 
 var (
 	WebMap    = make(map[string]*WebsiteEngine)
-	nextTime  = time.Now().Add(10 * time.Second)
+	nextTime  = time.Now().Add(3 * time.Second)
 	timeMutex = sync.RWMutex{}
 )
 
