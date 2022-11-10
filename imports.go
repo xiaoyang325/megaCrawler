@@ -3,6 +3,7 @@ package main
 import (
 	_ "megaCrawler/plugins/cprindia"
 	_ "megaCrawler/plugins/csis"
+	_ "megaCrawler/plugins/heritage"
 	_ "megaCrawler/plugins/ipcs"
 	_ "megaCrawler/plugins/ips"
 	_ "megaCrawler/plugins/maritimeindia"
