@@ -173,9 +173,6 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 		}
 		_ = w.bar.Add(1)
 		ctx := response.Ctx.GetAny("ctx").(*Context)
-		if ctx.Title == "" && ctx.PageType != Index {
-			Sugar.Debugw("Empty Page", "Body", string(response.Body), "Status", response.StatusCode, "Url", ctx.Url)
-		}
 		ctx.CrawlTime = time.Now()
 		go func() {
 			if !ctx.process() {

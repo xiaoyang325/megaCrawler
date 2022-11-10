@@ -235,7 +235,7 @@ func (c Context) process() (success bool) {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		}
-		if n.Title == "" || n.Content == "" {
+		if n.Title == "" {
 			return false
 		}
 		marshal, err = json.Marshal(n)
