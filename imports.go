@@ -10,6 +10,7 @@ import (
 	_ "megaCrawler/plugins/piie"
 	_ "megaCrawler/plugins/prri"
 	_ "megaCrawler/plugins/quincyinst"
+	_ "megaCrawler/plugins/rockefeller"
 	_ "megaCrawler/plugins/siia"
 	_ "megaCrawler/plugins/southasiajournal"
 	_ "megaCrawler/plugins/vifindia"

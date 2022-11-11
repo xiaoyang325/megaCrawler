@@ -17,6 +17,7 @@ func init() {
 	w.OnHTML("div > div.offset-full-1 > ul > li> div > div > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		w.Visit(element.Attr("href"), megaCrawler.Expert)
 	})
+
 	w.OnHTML(" ul > span > span > li > div.pic > div > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		w.Visit(element.Attr("href"), megaCrawler.Expert)
 	})
@@ -41,7 +42,7 @@ func init() {
 	})
 
 	//专家描述,新闻正文
-	w.OnHTML("#main-content", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+	w.OnHTML(".article-body", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
 		if ctx.PageType == megaCrawler.Expert {
 			ctx.Description = element.Text
 		} else if ctx.PageType == megaCrawler.News {
@@ -51,12 +52,12 @@ func init() {
 
 	//访问index
 	w.OnHTML("#update-loadmore > ul > li > button", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-		w.Visit("href", megaCrawler.Index)
+		w.Visit(element.Attr("href"), megaCrawler.Index)
 	})
 
 	//访问新闻
 	w.OnHTML("section > div > div.authored_content > div > ul> li > article > span.info > span.title > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-		w.Visit("href", megaCrawler.News)
+		w.Visit(element.Attr("href"), megaCrawler.News)
 	})
 
 	//获取作者
@@ -74,4 +75,13 @@ func init() {
 		ctx.Tags = append(ctx.Tags, element.Text)
 	})
 
+	// Twitter
+	w.OnHTML("li.twitter > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+		ctx.TwitterId = element.Text
+	})
+
+	// LinkedIn
+	w.OnHTML("li.linkedin > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+		ctx.TwitterId = element.Text
+	})
 }
