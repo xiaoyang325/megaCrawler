@@ -45,7 +45,7 @@ func init() {
 		if ctx.PageType == megaCrawler.Expert {
 			ctx.Description = element.Text
 		} else if ctx.PageType == megaCrawler.News {
-			ctx.Content == element.Text
+			ctx.Content = element.Text
 		}
 	})
 
