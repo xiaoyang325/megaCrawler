@@ -83,13 +83,13 @@ func getProducer() (newsChannel chan string, reportChannel chan string, expertCh
 
 	syncProducer, err := sarama.NewSyncProducer([]string{"42.157.195.140:11003"}, conf)
 	if err != nil {
-		sugar.Error("Failed to create producer: ", err)
+		Sugar.Error("Failed to create producer: ", err)
 	}
 	wg := sync.WaitGroup{}
 
 	f := func(topic string, channel chan string) {
 		wg.Add(1)
-		sugar.Info("Created producer for ", topic)
+		Sugar.Info("Created producer for ", topic)
 		signals := make(chan os.Signal, 1)
 		signal.Notify(signals, os.Interrupt)
 
@@ -105,9 +105,9 @@ func getProducer() (newsChannel chan string, reportChannel chan string, expertCh
 					Value: sarama.StringEncoder(message),
 				})
 				if err != nil {
-					sugar.Error("Failed to send message to ", topic, err)
+					Sugar.Error("Failed to send message to ", topic, err)
 				}
-				sugar.Debugf("Wrote message at partition: %d, offset: %d", partition, offset)
+				Sugar.Debugf("Wrote message at partition: %d, offset: %d", partition, offset)
 			case <-signals:
 				break ProducerLoop
 			}

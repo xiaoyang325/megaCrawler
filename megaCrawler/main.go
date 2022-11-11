@@ -9,17 +9,21 @@ import (
 	"github.com/mouuff/go-rocket-update/pkg/updater"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"log"
 	"megaCrawler/megaCrawler/commands"
 	"megaCrawler/megaCrawler/config"
 	"net/http"
+	"os"
 	"runtime"
 	"sync"
 	"time"
 )
 
-var sugar *zap.SugaredLogger
+var Sugar *zap.SugaredLogger
 var Debug bool
+var Threads int
+var Kafka bool
 
 // CrawlerManager Program structures.
 // Define Start and Stop methods.
@@ -29,9 +33,9 @@ type CrawlerManager struct {
 
 func (c *CrawlerManager) Start(_ service.Service) error {
 	if service.Interactive() {
-		sugar.Info("Running in terminal.")
+		Sugar.Info("Running in terminal.")
 	} else {
-		sugar.Info("Running under service manager.")
+		Sugar.Info("Running under service manager.")
 	}
 	c.exit = make(chan struct{})
 
@@ -46,7 +50,7 @@ func (c *CrawlerManager) Start(_ service.Service) error {
 }
 
 func (c *CrawlerManager) run() error {
-	sugar.Infof("I'm running %v.", service.Platform())
+	Sugar.Infof("I'm running %v.", service.Platform())
 	StartWebServer()
 
 	ticker := time.NewTicker(2 * time.Second)
@@ -61,7 +65,7 @@ func (c *CrawlerManager) run() error {
 
 func (c *CrawlerManager) Stop(_ service.Service) error {
 	// Any work in Stop should be quick, usually a few seconds at most.
-	sugar.Info("CrawlerManager are Stopping!")
+	Sugar.Info("CrawlerManager are Stopping!")
 	close(c.exit)
 	err := config.Configs.Save()
 	if err != nil {
@@ -79,9 +83,11 @@ func Start() {
 	testFlag := flag.Bool("test", false, "Test connection for every website registered")
 	updateFlag := flag.Bool("update", false, "Update the program to the latest release version")
 	passwordFlag := flag.String("password", "", "The password for kafka server")
+	threadFlag := flag.Int("thread", 16, "Number of networking thread")
 
 	flag.Parse()
 	Debug = *debugFlag
+	Threads = *threadFlag
 	if *updateFlag {
 		var Updater *updater.Updater
 
@@ -92,7 +98,7 @@ func Start() {
 					ArchiveName:   fmt.Sprintf("megaCrawler_%s_%s.tar.gz", runtime.GOOS, runtime.GOARCH),
 				},
 				ExecutableName: "megaCrawler",
-				Version:        "v1.1.2",
+				Version:        "v2.0.0",
 			}
 		} else if runtime.GOOS == "windows" {
 			Updater = &updater.Updater{
@@ -101,7 +107,7 @@ func Start() {
 					ArchiveName:   fmt.Sprintf("megaCrawler_%s_%s.zip", runtime.GOOS, runtime.GOARCH),
 				},
 				ExecutableName: "megaCrawler.exe",
-				Version:        "v1.1.2",
+				Version:        "v2.0.0",
 			}
 		}
 
@@ -184,25 +190,59 @@ func Start() {
 	}
 
 	passwd = *passwordFlag
-	loggerConfig := zap.NewProductionConfig()
+
+	w := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   "./log/debug.json",
+		MaxSize:    500, // megabytes
+		MaxBackups: 3,
+		MaxAge:     28, // days
+	})
+	var fileCore zapcore.Core
+	ProductionEncoder := zap.NewProductionEncoderConfig()
+	DevEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+
 	if *debugFlag {
-		loggerConfig.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
-	}
-	loggerConfig.EncoderConfig.TimeKey = "timestamp"
-	loggerConfig.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.RFC3339)
-
-	logger, err := loggerConfig.Build()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	sugar = logger.Sugar()
-	if Debug {
-		if *passwordFlag == "" {
-			panic("Either turn on debug mode or enter the password for kafka")
-		}
+		fileCore = zapcore.NewCore(
+			zapcore.NewJSONEncoder(ProductionEncoder),
+			w,
+			zap.DebugLevel,
+		)
 	} else {
+		fileCore = zapcore.NewCore(
+			zapcore.NewJSONEncoder(ProductionEncoder),
+			w,
+			zap.InfoLevel,
+		)
+	}
+
+	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		return lvl >= zapcore.ErrorLevel
+	})
+	lowPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		if Debug {
+			return lvl < zapcore.ErrorLevel
+		}
+		return lvl < zapcore.ErrorLevel && lvl > zapcore.DebugLevel
+	})
+
+	consoleDebugging := zapcore.Lock(os.Stdout)
+	consoleErrors := zapcore.Lock(os.Stderr)
+
+	tree := zapcore.NewTee(
+		fileCore,
+		zapcore.NewCore(DevEncoder, consoleDebugging, lowPriority),
+		zapcore.NewCore(DevEncoder, consoleErrors, highPriority),
+	)
+	logger := zap.New(tree)
+
+	Sugar = logger.Sugar()
+	if !Debug && *passwordFlag == "" {
+		Sugar.Warn("Debug mode and kafka is both not on, you might not see some output.")
+	}
+
+	if *passwordFlag != "" {
 		newsChannel, reportChannel, expertChannel = getProducer()
+		Kafka = true
 	}
 
 	prg := &CrawlerManager{}
