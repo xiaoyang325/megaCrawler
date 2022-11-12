@@ -1,4 +1,4 @@
-package megaCrawler
+package Crawler
 
 import (
 	"encoding/json"
@@ -14,6 +14,18 @@ import (
 type errorResp struct {
 	StatusCode int    `json:"status_code"`
 	Message    string `json:"msg"`
+}
+
+func Unique[T comparable](intSlice []T) []T {
+	keys := make(map[T]bool)
+	var list []T
+	for _, entry := range intSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
 }
 
 func Contain[T comparable](slice []T, check T) bool {
