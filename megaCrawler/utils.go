@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -15,7 +16,7 @@ type errorResp struct {
 	Message    string `json:"msg"`
 }
 
-func contain[T comparable](slice []T, check T) bool {
+func Contain[T comparable](slice []T, check T) bool {
 	for _, a := range slice {
 		if a == check {
 			return true
@@ -60,7 +61,7 @@ func errorResponse(w http.ResponseWriter, statusCode int, msg string) (err error
 	if err != nil {
 		return err
 	}
-	sugar.Error(msg)
+	Sugar.Error(msg)
 	return nil
 }
 
@@ -99,4 +100,17 @@ func downloadFile(filepath string, url string) (err error) {
 	}
 
 	return nil
+}
+
+func spread(args interface{}) (k []interface{}) {
+	s := reflect.ValueOf(args)
+	st := s.Type()
+
+	for i := 0; i < st.NumField(); i++ {
+		iField := s.Field(i)
+		tField := st.Field(i)
+		k = append(k, tField.Tag.Get("json"))
+		k = append(k, iField.Interface())
+	}
+	return
 }
