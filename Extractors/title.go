@@ -8,8 +8,6 @@ import (
 	"strings"
 )
 
-var filterRegex, _ = regexp.Compile("[^\\u4e00-\\u9fa5a-zA-Z\\d ]")
-
 func splitTitle(title string, splitter string, hint string) string {
 	var largeTextLength int
 	var largeTextIndex int
@@ -43,6 +41,11 @@ func splitTitle(title string, splitter string, hint string) string {
 //   - h1, if properly detected, is the best (visible to users)
 //   - og:title and h1 can help improve the title extraction
 func getTitle(dom *colly.HTMLElement) (title string) {
+	var filterRegex, err = regexp.Compile("[^\u4e00-\u9fa5a-zA-Z\\d ]")
+	if err != nil {
+		Crawler.Sugar.Panic("Compile regex failed", err)
+		return
+	}
 	title = dom.ChildText("title")
 	var useDelimeter bool
 	if len(title) == 0 {
@@ -98,4 +101,13 @@ func getTitle(dom *colly.HTMLElement) (title string) {
 		title = titleH1
 	}
 	return title
+}
+
+func Titles(ctx *Crawler.Context, dom *colly.HTMLElement) {
+	title := getTitle(dom)
+	if ctx.PageType == Crawler.Expert {
+		ctx.Name = title
+	} else {
+		ctx.Title = title
+	}
 }
