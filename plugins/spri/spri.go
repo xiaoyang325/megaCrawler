@@ -2,30 +2,47 @@ package spri
 
 import (
 	"github.com/gocolly/colly/v2"
-	"megaCrawler/megaCrawler"
+	"megaCrawler/Crawler"
+	"megaCrawler/Extractors"
+	"regexp"
+	"strconv"
 )
 
 func init() {
-	w := megaCrawler.Register("spri", "安全政策改革研究所", "https://www.securityreform.org/")
+	w := Crawler.Register("spri", "安全政策改革研究所", "https://www.securityreform.org/")
 	w.SetStartingUrls([]string{"https://www.securityreform.org/news-and-analysis"})
 
-	//访问新闻
-	w.OnHTML("a.summary-title-link", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-		w.Visit(element.Attr("href"), megaCrawler.News)
+	w.OnHTML("html", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		Extractors.Tags(ctx, element)
+		Extractors.Titles(ctx, element)
 	})
 
-	//获取新闻标题
-	w.OnHTML("header > h1 > a", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
-		ctx.Title = element.Text
+	//访问新闻
+	w.OnHTML("a.summary-title-link", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.News)
 	})
 
 	//获取新闻时间
-	w.OnHTML(" header > div > span.date > a > time", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+	w.OnHTML(" header > div > span.date > a > time", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.PublicationTime = element.Text
 	})
 
 	//获取正文
-	w.OnHTML("#page>article>div>div>div>div>div>div>div>div>p", func(element *colly.HTMLElement, ctx *megaCrawler.Context) {
+	w.OnHTML(".entry-content", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Content = element.Text
+	})
+
+	w.OnHTML(".like-count", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		reg, _ := regexp.Compile("\\d+")
+		if val, err := strconv.Atoi(reg.FindString(element.Text)); err != nil {
+			ctx.LikeCount = val
+		}
+	})
+
+	w.OnHTML(".comment-count", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		reg, _ := regexp.Compile("\\d+")
+		if val, err := strconv.Atoi(reg.FindString(element.Text)); err != nil {
+			ctx.LikeCount = val
+		}
 	})
 }
