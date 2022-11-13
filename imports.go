@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "megaCrawler/plugins/splcenter"
 	//_ "megaCrawler/plugins/cprindia"
 	//_ "megaCrawler/plugins/csis"
 	//_ "megaCrawler/plugins/heritage"
@@ -13,6 +14,7 @@ import (
 	//_ "megaCrawler/plugins/rockefeller"
 	//_ "megaCrawler/plugins/siia"
 	//_ "megaCrawler/plugins/southasiajournal"
-	_ "megaCrawler/plugins/spri"
+	//_ "megaCrawler/plugins/spri"
+	//_ "megaCrawler/plugins/stanford"
 	//_ "megaCrawler/plugins/vifindia"
 )
