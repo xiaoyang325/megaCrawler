@@ -1,8 +1,8 @@
 package Crawler
 
 import (
+	"github.com/jpillora/go-tld"
 	"megaCrawler/Crawler/config"
-	"net/url"
 	"sync"
 	"time"
 )
@@ -15,7 +15,7 @@ var (
 
 // Register 注册插件控制器
 func Register(service string, name string, baseUrl string) *WebsiteEngine {
-	k, err := url.Parse(baseUrl)
+	k, err := tld.Parse(baseUrl)
 	if err != nil {
 		panic(err)
 	}
