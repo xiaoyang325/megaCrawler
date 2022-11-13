@@ -1,4 +1,4 @@
-package megaCrawler
+package Crawler
 
 import (
 	"encoding/json"
@@ -9,8 +9,8 @@ import (
 	"github.com/temoto/robotstxt"
 	"io/ioutil"
 	"math/rand"
-	"megaCrawler/megaCrawler/commands"
-	"megaCrawler/megaCrawler/config"
+	"megaCrawler/Crawler/commands"
+	"megaCrawler/Crawler/config"
 	"net/http"
 	"net/url"
 	"strings"

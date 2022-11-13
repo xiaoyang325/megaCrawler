@@ -1,4 +1,4 @@
-package megaCrawler
+package Crawler
 
 import "github.com/gocolly/colly/v2"
 

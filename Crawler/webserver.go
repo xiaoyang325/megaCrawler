@@ -1,10 +1,10 @@
-package megaCrawler
+package Crawler
 
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"megaCrawler/megaCrawler/commands"
-	"megaCrawler/megaCrawler/config"
+	"megaCrawler/Crawler/commands"
+	"megaCrawler/Crawler/config"
 	"net/http"
 	"sort"
 )
