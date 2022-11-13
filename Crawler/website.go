@@ -45,15 +45,16 @@ func (w *WebsiteEngine) Visit(url string, pageType PageType) {
 		return
 	}
 
-	u, err := tld.Parse(url)
+	u, err := w.BaseUrl.Parse(url)
 	if err != nil {
 		return
 	}
-	if u.Domain != w.BaseUrl.Domain || u.TLD != w.BaseUrl.TLD {
+	topLevel, _ := tld.Parse(u.String())
+	if topLevel.Domain != w.BaseUrl.Domain || topLevel.TLD != w.BaseUrl.TLD {
 		return
 	}
 
-	w.UrlData <- urlData{Url: u.URL, PageType: pageType}
+	w.UrlData <- urlData{Url: u, PageType: pageType}
 }
 
 func (w *WebsiteEngine) SetStartingUrls(urls []string) *WebsiteEngine {
