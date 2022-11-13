@@ -5,6 +5,7 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/extensions"
+	tld "github.com/jpillora/go-tld"
 	"github.com/schollz/progressbar/v3"
 	"github.com/temoto/robotstxt"
 	"io/ioutil"
@@ -20,7 +21,7 @@ import (
 
 type WebsiteEngine struct {
 	Id           string
-	BaseUrl      url.URL
+	BaseUrl      tld.URL
 	IsRunning    bool
 	Disabled     bool
 	bar          *progressbar.ProgressBar
@@ -44,12 +45,15 @@ func (w *WebsiteEngine) Visit(url string, pageType PageType) {
 		return
 	}
 
-	u, err := w.BaseUrl.Parse(url)
-	if err != nil || u.Host != w.BaseUrl.Host {
+	u, err := tld.Parse(url)
+	if err != nil {
+		return
+	}
+	if u.Domain != w.BaseUrl.Domain || u.TLD != w.BaseUrl.TLD {
 		return
 	}
 
-	w.UrlData <- urlData{Url: u, PageType: pageType}
+	w.UrlData <- urlData{Url: u.URL, PageType: pageType}
 }
 
 func (w *WebsiteEngine) SetStartingUrls(urls []string) *WebsiteEngine {
@@ -291,7 +295,7 @@ func (w *WebsiteEngine) toJson() (b []byte, err error) {
 	return
 }
 
-func NewEngine(id string, baseUrl url.URL) (we *WebsiteEngine) {
+func NewEngine(id string, baseUrl tld.URL) (we *WebsiteEngine) {
 	we = &WebsiteEngine{
 		WG:         &sync.WaitGroup{},
 		Id:         id,
