@@ -1,4 +1,4 @@
-package megaCrawler
+package Crawler
 
 import (
 	"encoding/json"

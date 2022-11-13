@@ -1,7 +1,7 @@
-package megaCrawler
+package Crawler
 
 import (
-	"megaCrawler/megaCrawler/config"
+	"megaCrawler/Crawler/config"
 	"net/url"
 	"sync"
 	"time"

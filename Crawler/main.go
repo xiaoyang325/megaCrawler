@@ -1,4 +1,4 @@
-package megaCrawler
+package Crawler
 
 import (
 	"encoding/json"
@@ -11,8 +11,8 @@ import (
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"log"
-	"megaCrawler/megaCrawler/commands"
-	"megaCrawler/megaCrawler/config"
+	"megaCrawler/Crawler/commands"
+	"megaCrawler/Crawler/config"
 	"net/http"
 	"os"
 	"runtime"
