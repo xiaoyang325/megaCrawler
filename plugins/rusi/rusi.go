@@ -63,7 +63,7 @@ func init() {
 	//获取标签
 	w.OnHTML("#gatsby-focus-wrapper > div:nth-child(2) > div.Layout-module--component--JbLd9 > div > main > article > div.Article-module--contentArea--7IPcP > div:nth-child(1) > section.KeywordTags-module--component--s-ZCe.Article-module--section--vy2LJ.hideOnPrint > div:nth-child(2) > ul > li > a > span",
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Tags = element.Text
+			ctx.Tags = append(ctx.Tags, element.Text)
 		})
 
 	//pdf
