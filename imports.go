@@ -12,6 +12,7 @@ import (
 	_ "megaCrawler/plugins/quincyinst"
 	_ "megaCrawler/plugins/rockefeller"
 	_ "megaCrawler/plugins/rra"
+	_ "megaCrawler/plugins/si"
 	_ "megaCrawler/plugins/siia"
 	_ "megaCrawler/plugins/southasiajournal"
 	_ "megaCrawler/plugins/splcenter"
