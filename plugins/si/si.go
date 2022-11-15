@@ -16,7 +16,7 @@ func init() {
 	})
 
 	//访问新闻
-	w.OnHTML("h2.post-title.h5", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".post-link", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		w.Visit(element.Attr("href"), Crawler.News)
 	})
 
@@ -36,7 +36,7 @@ func init() {
 	})
 
 	//获取正文
-	w.OnHTML("  div.row > div.col-md-7 > p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.row > div.col-md-7 > p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Content = element.Text
 	})
 
