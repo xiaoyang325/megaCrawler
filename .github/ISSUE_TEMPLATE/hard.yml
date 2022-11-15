@@ -1,0 +1,55 @@
+name: "复杂网站"
+description: "你无法自行完成的网站"
+labels: [help wanted]
+body:
+  - type: input
+    id: intro
+    attributes:
+      label: "摘要"
+      description: "这个网站有什么困难的简单摘要"
+    validations:
+      required: true
+  - type: input
+    id: website
+    attributes:
+      label: "网站 Url"
+      description: "这个网站的 URL 和 ID"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce_step
+    attributes:
+      label: "复现步骤"
+      description: >
+         你做了什么来发现这个困难。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce_code
+    attributes:
+      label: "最小的复现代码"
+      description: >
+        一个展示了这个错误的代码片段。
+      render: golang
+  - type: textarea
+    id: problem
+    attributes:
+      label: "问题所在"
+      description: >
+        你需要解决什么问题？
+    validations:
+      required: true
+  - type: checkboxes
+    id: check_list
+    attributes:
+      label: "核对清单"
+      description: >
+        确保在报告这个问题时，你已经适当地做了调查!
+      options:
+        - label: "如果是关于如何进入入口的问题，我已经确认该网站并没有 sitemap。"
+          required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: "额外背景"
+      description: "如果还有什么要说的，请在这里说。"
