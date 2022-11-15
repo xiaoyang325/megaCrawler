@@ -199,19 +199,20 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 			ctx := colly.NewContext()
 
 			ctx.Put("ctx", &Context{
-				PageType:  k.PageType,
-				Authors:   []string{},
-				Image:     []string{},
-				Video:     []string{},
-				Audio:     []string{},
-				File:      []string{},
-				Link:      []string{},
-				Tags:      []string{},
-				Keywords:  []string{},
-				Url:       k.Url.String(),
-				Host:      k.Url.Host,
-				Website:   w.Id,
-				CrawlTime: time.Time{},
+				PageType:   k.PageType,
+				Authors:    []string{},
+				Image:      []string{},
+				Video:      []string{},
+				Audio:      []string{},
+				File:       []string{},
+				Link:       []string{},
+				Tags:       []string{},
+				Keywords:   []string{},
+				SubContext: []*Context{},
+				Url:        k.Url.String(),
+				Host:       k.Url.Host,
+				Website:    w.Id,
+				CrawlTime:  time.Time{},
 			})
 			w.WG.Add(1)
 			err := c.Request("GET", k.Url.String(), nil, ctx, nil)
