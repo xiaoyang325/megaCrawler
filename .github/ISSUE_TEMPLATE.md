@@ -1,7 +1,7 @@
 ---
-name: 复杂网站模版
-about: 你无法自行完成的网站
-title: [复杂网站]: 这个网站有什么困难的简单摘要"
+name: "复杂网站模版"
+about: "你无法自行完成的网站"
+title: "[复杂网站]: 这个网站有什么困难的简单摘要"
 labels: "help wanted"
 assignees: ""
 ---
