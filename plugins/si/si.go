@@ -40,18 +40,12 @@ func init() {
 		ctx.Content = element.Text
 	})
 
-	//获取人物姓名
-	w.OnHTML("#aboutTeamMembers > div > div > a > div > h4", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Name = element.Text
-	})
-
-	//获取人物头衔
-	w.OnHTML("#aboutTeamMembers > div > div > a > div > p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Title = element.Text
-	})
-
-	//获取人物介绍
-	w.OnHTML("#aboutTeamMembers>div>div>div>p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Description = element.Text
+	//获取人物信息
+	w.OnHTML(".person", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		subCtx := ctx.CreateSubContext()
+		subCtx.PageType = Crawler.Expert
+		subCtx.Name = element.ChildText(".person-name")
+		subCtx.Title = element.ChildText(".person-position")
+		subCtx.Description = element.ChildText(".person > div > p")
 	})
 }
