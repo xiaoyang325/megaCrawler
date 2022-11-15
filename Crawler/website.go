@@ -5,6 +5,7 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/extensions"
+	tld "github.com/jpillora/go-tld"
 	"github.com/schollz/progressbar/v3"
 	"github.com/temoto/robotstxt"
 	"io/ioutil"
@@ -20,7 +21,7 @@ import (
 
 type WebsiteEngine struct {
 	Id           string
-	BaseUrl      url.URL
+	BaseUrl      tld.URL
 	IsRunning    bool
 	Disabled     bool
 	bar          *progressbar.ProgressBar
@@ -45,7 +46,11 @@ func (w *WebsiteEngine) Visit(url string, pageType PageType) {
 	}
 
 	u, err := w.BaseUrl.Parse(url)
-	if err != nil || u.Host != w.BaseUrl.Host {
+	if err != nil {
+		return
+	}
+	topLevel, _ := tld.Parse(u.String())
+	if topLevel.Domain != w.BaseUrl.Domain || topLevel.TLD != w.BaseUrl.TLD {
 		return
 	}
 
@@ -194,19 +199,20 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 			ctx := colly.NewContext()
 
 			ctx.Put("ctx", &Context{
-				PageType:  k.PageType,
-				Authors:   []string{},
-				Image:     []string{},
-				Video:     []string{},
-				Audio:     []string{},
-				File:      []string{},
-				Link:      []string{},
-				Tags:      []string{},
-				Keywords:  []string{},
-				Url:       k.Url.String(),
-				Host:      k.Url.Host,
-				Website:   w.Id,
-				CrawlTime: time.Time{},
+				PageType:   k.PageType,
+				Authors:    []string{},
+				Image:      []string{},
+				Video:      []string{},
+				Audio:      []string{},
+				File:       []string{},
+				Link:       []string{},
+				Tags:       []string{},
+				Keywords:   []string{},
+				SubContext: []*Context{},
+				Url:        k.Url.String(),
+				Host:       k.Url.Host,
+				Website:    w.Id,
+				CrawlTime:  time.Time{},
 			})
 			w.WG.Add(1)
 			err := c.Request("GET", k.Url.String(), nil, ctx, nil)
@@ -291,7 +297,7 @@ func (w *WebsiteEngine) toJson() (b []byte, err error) {
 	return
 }
 
-func NewEngine(id string, baseUrl url.URL) (we *WebsiteEngine) {
+func NewEngine(id string, baseUrl tld.URL) (we *WebsiteEngine) {
 	we = &WebsiteEngine{
 		WG:         &sync.WaitGroup{},
 		Id:         id,

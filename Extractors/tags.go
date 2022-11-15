@@ -10,7 +10,7 @@ func getTags(dom *colly.HTMLElement) (tags []string) {
 	if len(tags) != 0 {
 		tags = append(tags, dom.ChildTexts("a[href*='/tag/'], a[href*='/tags/'], a[href*='/topic/'], a[href*='?keyword=']")...)
 	}
-	return
+	return Crawler.Unique(tags)
 }
 
 func Tags(ctx *Crawler.Context, dom *colly.HTMLElement) {
