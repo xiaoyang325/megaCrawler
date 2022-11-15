@@ -36,7 +36,7 @@ func init() {
 	})
 
 	//获取正文
-	w.OnHTML(" div.row > div.col-md-7.offset-md-1.post-content.fadein-children > p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("  div.row > div.col-md-7 > p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Content = element.Text
 	})
 
