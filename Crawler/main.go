@@ -14,6 +14,7 @@ import (
 	"megaCrawler/Crawler/commands"
 	"megaCrawler/Crawler/config"
 	"net/http"
+	"net/url"
 	"os"
 	"runtime"
 	"sync"
@@ -24,6 +25,7 @@ var Sugar *zap.SugaredLogger
 var Debug bool
 var Threads int
 var Kafka bool
+var Proxy *url.URL
 
 // CrawlerManager Program structures.
 // Define Start and Stop methods.
@@ -72,6 +74,10 @@ func (c *CrawlerManager) Stop(_ service.Service) error {
 		return err
 	}
 	return nil
+}
+
+func getProxy() {
+
 }
 
 // Start is a blocking function that starts the crawler
@@ -243,6 +249,14 @@ func Start() {
 	if *passwordFlag != "" {
 		newsChannel, reportChannel, expertChannel = getProducer()
 		Kafka = true
+	}
+
+	if proxy := os.Getenv("HTTP_PROXY"); proxy != "" {
+		if parsedU, err := url.Parse(proxy); err == nil {
+			Proxy = parsedU
+		} else {
+			Sugar.Panicf("Cannot parse proxy in HTTP_PROXY: %s", proxy)
+		}
 	}
 
 	prg := &CrawlerManager{}

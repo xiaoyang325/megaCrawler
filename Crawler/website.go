@@ -108,6 +108,13 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 	extensions.RandomUserAgent(c)
 	extensions.Referer(c)
 
+	if Proxy != nil {
+		err := c.SetProxy(Proxy.String())
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	err := c.Limit(&colly.LimitRule{
 		RandomDelay: 5 * time.Second,
 		DomainGlob:  cc.domainGlob,
