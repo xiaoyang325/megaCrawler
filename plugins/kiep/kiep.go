@@ -3,25 +3,25 @@ package kiep
 import (
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 // 这个函数用于分隔使用 "," 和 "and" 的字符串
 // 并返回分割开的 []string
-func cutToList(input_str string) ([]string)  {
-	name_str := strings.Replace(input_str, "and", ",", 1)
-	name_list := strings.Split(name_str, ",")
-	for index, value := range name_list {
-		name_list[index] = strings.TrimSpace(value)
+func cutToList(inputStr string) []string {
+	nameStr := strings.Replace(inputStr, "and", ",", 1)
+	nameList := strings.Split(nameStr, ",")
+	for index, value := range nameList {
+		nameList[index] = strings.TrimSpace(value)
 	}
 
-	return name_list
+	return nameList
 }
 
 func init() {
 	w := Crawler.Register("kiep", "对外经济政策研究所", "https://www.kiep.go.kr/")
-	
+
 	w.SetStartingUrls([]string{
 		"https://www.kiep.go.kr/gallery.es?mid=a20301000000&bid=0007",
 		"https://www.kiep.go.kr/gallery.es?mid=a20303000000&bid=0001&cg_code=C01,C02,C03,C04,C13,C19",
@@ -90,7 +90,6 @@ func init() {
 			ctx.Description = strings.TrimSpace(element.Text)
 		})
 
-
 	// 获取 PublicationTime
 	w.OnHTML(`.info > li.date > span`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
@@ -107,7 +106,7 @@ func init() {
 	w.OnHTML(`.info > li.write > span`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			// 若有 "," 或者 "and" 则为多人作者
-			if (strings.Contains(element.Text, ",")) {
+			if strings.Contains(element.Text, ",") {
 				ctx.Authors = append(ctx.Authors, cutToList(element.Text)...)
 			} else {
 				ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
@@ -118,7 +117,7 @@ func init() {
 	w.OnHTML(`.board_book .desc > .info > span:nth-child(1) > strong`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			// 若有 "," 或者 "and" 则为多人作者
-			if (strings.Contains(element.Text, ",")) {
+			if strings.Contains(element.Text, ",") {
 				ctx.Authors = append(ctx.Authors, cutToList(element.Text)...)
 			} else {
 				ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
@@ -141,7 +140,7 @@ func init() {
 	w.OnHTML(`.board_book .desc > .category`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			// 若有 "," 或者 "and" 则为多个 Tag
-			if (strings.Contains(element.Text, ",")) {
+			if strings.Contains(element.Text, ",") {
 				ctx.Tags = append(ctx.Tags, cutToList(element.Text)...)
 			} else {
 				ctx.Tags = append(ctx.Tags, strings.TrimSpace(element.Text))

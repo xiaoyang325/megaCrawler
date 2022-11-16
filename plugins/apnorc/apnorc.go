@@ -11,6 +11,7 @@ func init() {
 		"https://apnorc.org/")
 
 	w.SetStartingUrls([]string{
+		"https://apnorc.org/experts/",
 		"https://apnorc.org/topics/economics/",
 		"https://apnorc.org/topics/politics/",
 		"https://apnorc.org/topics/healthcare/",
@@ -60,4 +61,16 @@ func init() {
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.Content = strings.TrimSpace(element.Text)
 		})
+
+	w.OnHTML(".experts-list", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		subCtx := ctx.CreateSubContext()
+		subCtx.PageType = Crawler.Expert
+		subCtx.Title = element.ChildText(".designation")
+		subCtx.Area = element.ChildText(".organisation")
+		subCtx.Email = strings.TrimSpace(element.ChildText(".email-address"))
+		subCtx.Phone = element.ChildText(".contact-no")
+		subCtx.Name = element.ChildText(".entry-title")
+		subCtx.Image = []string{element.ChildAttr(".has-thumbnail > img", "src")}
+		subCtx.Description = element.ChildText(".content")
+	})
 }

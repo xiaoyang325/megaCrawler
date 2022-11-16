@@ -94,6 +94,56 @@ func Start() {
 	flag.Parse()
 	Debug = *debugFlag
 	Threads = *threadFlag
+
+	w := zapcore.AddSync(&lumberjack.Logger{
+		Filename:   "./log/debug.json",
+		MaxSize:    500, // megabytes
+		MaxBackups: 3,
+		MaxAge:     28, // days
+	})
+	var fileCore zapcore.Core
+	ProductionEncoder := zap.NewProductionEncoderConfig()
+	DevEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+
+	if *debugFlag {
+		fileCore = zapcore.NewCore(
+			zapcore.NewJSONEncoder(ProductionEncoder),
+			w,
+			zap.DebugLevel,
+		)
+	} else {
+		fileCore = zapcore.NewCore(
+			zapcore.NewJSONEncoder(ProductionEncoder),
+			w,
+			zap.InfoLevel,
+		)
+	}
+
+	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		return lvl >= zapcore.ErrorLevel
+	})
+	lowPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		if Debug {
+			return lvl < zapcore.ErrorLevel
+		}
+		return lvl < zapcore.ErrorLevel && lvl > zapcore.DebugLevel
+	})
+
+	consoleDebugging := zapcore.Lock(os.Stdout)
+	consoleErrors := zapcore.Lock(os.Stderr)
+
+	tree := zapcore.NewTee(
+		fileCore,
+		zapcore.NewCore(DevEncoder, consoleDebugging, lowPriority),
+		zapcore.NewCore(DevEncoder, consoleErrors, highPriority),
+	)
+	logger := zap.New(tree)
+
+	Sugar = logger.Sugar()
+	if !Debug && *passwordFlag == "" {
+		Sugar.Warn("Debug mode and kafka is both not on, you might not see some output.")
+	}
+
 	if *updateFlag {
 		var Updater *updater.Updater
 
@@ -196,55 +246,6 @@ func Start() {
 	}
 
 	passwd = *passwordFlag
-
-	w := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   "./log/debug.json",
-		MaxSize:    500, // megabytes
-		MaxBackups: 3,
-		MaxAge:     28, // days
-	})
-	var fileCore zapcore.Core
-	ProductionEncoder := zap.NewProductionEncoderConfig()
-	DevEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
-
-	if *debugFlag {
-		fileCore = zapcore.NewCore(
-			zapcore.NewJSONEncoder(ProductionEncoder),
-			w,
-			zap.DebugLevel,
-		)
-	} else {
-		fileCore = zapcore.NewCore(
-			zapcore.NewJSONEncoder(ProductionEncoder),
-			w,
-			zap.InfoLevel,
-		)
-	}
-
-	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl >= zapcore.ErrorLevel
-	})
-	lowPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		if Debug {
-			return lvl < zapcore.ErrorLevel
-		}
-		return lvl < zapcore.ErrorLevel && lvl > zapcore.DebugLevel
-	})
-
-	consoleDebugging := zapcore.Lock(os.Stdout)
-	consoleErrors := zapcore.Lock(os.Stderr)
-
-	tree := zapcore.NewTee(
-		fileCore,
-		zapcore.NewCore(DevEncoder, consoleDebugging, lowPriority),
-		zapcore.NewCore(DevEncoder, consoleErrors, highPriority),
-	)
-	logger := zap.New(tree)
-
-	Sugar = logger.Sugar()
-	if !Debug && *passwordFlag == "" {
-		Sugar.Warn("Debug mode and kafka is both not on, you might not see some output.")
-	}
 
 	if *passwordFlag != "" {
 		newsChannel, reportChannel, expertChannel = getProducer()
