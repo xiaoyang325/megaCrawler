@@ -3,14 +3,14 @@ package aansi
 import (
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 func init() {
 	w := Crawler.Register("aansi", "American-Armenian National Security Institute",
-			"https://aansi.org/")
-	
+		"https://aansi.org/")
+
 	w.SetStartingUrls([]string{
 		"https://aansi.org/tag/future/",
 		"https://aansi.org/tag/investment/",

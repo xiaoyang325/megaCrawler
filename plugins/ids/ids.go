@@ -8,7 +8,7 @@ import (
 
 func init() {
 	w := Crawler.Register("ids", "发展研究所", "https://www.ids.ac.uk/")
-	
+
 	w.SetStartingUrls([]string{
 		"https://www.ids.ac.uk/about/clusters-and-teams/",
 		"https://www.ids.ac.uk/events/",
@@ -112,7 +112,7 @@ func init() {
 	// 获取 Content
 	w.OnHTML(`.o-content-from-editor`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			if (!strings.Contains(ctx.Url, "/learn-at-ids/")) {
+			if !strings.Contains(ctx.Url, "/learn-at-ids/") {
 				ctx.Content = strings.TrimSpace(element.Text)
 			}
 		})
@@ -120,7 +120,7 @@ func init() {
 	// 获取 Content (Type 2)
 	w.OnHTML(`.o-layout .u-container:nth-child(1) .o-layout__eight-col`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			if (strings.Contains(ctx.Url, "/learn-at-ids/")) {
+			if strings.Contains(ctx.Url, "/learn-at-ids/") {
 				ctx.Content = strings.TrimSpace(element.Text)
 			}
 		})

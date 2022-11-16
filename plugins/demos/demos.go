@@ -1,15 +1,15 @@
 package demos
 
 import (
+	"fmt"
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
 	"strings"
-	"fmt"
 )
 
 func init() {
 	w := Crawler.Register("demos", "Demos", "https://www.demos.org/")
-	
+
 	w.SetStartingUrls([]string{
 		"https://www.demos.org/our-issues/democratic-reform",
 		"https://www.demos.org/our-issues/economic-justice",
@@ -24,7 +24,7 @@ func init() {
 	w.OnHTML(`li[class="pager__item pager__item--next"] > a`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			fmt.Println(element.Attr("href"))
-			w.Visit("https://www.demos.org/resources" + element.Attr("href"), Crawler.Index)
+			w.Visit("https://www.demos.org/resources"+element.Attr("href"), Crawler.Index)
 		})
 
 	// 访问 Report 从 Index

@@ -1,4 +1,5 @@
 package apnorc
+
 import (
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
@@ -7,8 +8,8 @@ import (
 
 func init() {
 	w := Crawler.Register("apnorc", "Associated Press-NORC Center for Public Affairs Research",
-			"https://apnorc.org/")
-	
+		"https://apnorc.org/")
+
 	w.SetStartingUrls([]string{
 		"https://apnorc.org/topics/economics/",
 		"https://apnorc.org/topics/politics/",
