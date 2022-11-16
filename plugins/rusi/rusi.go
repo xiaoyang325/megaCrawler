@@ -1,88 +1,368 @@
 package rusi
 
 import (
+	"encoding/json"
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
+	"regexp"
+	"strings"
 )
+
+type PageData struct {
+	ComponentChunkName string `json:"componentChunkName"`
+	Path               string `json:"path"`
+	Result             struct {
+		Data struct {
+			Article struct {
+				Typename string `json:"__typename"`
+				Id       string `json:"id"`
+				Path     struct {
+					Alias string `json:"alias"`
+				} `json:"path"`
+				FieldReadTime           string      `json:"field_read_time"`
+				Title                   string      `json:"title"`
+				FieldMetatag            interface{} `json:"field_metatag"`
+				Created                 string      `json:"created"`
+				FieldOutsideAuthor      string      `json:"field_outside_author"`
+				FieldProfileDescriptors string      `json:"field_profile_descriptors"`
+				FieldPremium            bool        `json:"field_premium"`
+				FieldAbstract           struct {
+					Value     string `json:"value"`
+					Format    string `json:"format"`
+					Processed string `json:"processed"`
+				} `json:"field_abstract"`
+				Body struct {
+					Summary   string `json:"summary"`
+					Processed string `json:"processed"`
+					Value     string `json:"value"`
+				} `json:"body"`
+				FieldPublicationIssue    interface{} `json:"field_publication_issue"`
+				FieldPublicationVolume   interface{} `json:"field_publication_volume"`
+				FieldTandfPublic         bool        `json:"field_tandf_public"`
+				FieldTaylorAndFrancisUrl interface{} `json:"field_taylor_and_francis_url"`
+				Relationships            struct {
+					FieldMediaEnquiry interface{}   `json:"field_media_enquiry_"`
+					FieldSections     []interface{} `json:"field_sections"`
+					FieldContentType  struct {
+						Name string `json:"name"`
+						Path struct {
+							Alias string `json:"alias"`
+						} `json:"path"`
+					} `json:"field_content_type"`
+					FieldAuthor []struct {
+						Id                string      `json:"id"`
+						Title             string      `json:"title"`
+						FieldFirstNames   string      `json:"field_first_names"`
+						FieldEmailAddress interface{} `json:"field_email_address"`
+						Path              struct {
+							Alias string `json:"alias"`
+						} `json:"path"`
+						FieldPosition string `json:"field_position"`
+						Relationships struct {
+							FieldStaffDepartment []interface{} `json:"field_staff_department"`
+							FieldUserPicture     interface{}   `json:"field_user_picture"`
+						} `json:"relationships"`
+					} `json:"field_author"`
+					FieldPdf            []interface{} `json:"field_pdf"`
+					FieldRegion         []interface{} `json:"field_region"`
+					FieldResearchGroups []interface{} `json:"field_research_groups"`
+					FieldTopics         []struct {
+						Id   string `json:"id"`
+						Name string `json:"name"`
+						Path struct {
+							Alias string `json:"alias"`
+						} `json:"path"`
+					} `json:"field_topics"`
+					FieldRelatedProject []struct {
+						Id   string `json:"id"`
+						Name string `json:"name"`
+						Path struct {
+							Alias string `json:"alias"`
+						} `json:"path"`
+					} `json:"field_related_project"`
+					FieldMediaImage struct {
+						Relationships struct {
+							FieldMediaImage struct {
+								ChildImageKitAsset struct {
+									Fluid struct {
+										AspectRatio float64 `json:"aspectRatio"`
+										Base64      string  `json:"base64"`
+										Sizes       string  `json:"sizes"`
+										Src         string  `json:"src"`
+										SrcSet      string  `json:"srcSet"`
+									} `json:"fluid"`
+								} `json:"childImageKitAsset"`
+								Relationships struct {
+									MediaImage []struct {
+										FieldCredit     string      `json:"field_credit"`
+										FieldCreditLink interface{} `json:"field_credit_link"`
+									} `json:"media__image"`
+								} `json:"relationships"`
+							} `json:"field_media_image"`
+						} `json:"relationships"`
+					} `json:"field_media_image"`
+					FieldSignpostImage    interface{}   `json:"field_signpost_image"`
+					FieldJournalSignposts []interface{} `json:"field_journal_signposts"`
+				} `json:"relationships"`
+			} `json:"article"`
+		} `json:"data"`
+		PageContext struct {
+			Id         string `json:"id"`
+			Title      string `json:"title"`
+			IsHomepage bool   `json:"isHomepage"`
+			Breadcrumb struct {
+				Location string `json:"location"`
+				Crumbs   []struct {
+					Pathname   string `json:"pathname"`
+					CrumbLabel string `json:"crumbLabel"`
+				} `json:"crumbs"`
+			} `json:"breadcrumb"`
+		} `json:"pageContext"`
+	} `json:"result"`
+	StaticQueryHashes []string `json:"staticQueryHashes"`
+}
+type NewsData struct {
+	ComponentChunkName string `json:"componentChunkName"`
+	Path               string `json:"path"`
+	Result             struct {
+		Data struct {
+			Node struct {
+				Title                      string `json:"title"`
+				Id                         string `json:"id"`
+				FieldPublishDate           string `json:"field_publish_date"`
+				MachineDate                string `json:"machineDate"`
+				FieldPrimaryTag            string `json:"field_primary_tag"`
+				FieldFocus                 string `json:"field_focus"`
+				FieldExternalPubDescriptor string `json:"field_external_pub_descriptor"`
+				FieldOrganisation          struct {
+					Title string `json:"title"`
+					Uri   string `json:"uri"`
+				} `json:"field_organisation"`
+				Relationships struct {
+					FieldSections    []interface{} `json:"field_sections"`
+					FieldContentType struct {
+						Path struct {
+							Alias string `json:"alias"`
+						} `json:"path"`
+						Name string `json:"name"`
+					} `json:"field_content_type"`
+					FieldExternalPublication struct {
+						Name string `json:"name"`
+						Path struct {
+							Alias string `json:"alias"`
+						} `json:"path"`
+						Relationships struct {
+							FieldExternalPublicationLogo struct {
+								Relationships struct {
+									FieldMediaImage struct {
+										ChildImageKitAsset struct {
+											Fluid struct {
+												AspectRatio int    `json:"aspectRatio"`
+												Base64      string `json:"base64"`
+												Sizes       string `json:"sizes"`
+												Src         string `json:"src"`
+												SrcSet      string `json:"srcSet"`
+											} `json:"fluid"`
+										} `json:"childImageKitAsset"`
+									} `json:"field_media_image"`
+								} `json:"relationships"`
+							} `json:"field_external_publication_logo"`
+						} `json:"relationships"`
+					} `json:"field_external_publication"`
+					FieldAuthor []struct {
+						Id              string `json:"id"`
+						Title           string `json:"title"`
+						FieldFirstNames string `json:"field_first_names"`
+						FieldPosition   string `json:"field_position"`
+						Relationships   struct {
+							FieldUserPicture struct {
+								ChildImageKitAsset struct {
+									Fluid struct {
+										AspectRatio float64 `json:"aspectRatio"`
+										Base64      string  `json:"base64"`
+										Sizes       string  `json:"sizes"`
+										Src         string  `json:"src"`
+										SrcSet      string  `json:"srcSet"`
+									} `json:"fluid"`
+								} `json:"childImageKitAsset"`
+							} `json:"field_user_picture"`
+						} `json:"relationships"`
+						Path struct {
+							Alias string `json:"alias"`
+						} `json:"path"`
+					} `json:"field_author"`
+					FieldRegion []struct {
+						Id   string `json:"id"`
+						Name string `json:"name"`
+						Path struct {
+							Alias string `json:"alias"`
+						} `json:"path"`
+					} `json:"field_region"`
+					FieldResearchGroups []interface{} `json:"field_research_groups"`
+					FieldTopics         []struct {
+						Id   string `json:"id"`
+						Name string `json:"name"`
+						Path struct {
+							Alias string `json:"alias"`
+						} `json:"path"`
+					} `json:"field_topics"`
+					FieldRelatedProject []interface{} `json:"field_related_project"`
+				} `json:"relationships"`
+			} `json:"node"`
+		} `json:"data"`
+		PageContext struct {
+			Id         string `json:"id"`
+			Title      string `json:"title"`
+			IsHomepage bool   `json:"isHomepage"`
+			Breadcrumb struct {
+				Location string `json:"location"`
+				Crumbs   []struct {
+					Pathname   string `json:"pathname"`
+					CrumbLabel string `json:"crumbLabel"`
+				} `json:"crumbs"`
+			} `json:"breadcrumb"`
+		} `json:"pageContext"`
+	} `json:"result"`
+	StaticQueryHashes []string `json:"staticQueryHashes"`
+}
+type ReportData struct {
+	ComponentChunkName string `json:"componentChunkName"`
+	Path               string `json:"path"`
+	Result             struct {
+		Data struct {
+			PageData struct {
+				Typename                string      `json:"__typename"`
+				Id                      string      `json:"id"`
+				Title                   string      `json:"title"`
+				FieldProfileDescriptors interface{} `json:"field_profile_descriptors"`
+				FieldAbstract           interface{} `json:"field_abstract"`
+				Body                    interface{} `json:"body"`
+				Relationships           struct {
+					FieldSections []struct {
+						Id                           string `json:"id"`
+						FieldParagraphContainerStyle string `json:"field_paragraph_container_style"`
+						FieldBackground              string `json:"field_background"`
+						Fields                       struct {
+							Sections []struct {
+								Typename          string `json:"__typename"`
+								Id                string `json:"id"`
+								FieldGatedContent bool   `json:"field_gated_content"`
+								FieldEmbedCode    struct {
+									Processed string `json:"processed"`
+								} `json:"field_embed_code"`
+							} `json:"sections"`
+						} `json:"fields"`
+					} `json:"field_sections"`
+					FieldMainContent      []interface{} `json:"field_main_content"`
+					FieldAuthor           []interface{} `json:"field_author"`
+					FieldPdf              []interface{} `json:"field_pdf"`
+					FieldMediaImage       interface{}   `json:"field_media_image"`
+					FieldSignpostImage    interface{}   `json:"field_signpost_image"`
+					FieldRelatedContent   []interface{} `json:"field_related_content"`
+					FieldSecondaryContent []interface{} `json:"field_secondary_content"`
+				} `json:"relationships"`
+			} `json:"pageData"`
+		} `json:"data"`
+		PageContext struct {
+			Id         string `json:"id"`
+			Title      string `json:"title"`
+			IsHomepage bool   `json:"isHomepage"`
+			Breadcrumb struct {
+				Location string `json:"location"`
+				Crumbs   []struct {
+					Pathname   string `json:"pathname"`
+					CrumbLabel string `json:"crumbLabel"`
+				} `json:"crumbs"`
+			} `json:"breadcrumb"`
+		} `json:"pageContext"`
+	} `json:"result"`
+	StaticQueryHashes []string `json:"staticQueryHashes"`
+}
+
+var PageTypeMap = map[string]Crawler.PageType{
+	"sitemap":              Crawler.Index,
+	"explore-our-research": Crawler.Report,
+	"people":               Crawler.Expert,
+	"news-and-comment":     Crawler.News,
+	"in-the-news":          Crawler.News,
+	"podcasts":             Crawler.News,
+	"publication":          Crawler.Report,
+}
 
 func init() {
 	w := Crawler.Register("rusi", "皇家联合服务研究所", "https://rusi.org/")
-	w.SetStartingUrls([]string{"https://rusi.org/explore-our-research/topics",
-		"https://rusi.org/explore-our-research/region-and-country-groups"})
+	w.SetStartingUrls([]string{"https://www.rusi.org/sitemap/sitemap-index.xml"})
 
-	//访问索引页
-	w.OnHTML("a.TagLink-module--component--Yq0DF", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
-	})
-
-	//访问人物
-	w.OnHTML("#our-experts > div > div > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Expert)
-	})
-
-	//获取人物姓名
-	w.OnHTML(" div.ProfileTitleBlock-module--text--qfxrH > h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Name = element.Text
-	})
-
-	//获取人物头衔
-	w.OnHTML(" div.ProfileTitleBlock-module--text--qfxrH > samll", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Title = element.Text
-	})
-
-	//获取人物领域
-	w.OnHTML("aside > ul > li > a > span", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Area = element.Text
-	})
-
-	//获取人物描述
-	w.OnHTML("div.Section-module--content--Of\\+As > div > div > p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Description = element.Text
-	})
-
-	//访问报告
-	w.OnHTML("#latest-publications > div.SearchComponent-module--component--LLifa > div > ul > li > div > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Report)
-	})
-
-	//获取报告,新闻标题
-	w.OnHTML(" div:nth-child(1) > h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		if ctx.PageType == Crawler.News {
-			ctx.Title = element.Text
-		} else if ctx.PageType == Crawler.Report {
-			ctx.Title = element.Text
+	w.OnXML("//loc", func(element *colly.XMLElement, ctx *Crawler.Context) {
+		reg, _ := regexp.Compile("rusi.org/([\\w-]+)/")
+		if matches := reg.FindStringSubmatch(element.Text); len(matches) == 2 {
+			pageType, ok := PageTypeMap[matches[1]]
+			if !ok {
+				return
+			}
+			switch pageType {
+			case Crawler.Index:
+				w.Visit(element.Text, pageType)
+			case Crawler.Expert:
+				w.Visit(element.Text, pageType)
+			default:
+				url := strings.ReplaceAll(element.Text, "https://www.rusi.org/", "https://www.rusi.org/page-data/") + "/page-data.json"
+				w.Visit(url, pageType)
+			}
 		}
 	})
+	////获取人物姓名
+	//w.OnHTML("[class^=\"ProfileTitleBlock-module--text\"] > h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	//	ctx.Name = element.Text
+	//})
+	//
+	////获取人物头衔
+	//w.OnHTML("[class^=\"ProfileTitleBlock-module--text\"] > samll", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	//	ctx.Title = element.Text
+	//})
+	//
+	////获取人物领域
+	//w.OnHTML("aside > ul > li > a > span", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	//	ctx.Area = element.Text
+	//})
+	//
+	////获取人物描述
+	//w.OnHTML("[class^=\"Section-module--content\"] > div > div > p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	//	ctx.Description = element.Text
+	//})
 
-	//获取作者
-	w.OnHTML(" div.Layout-module--component--JbLd9 > div > main > article > div.Article-module--contentArea--7IPcP > div.Article-module--sidebar--7hr7W > aside:nth-child(2) > section > a > div > div.PersonCard-module--text--UQlnj > div > h3",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Authors = append(ctx.Authors, element.Text)
-		})
+	w.OnResponse(func(response *colly.Response, ctx *Crawler.Context) {
+		if strings.Contains(ctx.Url, "page-data.json") {
+			var obj PageData
+			err := json.Unmarshal(response.Body, &obj)
+			if err != nil {
+				Crawler.Sugar.Error(err.Error())
+			}
+			if obj.Result.Data.Article.Title != "" {
+				art := obj.Result.Data.Article
+				ctx.Title = art.Title
+				ctx.Content = art.Body.Processed
+				Crawler.Sugar.Info(obj)
+				return
+			}
 
-	//获取标签
-	w.OnHTML("#gatsby-focus-wrapper > div:nth-child(2) > div.Layout-module--component--JbLd9 > div > main > article > div.Article-module--contentArea--7IPcP > div:nth-child(1) > section.KeywordTags-module--component--s-ZCe.Article-module--section--vy2LJ.hideOnPrint > div:nth-child(2) > ul > li > a > span",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Tags = append(ctx.Tags, element.Text)
-		})
+			var obj2 NewsData
+			err = json.Unmarshal(response.Body, &obj)
+			if err != nil {
+				Crawler.Sugar.Error(err.Error())
+			}
+			if obj2.Result.Data.Node.Title != "" {
+				return
+			}
 
-	//pdf
-	w.OnHTML("#gatsby-focus-wrapper > div:nth-child(2) > div.Layout-module--component--JbLd9 > div > main > article > a",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.File = append(ctx.File, element.Attr("href"))
-		})
-
-	//访问新闻
-	w.OnHTML("#news-\\&-comment > ul > li> div > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.News)
+			var obj3 ReportData
+			err = json.Unmarshal(response.Body, &obj)
+			if err != nil {
+				Crawler.Sugar.Error(err.Error())
+			}
+			if obj3.Result.Data.PageData.Title != "" {
+				return
+			}
+		}
 	})
-	w.OnHTML("#latest-news-and-comment > ul > li > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.News)
-	})
-
-	//获取正文
-	w.OnHTML("#gatsby-focus-wrapper > div:nth-child(2) > div.Layout-module--component--JbLd9 > div > main > article > div.Article-module--contentArea--7IPcP > div:nth-child(1) > div",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = element.Text
-		})
 }
