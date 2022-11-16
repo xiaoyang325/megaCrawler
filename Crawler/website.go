@@ -151,7 +151,7 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 		if left == 0 {
 			_ = w.bar.Add(1)
 			w.WG.Done()
-			Sugar.Errorf("Max retries exceed for %s: %s", r.Request.URL.String(), err.Error())
+			Sugar.Errorw("Max retries exceed.", "Url", r.Request.URL.String(), "Error", err.Error(), "DOM", string(r.Body))
 		} else {
 			time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
 			Sugar.Debugf("Website error tries %d for %s: %s", left, r.Request.URL.String(), err.Error())
