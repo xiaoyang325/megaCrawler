@@ -138,7 +138,7 @@ func init() {
 		})
 
 	// 获取 Title
-	w.OnHTML(`h1[class="h2 hero__title"] > span`,
+	w.OnHTML(`.hero__title > span`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.Title = strings.TrimSpace(element.Text)
 		})
@@ -188,7 +188,7 @@ func init() {
 	// 获取 Authors
 	w.OnHTML(`h3[class="h4 person-teaser__title"]`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
+			ctx.Authors = append(ctx.Authors, Crawler.StandardizeSpaces(element.Text))
 		})
 
 	// 获取 Content
@@ -215,17 +215,20 @@ func init() {
 			ctx.Phone = strings.TrimSpace(element.Text)
 		})
 
-	// Expert 获取 Email
-	w.OnHTML(`.person-bio__contact-item:nth-child(2) > a`,
+	// Expert 获取 TwitterId, Email, LinkedIn
+	w.OnHTML(`.person-bio__contact-item > a`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			e := strings.Replace(element.Attr("href"), "mailto:", "", 1)
-			ctx.Email = strings.TrimSpace(e)
-		})
-
-	// Expert 获取 TwitterId
-	w.OnHTML(`.person-bio__contact-item:nth-child(2) > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			t := strings.Replace(element.Attr("href"), "https://twitter.com/", "", 1)
-			ctx.TwitterId = strings.TrimSpace(t)
+			if strings.Contains(element.Attr("href"), "https://twitter.com/") {
+				t := strings.ReplaceAll(element.Attr("href"), "https://twitter.com/", "")
+				ctx.TwitterId = strings.TrimSpace(t)
+			}
+			if strings.Contains(element.Attr("href"), "mailto:") {
+				e := strings.ReplaceAll(element.Attr("href"), "mailto:", "")
+				ctx.Email = strings.TrimSpace(e)
+			}
+			if strings.Contains(element.Attr("href"), "https://www.linkedin.com/in/") {
+				l := strings.ReplaceAll(element.Attr("href"), "https://www.linkedin.com/in/", "")
+				ctx.LinkedInId = l
+			}
 		})
 }
