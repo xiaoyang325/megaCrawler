@@ -3,6 +3,7 @@ package ids
 import (
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
+	"megaCrawler/Extractors"
 	"strings"
 )
 
@@ -41,29 +42,9 @@ func init() {
 			w.Visit(element.Attr("href"), Crawler.Report)
 		})
 
-	// 获取 Title
-	w.OnHTML(`h1[class="c-single-header__heading ts-heading-2"]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
-
-	// 获取 Title (Type 2)
-	w.OnHTML(`h1.ts-heading-1`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
-
-	// 获取 Title (Type 3)
-	w.OnHTML(`h1[class="c-learn-banner__degree ts-heading-4"]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
-
-	// 获取 Title (Type 4)
-	w.OnHTML(`h1[class="c-single-bio__heading ts-heading-3"]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML("html", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		Extractors.Titles(ctx, element)
+	})
 
 	// 获取 Description
 	w.OnHTML(`div.entry-summary > p`,
@@ -104,7 +85,11 @@ func init() {
 		})
 
 	// 获取 Authors
-	w.OnHTML(`div[class="c-basic-single-meta "] .c-person__link`,
+	w.OnHTML(`.c-basic-single-meta__author .c-person__link`,
+		func(element *colly.HTMLElement, ctx *Crawler.Context) {
+			ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
+		})
+	w.OnHTML(`aside .c-person__link`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
 		})
@@ -112,17 +97,7 @@ func init() {
 	// 获取 Content
 	w.OnHTML(`.o-content-from-editor`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			if !strings.Contains(ctx.Url, "/learn-at-ids/") {
-				ctx.Content = strings.TrimSpace(element.Text)
-			}
-		})
-
-	// 获取 Content (Type 2)
-	w.OnHTML(`.o-layout .u-container:nth-child(1) .o-layout__eight-col`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			if strings.Contains(ctx.Url, "/learn-at-ids/") {
-				ctx.Content = strings.TrimSpace(element.Text)
-			}
+			ctx.Content = strings.TrimSpace(element.Text)
 		})
 
 	// 获取 Tags
