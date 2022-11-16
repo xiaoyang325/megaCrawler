@@ -83,7 +83,7 @@ func getProducer() (newsChannel chan string, reportChannel chan string, expertCh
 
 	syncProducer, err := sarama.NewSyncProducer([]string{"42.157.195.140:11003"}, conf)
 	if err != nil {
-		Sugar.Error("Failed to create producer: ", err)
+		Sugar.Panic("Failed to create producer: ", err)
 	}
 	wg := sync.WaitGroup{}
 
