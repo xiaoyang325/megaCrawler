@@ -63,9 +63,17 @@ type PageData struct {
 							FieldUserPicture     interface{}   `json:"field_user_picture"`
 						} `json:"relationships"`
 					} `json:"field_author"`
-					FieldPdf            []interface{} `json:"field_pdf"`
-					FieldRegion         []interface{} `json:"field_region"`
-					FieldResearchGroups []interface{} `json:"field_research_groups"`
+					FieldPdf []struct {
+						Id       string `json:"id"`
+						Filename string `json:"filename"`
+						Filesize int    `json:"filesize"`
+						Filemime string `json:"filemime"`
+						Fields   struct {
+							CdnUrl string `json:"cdn_url"`
+						} `json:"fields"`
+					} `json:"field_pdf"`
+					FieldRegion         []struct{ name string } `json:"field_region"`
+					FieldResearchGroups []interface{}           `json:"field_research_groups"`
 					FieldTopics         []struct {
 						Id   string `json:"id"`
 						Name string `json:"name"`
@@ -225,59 +233,6 @@ type NewsData struct {
 	} `json:"result"`
 	StaticQueryHashes []string `json:"staticQueryHashes"`
 }
-type ReportData struct {
-	ComponentChunkName string `json:"componentChunkName"`
-	Path               string `json:"path"`
-	Result             struct {
-		Data struct {
-			PageData struct {
-				Typename                string      `json:"__typename"`
-				Id                      string      `json:"id"`
-				Title                   string      `json:"title"`
-				FieldProfileDescriptors interface{} `json:"field_profile_descriptors"`
-				FieldAbstract           interface{} `json:"field_abstract"`
-				Body                    interface{} `json:"body"`
-				Relationships           struct {
-					FieldSections []struct {
-						Id                           string `json:"id"`
-						FieldParagraphContainerStyle string `json:"field_paragraph_container_style"`
-						FieldBackground              string `json:"field_background"`
-						Fields                       struct {
-							Sections []struct {
-								Typename          string `json:"__typename"`
-								Id                string `json:"id"`
-								FieldGatedContent bool   `json:"field_gated_content"`
-								FieldEmbedCode    struct {
-									Processed string `json:"processed"`
-								} `json:"field_embed_code"`
-							} `json:"sections"`
-						} `json:"fields"`
-					} `json:"field_sections"`
-					FieldMainContent      []interface{} `json:"field_main_content"`
-					FieldAuthor           []interface{} `json:"field_author"`
-					FieldPdf              []interface{} `json:"field_pdf"`
-					FieldMediaImage       interface{}   `json:"field_media_image"`
-					FieldSignpostImage    interface{}   `json:"field_signpost_image"`
-					FieldRelatedContent   []interface{} `json:"field_related_content"`
-					FieldSecondaryContent []interface{} `json:"field_secondary_content"`
-				} `json:"relationships"`
-			} `json:"pageData"`
-		} `json:"data"`
-		PageContext struct {
-			Id         string `json:"id"`
-			Title      string `json:"title"`
-			IsHomepage bool   `json:"isHomepage"`
-			Breadcrumb struct {
-				Location string `json:"location"`
-				Crumbs   []struct {
-					Pathname   string `json:"pathname"`
-					CrumbLabel string `json:"crumbLabel"`
-				} `json:"crumbs"`
-			} `json:"breadcrumb"`
-		} `json:"pageContext"`
-	} `json:"result"`
-	StaticQueryHashes []string `json:"staticQueryHashes"`
-}
 
 var PageTypeMap = map[string]Crawler.PageType{
 	"sitemap":              Crawler.Index,
@@ -294,7 +249,7 @@ func init() {
 	w.SetStartingUrls([]string{"https://www.rusi.org/sitemap/sitemap-index.xml"})
 
 	w.OnXML("//loc", func(element *colly.XMLElement, ctx *Crawler.Context) {
-		reg, _ := regexp.Compile("rusi.org/([\\w-]+)/")
+		reg := regexp.MustCompile("rusi.org/([\\w-]+)/")
 		if matches := reg.FindStringSubmatch(element.Text); len(matches) == 2 {
 			pageType, ok := PageTypeMap[matches[1]]
 			if !ok {
@@ -311,56 +266,65 @@ func init() {
 			}
 		}
 	})
-	////获取人物姓名
-	//w.OnHTML("[class^=\"ProfileTitleBlock-module--text\"] > h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-	//	ctx.Name = element.Text
-	//})
-	//
-	////获取人物头衔
-	//w.OnHTML("[class^=\"ProfileTitleBlock-module--text\"] > samll", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-	//	ctx.Title = element.Text
-	//})
-	//
-	////获取人物领域
-	//w.OnHTML("aside > ul > li > a > span", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-	//	ctx.Area = element.Text
-	//})
-	//
-	////获取人物描述
-	//w.OnHTML("[class^=\"Section-module--content\"] > div > div > p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-	//	ctx.Description = element.Text
-	//})
+	//获取人物姓名
+	w.OnHTML("[class^=\"ProfileTitleBlock-module--text\"] > h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Name = element.Text
+	})
+
+	//获取人物头衔
+	w.OnHTML("[class^=\"ProfileTitleBlock-module--text\"] > samll", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = element.Text
+	})
+
+	//获取人物领域
+	w.OnHTML("aside > ul > li > a > span", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Area = element.Text
+	})
+
+	//获取人物描述
+	w.OnHTML("[class^=\"Section-module--content\"] > div > div > p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Description = element.Text
+	})
 
 	w.OnResponse(func(response *colly.Response, ctx *Crawler.Context) {
 		if strings.Contains(ctx.Url, "page-data.json") {
 			var obj PageData
-			err := json.Unmarshal(response.Body, &obj)
-			if err != nil {
-				Crawler.Sugar.Error(err.Error())
-			}
+			_ = json.Unmarshal(response.Body, &obj)
 			if obj.Result.Data.Article.Title != "" {
 				art := obj.Result.Data.Article
 				ctx.Title = art.Title
-				ctx.Content = art.Body.Processed
-				Crawler.Sugar.Info(obj)
+				ctx.Content = Crawler.HTML2Text(art.Body.Value)
+				if ctx.Content == "" {
+					ctx.Content = Crawler.HTML2Text(art.FieldAbstract.Value)
+				}
+				ctx.PublicationTime = art.Created
+				for _, s := range obj.Result.Data.Article.Relationships.FieldAuthor {
+					ctx.Authors = append(ctx.Authors, s.FieldFirstNames+" "+s.Title)
+				}
+				ctx.Area = art.Relationships.FieldRegion[0].name
+				for _, topic := range art.Relationships.FieldTopics {
+					ctx.Tags = append(ctx.Tags, topic.Name)
+				}
+				for _, pdf := range art.Relationships.FieldPdf {
+					ctx.File = append(ctx.File, pdf.Fields.CdnUrl)
+				}
 				return
 			}
 
 			var obj2 NewsData
-			err = json.Unmarshal(response.Body, &obj)
-			if err != nil {
-				Crawler.Sugar.Error(err.Error())
-			}
+			_ = json.Unmarshal(response.Body, &obj)
 			if obj2.Result.Data.Node.Title != "" {
-				return
-			}
-
-			var obj3 ReportData
-			err = json.Unmarshal(response.Body, &obj)
-			if err != nil {
-				Crawler.Sugar.Error(err.Error())
-			}
-			if obj3.Result.Data.PageData.Title != "" {
+				art := obj2.Result.Data.Node
+				ctx.Title = art.Title
+				ctx.Content = Crawler.HTML2Text(obj2.Result.Data.Node.FieldFocus)
+				ctx.PublicationTime = art.FieldPublishDate
+				for _, s := range obj.Result.Data.Article.Relationships.FieldAuthor {
+					ctx.Authors = append(ctx.Authors, s.FieldFirstNames+" "+s.Title)
+				}
+				ctx.Area = art.Relationships.FieldRegion[0].Name
+				for _, topic := range art.Relationships.FieldTopics {
+					ctx.Tags = append(ctx.Tags, topic.Name)
+				}
 				return
 			}
 		}
