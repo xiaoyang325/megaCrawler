@@ -8,18 +8,6 @@ import (
 	"fmt"
 )
 
-// 这个函数用于分隔使用 "," 和 "and" 的字符串
-// 并返回分割开的 []string
-func cutToList(input_str string) ([]string)  {
-	name_str := strings.Replace(input_str, "and", ",", 1)
-	name_list := strings.Split(name_str, ",")
-	for index, value := range name_list {
-		name_list[index] = strings.TrimSpace(value)
-	}
-
-	return name_list
-}
-
 func init() {
 	w := Crawler.Register("kdi", "发展研究会", "https://www.kdi.re.kr/")
 	
