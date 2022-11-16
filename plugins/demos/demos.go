@@ -87,6 +87,10 @@ func init() {
 			ctx.Content = strings.TrimSpace(element.Text)
 		})
 
+	w.OnHTML(".main-content > .field > div.field__item:nth-child(-n+2)", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Content = element.Text
+	})
+
 	// 获取 Tags
 	w.OnHTML(`div[class="field field--name-field-related-issues field--type-entity-reference field--label-hidden field__items"] > .field__item > a`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
