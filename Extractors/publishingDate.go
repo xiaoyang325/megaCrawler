@@ -1,7 +1,7 @@
 package Extractors
 
 import (
-	"errors"
+	"fmt"
 	"github.com/araddon/dateparse"
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
@@ -12,21 +12,16 @@ import (
 func pareDateStr(date string) (time.Time, error) {
 	parseAny, err := dateparse.ParseAny(date)
 	if err != nil {
-		return time.Time{}, errors.New("cannot parse time")
+		return time.Time{}, fmt.Errorf("cannot parse time: %s", err.Error())
 	}
 	return parseAny, nil
 }
 
 func getPublishingDate(dom *colly.HTMLElement) string {
-	var strictDateRegex, err = regexp.Compile("([./\\-_]?(19|20)\\d{2})[./\\-_]?(([0-3]?\\d[./\\-_])|(\\w{3,5}[./\\-_]))([0-3]?\\d[./\\-]?)?")
+	var strictDateRegex, err = regexp.Compile("\\d+/\\d+/\\d+")
 	if err != nil {
 		Crawler.Sugar.Panic("Compile regex failed", err)
 		return ""
-	}
-	if dateMatch := strictDateRegex.FindStringSubmatch(dom.Request.URL.String()); len(dateMatch) > 0 {
-		if obj, err := pareDateStr(dateMatch[0]); err != nil {
-			return obj.Format(time.RFC3339)
-		}
 	}
 
 	publishDateTags := []selectorContentPair{
@@ -77,9 +72,22 @@ func getPublishingDate(dom *colly.HTMLElement) string {
 	}
 	for _, tag := range publishDateTags {
 		datetimeString := dom.ChildAttr(tag.selector, tag.content)
-		if obj, err := pareDateStr(datetimeString); err != nil {
+		if datetimeString == "" {
+			continue
+		}
+		if obj, err := pareDateStr(datetimeString); err == nil {
+			return obj.Format(time.RFC3339)
+		} else {
+			Crawler.Sugar.Info(err)
+		}
+	}
+
+	if dateMatch := strictDateRegex.FindString(dom.Request.URL.String()); dateMatch != "" {
+		if obj, err := pareDateStr(dateMatch); err == nil {
 			return obj.Format(time.RFC3339)
 		}
+	} else {
+		Crawler.Sugar.Warn(dom.Request.URL.String())
 	}
 	return ""
 }
