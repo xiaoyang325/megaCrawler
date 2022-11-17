@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "megaCrawler/plugins/usni"
 	//_ "megaCrawler/plugins/aiaa"
 	//_ "megaCrawler/plugins/ait" // 反爬？
 	//_ "megaCrawler/plugins/apnorc"
@@ -13,7 +14,7 @@ import (
 	//_ "megaCrawler/plugins/ids"
 	//_ "megaCrawler/plugins/ipcs"
 	//_ "megaCrawler/plugins/ips"
-	_ "megaCrawler/plugins/kiep"
+	//_ "megaCrawler/plugins/kiep"
 	//_ "megaCrawler/plugins/maritimeindia"
 	//_ "megaCrawler/plugins/piie"
 	//_ "megaCrawler/plugins/prri"
