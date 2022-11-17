@@ -29,5 +29,6 @@ import (
 	//_ "megaCrawler/plugins/stanford"
 	//_ "megaCrawler/plugins/vifindia"
 	//_ "megaCrawler/plugins/kdi"
-	_ "megaCrawler/plugins/asaninst"
+	//_ "megaCrawler/plugins/asaninst"
+	_ "megaCrawler/plugins/lowyinstitute"
 )
