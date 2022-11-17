@@ -5,7 +5,6 @@ import (
 	"megaCrawler/Crawler"
 	"strings"
 	"strconv"
-	"fmt"
 )
 
 func init() {
@@ -151,7 +150,6 @@ func init() {
 			file_url += param_1 + "&member_pub=" + param_2 + "&type=" + param_3
 			file_url += "&cacheclear=81"
 
-			fmt.Println(file_url)
 			ctx.File = append(ctx.File, file_url)
 		})
 }
