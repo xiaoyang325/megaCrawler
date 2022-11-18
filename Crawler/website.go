@@ -2,7 +2,6 @@ package Crawler
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/go-co-op/gocron"
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/extensions"
@@ -160,10 +159,14 @@ func RetryRequest(r *colly.Request, err error, w *WebsiteEngine) {
 	if left == 0 {
 		_ = w.bar.Add(1)
 		w.WG.Done()
-		Sugar.Errorf("Max retries exceed for %s: %s", r.URL.String(), err.Error())
+		if err != nil {
+			Sugar.Errorf("Max retries exceed for %s: %s", r.URL.String(), err.Error())
+		}
 	} else {
 		time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
-		Sugar.Debugf("Website error tries %d for %s: %s", left, r.URL.String(), err.Error())
+		if err != nil {
+			Sugar.Debugf("Website error tries %d for %s: %s", left, r.URL.String(), err.Error())
+		}
 	}
 }
 
@@ -187,7 +190,7 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 		go func() {
 			if !ctx.process() {
 				Sugar.Debugw("Empty Page", spread(*ctx)...)
-				RetryRequest(response.Request, errors.New("empty Page"), w)
+				RetryRequest(response.Request, nil, w)
 			} else {
 				w.WG.Done()
 			}

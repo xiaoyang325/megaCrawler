@@ -13,13 +13,21 @@ func init() {
 
 	//index
 	w.OnHTML("#profile > ul > li > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		url, _ := element.Request.URL.Parse(element.Attr("href"))
+		url, err := element.Request.URL.Parse(element.Attr("href"))
+		if err != nil {
+			Crawler.Sugar.Error(err.Error())
+			return
+		}
 		w.Visit(url.String(), Crawler.Index)
 	})
 
 	//访问人物
-	w.OnHTML(" div> table > tbody > tr > td> a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		url, _ := element.Request.URL.Parse(element.Attr("href"))
+	w.OnHTML("div> table > tbody > tr > td> a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		url, err := element.Request.URL.Parse(element.Attr("href"))
+		if err != nil {
+			Crawler.Sugar.Error(err.Error(), element.Request.URL.String())
+			return
+		}
 		w.Visit(url.String(), Crawler.Expert)
 	})
 
@@ -40,35 +48,39 @@ func init() {
 
 	//index(report)
 	w.OnHTML("#localnavi > ul > li> a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		url, _ := element.Request.URL.Parse(element.Attr("href"))
+		url, err := element.Request.URL.Parse(element.Attr("href"))
+		if err != nil {
+			Crawler.Sugar.Error(err.Error())
+			return
+		}
 		w.Visit(url.String(), Crawler.Index)
 	})
 	w.OnHTML("#content > div.section > ul > li> a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		url, _ := element.Request.URL.Parse(element.Attr("href"))
+		url, err := element.Request.URL.Parse(element.Attr("href"))
+		if err != nil {
+			Crawler.Sugar.Error(err.Error())
+			return
+		}
 		w.Visit(url.String(), Crawler.Index)
 	})
 	w.OnHTML("#content > div.section.mtx > div > div > ul > li> a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		url, _ := element.Request.URL.Parse(element.Attr("href"))
+		url, err := element.Request.URL.Parse(element.Attr("href"))
+		if err != nil {
+			Crawler.Sugar.Error(err.Error())
+			return
+		}
 		w.Visit(url.String(), Crawler.Index)
 	})
 
 	// 尝试寻找下载pdf的按钮，并如果存在则将页面类型转换为报告
-	w.OnHTML("li > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		if strings.Contains(element.Attr("href"), ".pdf") && (ctx.PageType != Crawler.Expert) {
 			ctx.File = append(ctx.File, element.Attr("href"))
 			ctx.PageType = Crawler.Report
 		}
 	})
-	w.OnHTML("div > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		if strings.Contains(element.Attr("href"), ".pdf") && (ctx.PageType != Crawler.Expert) {
-			ctx.File = append(ctx.File, element.Attr("href"))
-			ctx.PageType = Crawler.Report
-		}
-	})
-	w.OnHTML("p > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		if strings.Contains(element.Attr("href"), ".pdf") && (ctx.PageType != Crawler.Expert) {
-			ctx.File = append(ctx.File, element.Attr("href"))
-			ctx.PageType = Crawler.Report
-		}
+
+	w.OnHTML("h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = element.Text
 	})
 }
