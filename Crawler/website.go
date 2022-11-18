@@ -189,6 +189,7 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 		go func() {
 			if !ctx.process() {
 				Sugar.Debugw("Empty Page", append([]interface{}{"dom", string(response.Body)}, spread(*ctx)...)...)
+				//Sugar.Infow("Empty Page", spread(*ctx)...)
 				RetryRequest(response.Request, 10)
 			} else {
 				w.WG.Done()

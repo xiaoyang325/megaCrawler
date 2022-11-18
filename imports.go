@@ -4,6 +4,7 @@ import (
 	//_ "megaCrawler/plugins/aiaa"
 	//_ "megaCrawler/plugins/ait" // 反爬？
 	//_ "megaCrawler/plugins/apnorc"
+	_ "megaCrawler/plugins/atlanticcouncil"
 	//_ "megaCrawler/plugins/brennancenter"
 	//_ "megaCrawler/plugins/chathamhouse"
 	//_ "megaCrawler/plugins/cprindia"
@@ -13,7 +14,7 @@ import (
 	//_ "megaCrawler/plugins/ids"
 	//_ "megaCrawler/plugins/ipcs"
 	//_ "megaCrawler/plugins/ips"
-	_ "megaCrawler/plugins/kiep"
+	//_ "megaCrawler/plugins/kiep"
 	//_ "megaCrawler/plugins/maritimeindia"
 	//_ "megaCrawler/plugins/piie"
 	//_ "megaCrawler/plugins/prri"
