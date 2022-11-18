@@ -1,6 +1,7 @@
 package ipcs
 
 import (
+	"errors"
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
 	"strings"
@@ -14,7 +15,7 @@ func init() {
 
 	w.OnResponse(func(response *colly.Response, ctx *Crawler.Context) {
 		if strings.Contains(string(response.Body), "connection unsuccessful") {
-			Crawler.RetryRequest(response.Request, 10)
+			Crawler.RetryRequest(response.Request, errors.New("connection unsuccessful"), w)
 		}
 	})
 

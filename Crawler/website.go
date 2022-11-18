@@ -108,13 +108,6 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 	extensions.RandomUserAgent(c)
 	extensions.Referer(c)
 
-	if Proxy != nil {
-		err := c.SetProxy(Proxy.String())
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	err := c.Limit(&colly.LimitRule{
 		RandomDelay: 5 * time.Second,
 		DomainGlob:  cc.domainGlob,
@@ -146,16 +139,7 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 		if err.Error() == "Too many requests" {
 			time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
 		}
-		left := RetryRequest(r.Request, 10)
-
-		if left == 0 {
-			_ = w.bar.Add(1)
-			w.WG.Done()
-			Sugar.Errorw("Max retries exceed.", "Url", r.Request.URL.String(), "Error", err.Error(), "DOM", string(r.Body))
-		} else {
-			time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
-			Sugar.Debugf("Website error tries %d for %s: %s", left, r.Request.URL.String(), err.Error())
-		}
+		RetryRequest(r.Request, err, w)
 	})
 
 	if w.UrlProcessor.launchHandler != nil {
@@ -167,6 +151,23 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 		})
 	}
 	return
+}
+
+func RetryRequest(r *colly.Request, err error, w *WebsiteEngine) {
+	left := retryRequest(r, 10)
+
+	if left == 0 {
+		_ = w.bar.Add(1)
+		w.WG.Done()
+		if err != nil {
+			Sugar.Errorf("Max retries exceed for %s: %s", r.URL.String(), err.Error())
+		}
+	} else {
+		time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
+		if err != nil {
+			Sugar.Debugf("Website error tries %d for %s: %s", left, r.URL.String(), err.Error())
+		}
+	}
 }
 
 func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
@@ -188,9 +189,8 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 		ctx.CrawlTime = time.Now()
 		go func() {
 			if !ctx.process() {
-				Sugar.Debugw("Empty Page", append([]interface{}{"dom", string(response.Body)}, spread(*ctx)...)...)
-				//Sugar.Infow("Empty Page", spread(*ctx)...)
-				RetryRequest(response.Request, 10)
+				Sugar.Debugw("Empty Page", spread(*ctx)...)
+				RetryRequest(response.Request, nil, w)
 			} else {
 				w.WG.Done()
 			}
