@@ -18,5 +18,5 @@ import (
 	//_ "megaCrawler/plugins/splcenter"
 	//_ "megaCrawler/plugins/spri"
 	//_ "megaCrawler/plugins/stanford"
-	_ "megaCrawler/plugins/nids"
+	_ "megaCrawler/plugins/jinf"
 )

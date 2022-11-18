@@ -29,13 +29,8 @@ func init() {
 		ctx.Title = element.Text
 	})
 
-	//获取作者
-	w.OnHTML("#weeklyPage > div > div.article > div.text > div", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Authors = append(ctx.Authors, element.Text)
-	})
-
 	//获取正文
-	w.OnHTML("div > div.article > div.text > p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".text", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Content = element.Text
 	})
 
