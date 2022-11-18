@@ -3,6 +3,7 @@ package usni
 import (
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
+	"megaCrawler/Extractors"
 	"strings"
 )
 
@@ -15,14 +16,10 @@ func init() {
 		"https://news.usni.org/tag/coronavirus",
 		"https://news.usni.org/category/fleet-tracker"})
 
-	// 尝试寻找下载pdf的按钮，并如果存在则将页面类型转换为报告
-	w.OnHTML("a.button", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		if strings.Contains(element.Attr("href"), ".pdf") {
-			ctx.File = append(ctx.File, element.Attr("href"))
-			ctx.PageType = Crawler.Report
-		}
+	w.OnHTML("html", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		Extractors.Image(ctx, element)
+		Extractors.Authors(ctx, element)
 	})
-
 	// 从翻页器获取链接并访问
 	w.OnHTML("ol.wp-paginate>li>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		w.Visit(element.Attr("href"), Crawler.Index)
@@ -33,15 +30,17 @@ func init() {
 	})
 	// new.title
 	w.OnHTML("h1.entry-title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Title = element.Text
+		if ctx.PageType != Crawler.Expert {
+			ctx.Title = element.Text
+		}
 	})
 	//new.publish time
-	w.OnHTML("span.entry-date", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".entry-date", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.PublicationTime = element.Text
 	})
 	// new.author
 	w.OnHTML("a[rel=\"author\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Authors = append(ctx.Authors, element.Text)
+		ctx.Authors = Crawler.Unique(append(ctx.Authors, element.Text))
 	})
 	// new.content
 	w.OnHTML("div.entry-content", func(element *colly.HTMLElement, ctx *Crawler.Context) {
@@ -51,15 +50,13 @@ func init() {
 	w.OnHTML("a[rel=\"author\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		w.Visit(element.Attr("href"), Crawler.Expert)
 	})
-	// expert.Name
-	w.OnHTML("#content > div > div.author-description > p:nth-child(3) > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Name = element.Text
-	})
 	// expert.description
 	w.OnHTML("div.author-description", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Content = element.Text
 	})
-
+	w.OnHTML(".author-description > h2", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Name = strings.TrimPrefix(element.Text, "About ")
+	})
 	//
 
 }
