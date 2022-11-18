@@ -139,16 +139,7 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 		if err.Error() == "Too many requests" {
 			time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
 		}
-		left := RetryRequest(r.Request, 10)
-
-		if left == 0 {
-			_ = w.bar.Add(1)
-			w.WG.Done()
-			Sugar.Errorf("Max retries exceed for %s: %s", r.Request.URL.String(), err.Error())
-		} else {
-			time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
-			Sugar.Debugf("Website error tries %d for %s: %s", left, r.Request.URL.String(), err.Error())
-		}
+		RetryRequest(r.Request, err, w)
 	})
 
 	if w.UrlProcessor.launchHandler != nil {
@@ -160,6 +151,23 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 		})
 	}
 	return
+}
+
+func RetryRequest(r *colly.Request, err error, w *WebsiteEngine) {
+	left := retryRequest(r, 10)
+
+	if left == 0 {
+		_ = w.bar.Add(1)
+		w.WG.Done()
+		if err != nil {
+			Sugar.Errorf("Max retries exceed for %s: %s", r.URL.String(), err.Error())
+		}
+	} else {
+		time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
+		if err != nil {
+			Sugar.Debugf("Website error tries %d for %s: %s", left, r.URL.String(), err.Error())
+		}
+	}
 }
 
 func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
@@ -182,7 +190,7 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 		go func() {
 			if !ctx.process() {
 				Sugar.Debugw("Empty Page", spread(*ctx)...)
-				RetryRequest(response.Request, 10)
+				RetryRequest(response.Request, nil, w)
 			} else {
 				w.WG.Done()
 			}

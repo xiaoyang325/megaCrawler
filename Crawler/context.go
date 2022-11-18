@@ -263,7 +263,7 @@ func (ctx Context) process() (success bool) {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		}
-		if n.Title == "" {
+		if n.Title == "" || (n.Content == "" && len(n.File) == 0) {
 			return false
 		}
 		marshal, err = json.Marshal(n)

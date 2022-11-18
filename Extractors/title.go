@@ -47,7 +47,7 @@ func getTitle(dom *colly.HTMLElement) (title string) {
 		return
 	}
 	title = dom.ChildText("title")
-	var useDelimeter bool
+	var useDelimiter bool
 	if len(title) == 0 {
 		return ""
 	}
@@ -76,21 +76,21 @@ func getTitle(dom *colly.HTMLElement) (title string) {
 	filterTitleOG := strings.ToLower(filterRegex.ReplaceAllString(titleOG, ""))
 
 	if titleH1 == title {
-		useDelimeter = true
+		useDelimiter = true
 	} else if filterTitleH1 == filterTitleOG && filterTitleH1 != "" {
 		title = titleH1
-		useDelimeter = true
+		useDelimiter = true
 	} else if filterTitleH1 != "" && strings.Contains(filterTitleText, filterTitleH1) && filterTitleOG != "" && strings.Contains(filterTitleText, filterTitleOG) && len(filterTitleH1) > len(titleOG) {
 		title = titleH1
-		useDelimeter = true
+		useDelimiter = true
 	} else if filterTitleOG != "" && strings.HasPrefix(filterTitleText, filterTitleOG) && filterTitleOG != filterTitleText {
 		title = titleOG
-		useDelimeter = true
+		useDelimiter = true
 	}
 
-	for _, delimeter := range []string{"|", " - ", "_", "/", " » "} {
-		if !useDelimeter && strings.Contains(title, delimeter) {
-			title = splitTitle(title, delimeter, titleH1)
+	for _, delimiter := range []string{"|", " - ", "_", "/", " » "} {
+		if !useDelimiter && strings.Contains(title, delimiter) {
+			title = splitTitle(title, delimiter, titleH1)
 		}
 	}
 
