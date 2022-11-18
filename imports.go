@@ -31,5 +31,5 @@ import (
 	//_ "megaCrawler/plugins/kdi"
 	//_ "megaCrawler/plugins/asaninst"
 	//_ "megaCrawler/plugins/lowyinstitute"
-	_ "megaCrawler/plugins/blueoceanstrategy"
+	_ "megaCrawler/plugins/csdsafrica"
 )
