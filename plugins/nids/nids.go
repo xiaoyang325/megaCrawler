@@ -13,12 +13,14 @@ func init() {
 
 	//index
 	w.OnHTML("#profile > ul > li > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+		url, _ := element.Request.URL.Parse(element.Attr("href"))
+		w.Visit(url.String(), Crawler.Index)
 	})
 
 	//访问人物
 	w.OnHTML(" div> table > tbody > tr > td> a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Expert)
+		url, _ := element.Request.URL.Parse(element.Attr("href"))
+		w.Visit(url.String(), Crawler.Expert)
 	})
 
 	//获取人物姓名
@@ -38,13 +40,16 @@ func init() {
 
 	//index(report)
 	w.OnHTML("#localnavi > ul > li> a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+		url, _ := element.Request.URL.Parse(element.Attr("href"))
+		w.Visit(url.String(), Crawler.Index)
 	})
 	w.OnHTML("#content > div.section > ul > li> a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+		url, _ := element.Request.URL.Parse(element.Attr("href"))
+		w.Visit(url.String(), Crawler.Index)
 	})
 	w.OnHTML("#content > div.section.mtx > div > div > ul > li> a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+		url, _ := element.Request.URL.Parse(element.Attr("href"))
+		w.Visit(url.String(), Crawler.Index)
 	})
 
 	// 尝试寻找下载pdf的按钮，并如果存在则将页面类型转换为报告
