@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "megaCrawler/plugins/usni"
 	//_ "megaCrawler/plugins/aiaa"
 	//_ "megaCrawler/plugins/ait" // 反爬？
 	//_ "megaCrawler/plugins/apnorc"
