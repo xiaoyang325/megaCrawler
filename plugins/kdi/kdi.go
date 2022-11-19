@@ -61,31 +61,25 @@ func init() {
 		})
 
 	// 获取 Title
-	w.OnHTML(`#ui_contents > div > div.board_view_wrap > div.top_title > dl > dd > div > strong`,
+	w.OnHTML(`dl > dd > div > strong`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.Title = strings.TrimSpace(element.Text)
 		})
 
 	// 获取 Title (Type 2)
-	w.OnHTML(`#ui_contents > div > div.board_view_wrap > div.top_title > div > ul > li.title > strong`,
+	w.OnHTML(`ul > li.title > strong`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.Title = strings.TrimSpace(element.Text)
 		})
 
 	// 获取 Title (Type 3)
-	w.OnHTML(`#ui_contents > div > div.board_view_wrap.seminar_view > div.top_title > dl > dd > strong`,
+	w.OnHTML(`dd > strong`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.Title = strings.TrimSpace(element.Text)
 		})
 
 	// 获取 Content
-	w.OnHTML(`#ui_contents > div > div.board_view_wrap > div.repoart_contents > div.cnts_detail > div`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.Text)
-		})
-
-	// 获取 Content (Type 2)
-	w.OnHTML(`#ui_contents > div > div.board_view_wrap.seminar_view > div.repoart_contents > div:nth-child(2) > div.cnts_detail > div > div:nth-child(1)`,
+	w.OnHTML(`.cnts_detail`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.Content = strings.TrimSpace(element.Text)
 		})

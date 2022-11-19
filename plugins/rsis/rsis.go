@@ -11,30 +11,29 @@ import (
 
 // 这个函数用于分隔使用 ",", "&" 和 "and" 的字符串
 // 并返回分割开的 []string
-func cutToList(input_str string) []string {
-	name_str := strings.Replace(input_str, "and", ",", -1)
-	name_str = strings.Replace(name_str, "&", ",", -1)
-	name_list := strings.Split(name_str, ",")
-	for index, value := range name_list {
-		name_list[index] = strings.TrimSpace(value)
+func cutToList(inputStr string) []string {
+	nameStr := strings.Replace(inputStr, "and", ",", -1)
+	nameStr = strings.Replace(nameStr, "&", ",", -1)
+	nameList := strings.Split(nameStr, ",")
+	for index, value := range nameList {
+		nameList[index] = strings.TrimSpace(value)
 	}
 
-	return name_list
+	return nameList
 }
 
 // 这个函数修改当前 Index 页面的 Path，以获取下一页 Index，并返回相应的 URL
-func getNextIndexURL(current_url string) string {
-	this_url, _ := url.Parse(current_url)
-	path := this_url.Path
+func getNextIndexURL(currentUrl string) string {
+	thisUrl, _ := url.Parse(currentUrl)
+	path := thisUrl.Path
 
-	reg, _ := regexp.Compile("page/\\d+")
-	raw_str := reg.FindString(path)
-	num, _ := strconv.Atoi(strings.TrimSpace(strings.Replace(raw_str, "page/", "", 1)))
+	reg := regexp.MustCompile("page/(\\d+)")
+	rawStr := reg.FindStringSubmatch(path)
+	num, _ := strconv.Atoi(rawStr[1])
 	num++
-	new := "page/" + strconv.Itoa(num)
-	new_url := reg.ReplaceAllString(current_url, new)
+	newUrl := reg.ReplaceAllString(currentUrl, "page/"+strconv.Itoa(num))
 
-	return new_url
+	return newUrl
 }
 
 func init() {

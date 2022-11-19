@@ -61,15 +61,9 @@ func init() {
 		})
 
 	// 获取 Content
-	w.OnHTML(`body[class="homepage embed-false"] > main > article`,
+	w.OnHTML(".flexible-content__main-content",
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.Content = strings.TrimSpace(element.Text)
-		})
-
-	// 获取 Content
-	w.OnHTML(`#block-lowy-content > article > div > div.flexible-content-wrapper > div.flexible-content__main-content > div.field--type-paragraph`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.ChildText("p h2"))
 		})
 
 	// 获取 PublicationTime

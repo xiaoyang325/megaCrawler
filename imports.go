@@ -32,8 +32,8 @@ import (
 	//_ "megaCrawler/plugins/asaninst"
 	//_ "megaCrawler/plugins/blueoceanstrategy"
 	//_ "megaCrawler/plugins/csdsafrica"
-	_ "megaCrawler/plugins/ifans"
+	//_ "megaCrawler/plugins/ifans"
 	//_ "megaCrawler/plugins/kdi"
 	//_ "megaCrawler/plugins/lowyinstitute"
-	//_ "megaCrawler/plugins/rsis"
+	_ "megaCrawler/plugins/rsis"
 )
