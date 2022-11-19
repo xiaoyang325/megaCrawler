@@ -3,38 +3,38 @@ package swp_berlin
 import (
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
-	"strings"
 	"net/url"
+	"strings"
 )
 
 // 将 URL 的路劲加上 "/en" 以进入英文页面
-func swtichToEnglish(this_url *string) (string) {
-	url_struct, _ := url.Parse(*this_url)
-	path := url_struct.Path
+func switchToEnglish(thisUrl *string) string {
+	urlStruct, _ := url.Parse(*thisUrl)
+	path := urlStruct.Path
 	path = "/en" + path
-	url_struct.Path = path
-	return url_struct.String()
+	urlStruct.Path = path
+	return urlStruct.String()
 }
 
 func init() {
 	w := Crawler.Register("swp_berlin", "Stiftung Wissenschaft und Politik",
-			"https://www.swp-berlin.org/")
-	
+		"https://www.swp-berlin.org/")
+
 	w.SetStartingUrls([]string{
 		"https://www.swp-berlin.org/sitemap.xml",
 	})
 
 	w.OnXML(`//loc`, func(element *colly.XMLElement, ctx *Crawler.Context) {
-			if (strings.Contains(element.Text, "sitemap.xml")) {
-				w.Visit(element.Text, Crawler.Index)
-			} else if (strings.Contains(element.Text, "/wissenschaftler-in")) {
-				w.Visit(swtichToEnglish(&element.Text), Crawler.Expert)
-			} else if (strings.Contains(element.Text, "/presse")) {
-				w.Visit(swtichToEnglish(&element.Text), Crawler.News)
-			} else if (strings.Contains(element.Text, "/publikation")) {
-				w.Visit(swtichToEnglish(&element.Text), Crawler.Report)
-			}
-		})
+		if strings.Contains(element.Text, "sitemap.xml") {
+			w.Visit(element.Text, Crawler.Index)
+		} else if strings.Contains(element.Text, "/wissenschaftler-in") {
+			w.Visit(switchToEnglish(&element.Text), Crawler.Expert)
+		} else if strings.Contains(element.Text, "/presse") {
+			w.Visit(switchToEnglish(&element.Text), Crawler.News)
+		} else if strings.Contains(element.Text, "/publikation") {
+			w.Visit(switchToEnglish(&element.Text), Crawler.Report)
+		}
+	})
 
 	// 获取 Title //
 	w.OnHTML(`body > header.publication-page > div > h1`,
@@ -105,18 +105,18 @@ func init() {
 	// 获取 File //
 	w.OnHTML(`body > header.publication-page > section > div > ul > li > a`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			if (strings.Contains(element.Attr("href"), ".pdf")) {
-				file_url := "https://www.swp-berlin.org" + element.Attr("href")
-				ctx.File = append(ctx.File, file_url)
+			if strings.Contains(element.Attr("href"), ".pdf") {
+				fileUrl := "https://www.swp-berlin.org" + element.Attr("href")
+				ctx.File = append(ctx.File, fileUrl)
 			}
 		})
 
 	// 获取 File //
 	w.OnHTML(`div > ul.downloads__list > li > a`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			if (strings.Contains(element.Attr("href"), ".pdf")) {
-				file_url := "https://www.swp-berlin.org" + element.Attr("href")
-				ctx.File = append(ctx.File, file_url)
+			if strings.Contains(element.Attr("href"), ".pdf") {
+				fileUrl := "https://www.swp-berlin.org" + element.Attr("href")
+				ctx.File = append(ctx.File, fileUrl)
 			}
 		})
 
