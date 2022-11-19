@@ -17,6 +17,14 @@ func pareDateStr(date string) (time.Time, error) {
 	return parseAny, nil
 }
 
+func MustParseTime(format string, text string) time.Time {
+	if t, err := time.Parse(format, text); err != nil {
+		panic(err)
+	} else {
+		return t
+	}
+}
+
 func getPublishingDate(dom *colly.HTMLElement) string {
 	var strictDateRegex, err = regexp.Compile("\\d+/\\d+/\\d+")
 	if err != nil {
