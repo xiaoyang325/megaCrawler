@@ -169,13 +169,12 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 	return
 }
 
-func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
+func (w *WebsiteEngine) processUrl() (err error) {
 	c, err := w.getCollector()
 	if err != nil {
 		return
 	}
 	w.UrlData = make(chan urlData)
-	data = []*Context{}
 
 	c.OnScraped(func(response *colly.Response) {
 		if strings.Contains(response.Ctx.Get("title"), "Internal server error") {
@@ -183,7 +182,6 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 			_ = response.Request.Retry()
 			return
 		}
-		_ = w.bar.Add(1)
 		ctx := response.Ctx.GetAny("ctx").(*Context)
 		ctx.CrawlTime = time.Now()
 		go func() {
@@ -191,10 +189,10 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 				Sugar.Debugw("Empty Page", append([]interface{}{"dom", string(response.Body)}, spread(*ctx)...)...)
 				RetryRequest(response.Request, 10)
 			} else {
+				_ = w.bar.Add(1)
 				w.WG.Done()
 			}
 		}()
-		data = append(data, ctx)
 	})
 
 	go func() {
@@ -221,12 +219,11 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 				Website:    w.Id,
 				CrawlTime:  time.Time{},
 			})
-			w.WG.Add(1)
 			err := c.Request("GET", k.Url.String(), nil, ctx, nil)
 			if err != nil {
-				w.WG.Done()
 				continue
 			}
+			w.WG.Add(1)
 			w.bar.ChangeMax64(w.bar.GetMax64() + 1)
 		}
 	}()
@@ -238,15 +235,15 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 	if w.UrlProcessor.robotTxt != "" {
 		resp, err := http.Get(w.UrlProcessor.robotTxt)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		robots, err := robotstxt.FromResponse(resp)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		err = resp.Body.Close()
 		if err != nil {
-			return nil, err
+			return err
 		}
 		if len(robots.Sitemaps) > 0 {
 			for _, sitemap := range robots.Sitemaps {
@@ -261,7 +258,6 @@ func (w *WebsiteEngine) processUrl() (data []*Context, err error) {
 
 	time.Sleep(5 * time.Second)
 	w.WG.Wait()
-	close(w.UrlData)
 	return
 }
 
@@ -270,16 +266,15 @@ func startEngine(w *WebsiteEngine) {
 		Sugar.Info("Already running id \"" + w.Id + "\"")
 		return
 	}
-	Sugar.Info("Starting engine ", w.Id)
+	Sugar.Infow("Starting engine", "id", w.Id)
 	w.IsRunning = true
 	_ = w.bar.Set(0)
 	w.bar.ChangeMax(0)
 	w.bar.Reset()
-	data, err := w.processUrl()
+	err := w.processUrl()
 	if err != nil {
-		Sugar.Error("Error when processing url for id \"" + w.Id + "\": " + err.Error())
+		Sugar.Errorw("Error when processing url", "id", w.Id, "err", err)
 	}
-	Sugar.Infof("Processed %d data from \"%s\" in %s", len(data), w.Id, shortDur(time.Duration(w.bar.State().SecondsSince)*time.Second))
 	w.IsRunning = false
 	Sugar.Info("Finished engine \"" + w.Id + "\"")
 }

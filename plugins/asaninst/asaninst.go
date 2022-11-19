@@ -3,24 +3,26 @@ package asaninst
 import (
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
+	"megaCrawler/Extractors"
 	"strings"
+	"time"
 )
 
 // 这个函数用于分隔使用 "," 和 "and" 的字符串
 // 并返回分割开的 []string
-func cutToList(input_str string) ([]string)  {
-	name_str := strings.Replace(input_str, "and", ",", 1)
-	name_list := strings.Split(name_str, ",")
-	for index, value := range name_list {
-		name_list[index] = strings.TrimSpace(value)
+func cutToList(inputStr string) []string {
+	nameStr := strings.Replace(inputStr, "and", ",", 1)
+	nameList := strings.Split(nameStr, ",")
+	for index, value := range nameList {
+		nameList[index] = strings.TrimSpace(value)
 	}
 
-	return name_list
+	return nameList
 }
 
 func init() {
 	w := Crawler.Register("asaninst", "峨山政策研究院", "https://en.asaninst.org/")
-	
+
 	w.SetStartingUrls([]string{
 		"https://en.asaninst.org/contents/issues/security/",
 		"https://en.asaninst.org/contents/issues/international-law/",
@@ -62,7 +64,7 @@ func init() {
 	// 获取 PublicationTime
 	w.OnHTML(`#content header > div.post_date_big`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.PublicationTime = strings.TrimSpace(element.Text)
+			ctx.PublicationTime = Extractors.MustParseTime("2006Jan02", element.Text).Format(time.RFC3339)
 		})
 
 	// 获取 Authors
@@ -113,8 +115,8 @@ func init() {
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.Name = strings.TrimSpace(element.ChildText("h3"))
 			// 去除其他信息以得到 Expert 的 Title
-			title_raw := strings.Replace(element.Text, ctx.Name, "", 1)
-			title_raw = strings.Replace(element.Text, element.ChildText("p"), "", 1)
-			ctx.Title = strings.TrimSpace(title_raw)
+			titleRaw := strings.Replace(element.Text, ctx.Name, "", 1)
+			titleRaw = strings.Replace(element.Text, element.ChildText("p"), "", 1)
+			ctx.Title = strings.TrimSpace(titleRaw)
 		})
 }

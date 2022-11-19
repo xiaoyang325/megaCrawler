@@ -3,32 +3,30 @@ package ifans
 import (
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
-	"strings"
-	"strconv"
 	"net/url"
+	"regexp"
+	"strconv"
+	"strings"
 )
 
 // 这个函数用于从 onclick 函数调用中获取信息，拼接成 Report 的 URL，并返回
-func getURLFromFunctionCall(function_call string, channel_type string) (string) {
-		raw_str := function_call
-		raw_str = strings.Replace(raw_str, "fnCmdView(", "", 1)
-		raw_str = strings.Replace(raw_str, ")", "", 1)
-		raw_str = strings.Replace(raw_str, "'", "", -1)
-		param_list := strings.Split(raw_str, ",")
+func getURLFromFunctionCall(functionCall string, channelType string) string {
+	reg := regexp.MustCompile("fnCmdView\\('(\\d+)','(\\w+)'\\)")
+	paramList := reg.FindStringSubmatch(functionCall)
 
-		for index, value := range param_list {
-			param_list[index] = strings.TrimSpace(value)
-		}
+	for index, value := range paramList {
+		paramList[index] = strings.TrimSpace(value)
+	}
 
-		param_1, param_2 := param_list[0], param_list[1]
-		file_url := "https://www.ifans.go.kr/knda/ifans/eng/act/"
-		file_url += channel_type + ".do?sn=" + param_1 + "&boardSe=" + param_2
+	param1, param2 := paramList[1], paramList[2]
+	fileUrl := "https://www.ifans.go.kr/knda/ifans/eng/act/"
+	fileUrl += channelType + ".do?sn=" + param1 + "&boardSe=" + param2
 
-		return file_url
+	return fileUrl
 }
 
 // 这个函数修改当前 Index 页面的查询参数，以获取下一页 Index，并返回相应的 URL
-func getNextIndexURL(current_url string, current_page_num string, param_name string) (string) {
+func getNextIndexURL(current_url string, current_page_num string, param_name string) string {
 	this_url, _ := url.Parse(current_url)
 	param_list := this_url.Query()
 
@@ -43,7 +41,7 @@ func getNextIndexURL(current_url string, current_page_num string, param_name str
 
 func init() {
 	w := Crawler.Register("ifans", "外交与国家安全研究所", "https://www.ifans.go.kr/")
-	
+
 	w.SetStartingUrls([]string{
 		"https://www.ifans.go.kr/knda/ifans/eng/act/ActivityList.do?ctgrySe=02&pageIndex=1",
 		"https://www.ifans.go.kr/knda/ifans/eng/act/ActivityList.do?ctgrySe=15&pageIndex=1",
@@ -78,9 +76,9 @@ func init() {
 			var report_url string
 
 			// 从 a[onclick] 中的函数调用获取 Report 的 URL
-			if (strings.Contains(ctx.Url, "ActivityList")) {
+			if strings.Contains(ctx.Url, "ActivityList") {
 				report_url = getURLFromFunctionCall(element.Attr("onclick"), "ActivityView")
-			} else if (strings.Contains(ctx.Url, "ActivityAreaList")) {
+			} else if strings.Contains(ctx.Url, "ActivityAreaList") {
 				report_url = getURLFromFunctionCall(element.Attr("onclick"), "ActivityAreaView")
 			}
 

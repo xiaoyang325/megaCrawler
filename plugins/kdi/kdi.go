@@ -3,13 +3,13 @@ package kdi
 import (
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 func init() {
 	w := Crawler.Register("kdi", "发展研究会", "https://www.kdi.re.kr/")
-	
+
 	w.SetStartingUrls([]string{
 		"https://www.kdi.re.kr/kdi_eng/topics/dep_strategy.jsp",
 		"https://www.kdi.re.kr/kdi_eng/topics/dep_policy.jsp",
@@ -24,7 +24,7 @@ func init() {
 			page_num := strings.TrimSpace(element.Text)
 			num, _ := strconv.Atoi(page_num)
 			next_url := "https://www.kdi.re.kr/kdi_eng/issues/policy_information.jsp?pg="
-			next_url += strconv.Itoa(num + 1) + "&pp="
+			next_url += strconv.Itoa(num+1) + "&pp="
 			w.Visit(next_url, Crawler.Index)
 		})
 
