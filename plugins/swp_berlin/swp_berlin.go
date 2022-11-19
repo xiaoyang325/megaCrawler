@@ -4,6 +4,7 @@ import (
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
 	"net/url"
+	"regexp"
 	"strings"
 )
 
@@ -67,15 +68,10 @@ func init() {
 		})
 
 	// 获取 PublicationTime //
-	w.OnHTML(`body > header.publication-page > div > span.small-text`,
+	w.OnHTML(`.news-header > div > time, .publication-page > div > span.small-text`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.PublicationTime = strings.TrimSpace(strings.Split(element.Text, ",")[1])
-		})
-
-	// 获取 PublicationTime //
-	w.OnHTML(`body > div.news-header > div > time`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.PublicationTime = strings.TrimSpace(strings.Split(element.Text, ",")[1])
+			reg := regexp.MustCompile("[\\d./]+")
+			ctx.PublicationTime = reg.FindString(element.Text)
 		})
 
 	// 获取 Authors //
@@ -85,13 +81,7 @@ func init() {
 		})
 
 	// 获取 Content //
-	w.OnHTML(`body > div.publication-page__fulltext > div > div`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.Text)
-		})
-
-	// 获取 Content //
-	w.OnHTML(`body > div.textmedia.ce-above > div > div.ce-bodytext`,
+	w.OnHTML(`.ce-bodytext, .publication-page__fulltext > div > div`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.Content = strings.TrimSpace(element.Text)
 		})
