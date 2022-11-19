@@ -1,12 +1,14 @@
 package ifans
 
 import (
+	"github.com/araddon/dateparse"
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
 	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // 这个函数用于从 onclick 函数调用中获取信息，拼接成 Report 的 URL，并返回
@@ -26,17 +28,17 @@ func getURLFromFunctionCall(functionCall string, channelType string) string {
 }
 
 // 这个函数修改当前 Index 页面的查询参数，以获取下一页 Index，并返回相应的 URL
-func getNextIndexURL(current_url string, current_page_num string, param_name string) string {
-	this_url, _ := url.Parse(current_url)
-	param_list := this_url.Query()
+func getNextIndexURL(currentUrl string, currentPageNum string, paramName string) string {
+	thisUrl, _ := url.Parse(currentUrl)
+	paramList := thisUrl.Query()
 
-	current_num, _ := strconv.Atoi(current_page_num)
-	current_num++
+	currentNum, _ := strconv.Atoi(currentPageNum)
+	currentNum++
 
-	param_list.Set(param_name, strconv.Itoa(current_num))
-	this_url.RawQuery = param_list.Encode()
+	paramList.Set(paramName, strconv.Itoa(currentNum))
+	thisUrl.RawQuery = paramList.Encode()
 
-	return this_url.String()
+	return thisUrl.String()
 }
 
 func init() {
@@ -66,23 +68,23 @@ func init() {
 	w.OnHTML(`#listForm > div.pagination > span.on`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			// 从当前 Index 的 URL 获取下一页 Index 的 URL
-			next_url := getNextIndexURL(ctx.Url, strings.TrimSpace(element.Text), "pageIndex")
-			w.Visit(next_url, Crawler.Index)
+			nextUrl := getNextIndexURL(ctx.Url, strings.TrimSpace(element.Text), "pageIndex")
+			w.Visit(nextUrl, Crawler.Index)
 		})
 
 	// 访问 Report 从 Index
 	w.OnHTML(`#listForm > ul.board_list > li > a`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			var report_url string
+			var reportUrl string
 
 			// 从 a[onclick] 中的函数调用获取 Report 的 URL
 			if strings.Contains(ctx.Url, "ActivityList") {
-				report_url = getURLFromFunctionCall(element.Attr("onclick"), "ActivityView")
+				reportUrl = getURLFromFunctionCall(element.Attr("onclick"), "ActivityView")
 			} else if strings.Contains(ctx.Url, "ActivityAreaList") {
-				report_url = getURLFromFunctionCall(element.Attr("onclick"), "ActivityAreaView")
+				reportUrl = getURLFromFunctionCall(element.Attr("onclick"), "ActivityAreaView")
 			}
 
-			w.Visit(report_url, Crawler.Report)
+			w.Visit(reportUrl, Crawler.Report)
 		})
 
 	// 获取 Title
@@ -110,15 +112,9 @@ func init() {
 		})
 
 	// 获取 PublicationTime
-	w.OnHTML(`#content > div > div.sub_top_view.con_in > span.date > em`,
+	w.OnHTML(`span.date > em`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.PublicationTime = strings.TrimSpace(element.Text)
-		})
-
-	// 获取 PublicationTime
-	w.OnHTML(`#detailForm > div.editor.board_con_top.con_in > span.date > em`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.PublicationTime = strings.TrimSpace(element.Text)
+			ctx.PublicationTime = dateparse.MustParse(strings.TrimSpace(element.Text)).Format(time.RFC3339)
 		})
 
 	// 获取 CategoryText
@@ -152,17 +148,17 @@ func init() {
 	// 获取 File
 	w.OnHTML(`#detailForm > div.editor.board_con.con_in > dl > dd > a`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			file_url := "https://www.ifans.go.kr" + element.Attr("href")
-			ctx.File = append(ctx.File, file_url)
+			fileUrl := "https://www.ifans.go.kr" + element.Attr("href")
+			ctx.File = append(ctx.File, fileUrl)
 		})
 
 	// 获取 Tags
 	w.OnHTML(`#detailForm > div.editor.board_con.con_in > span.tag > a`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			tag_str := strings.TrimSpace(element.Text)
+			tagStr := strings.TrimSpace(element.Text)
 			// 删除 Tag 中的 "#"
-			tag_str = strings.Replace(tag_str, "#", "", 1)
-			ctx.Tags = append(ctx.Tags, tag_str)
+			tagStr = strings.Replace(tagStr, "#", "", 1)
+			ctx.Tags = append(ctx.Tags, tagStr)
 		})
 
 	// 获取 Tags
@@ -170,4 +166,8 @@ func init() {
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.Tags = append(ctx.Tags, strings.TrimSpace(element.Text))
 		})
+
+	w.OnHTML(".board_con", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Content = element.Text
+	})
 }
