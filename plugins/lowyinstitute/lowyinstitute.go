@@ -8,7 +8,7 @@ import (
 
 func init() {
 	w := Crawler.Register("lowyinstitute", "洛伊国际政策研究所", "https://www.lowyinstitute.org/")
-	
+
 	w.SetStartingUrls([]string{
 		"https://www.lowyinstitute.org/publications?keys=&author=All&type=All&issues=195&related_issues=All",
 		"https://www.lowyinstitute.org/publications?keys=&author=All&type=All&issues=199&related_issues=All",

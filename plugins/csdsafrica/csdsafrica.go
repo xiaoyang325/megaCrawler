@@ -3,13 +3,13 @@ package csdsafrica
 import (
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 func init() {
 	w := Crawler.Register("csdsafrica", "战略与国防研究中心", "https://csdsafrica.org/")
-	
+
 	w.SetStartingUrls([]string{
 		"https://csdsafrica.org/close-protection-africa/",
 		"https://csdsafrica.org/our-insights/",

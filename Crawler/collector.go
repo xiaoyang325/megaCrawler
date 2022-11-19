@@ -31,7 +31,7 @@ type CollectorConstructor struct {
 	launchHandler    func()
 }
 
-func RetryRequest(r *colly.Request, maxRetries int) int {
+func retryRequest(r *colly.Request, maxRetries int) int {
 	retriesLeft := maxRetries
 	if x, ok := r.Ctx.GetAny("retriesLeft").(int); ok {
 		retriesLeft = x
