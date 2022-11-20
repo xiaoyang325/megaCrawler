@@ -37,5 +37,6 @@ import (
 	//_ "megaCrawler/plugins/lowyinstitute"
 	//_ "megaCrawler/plugins/rsis"
 	//_ "megaCrawler/plugins/swp_berlin"
-	_ "megaCrawler/plugins/dgap"
+	//_ "megaCrawler/plugins/dgap"
+	_ "megaCrawler/plugins/transparency"
 )
