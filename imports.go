@@ -39,5 +39,6 @@ import (
 	//_ "megaCrawler/plugins/swp_berlin"
 	//_ "megaCrawler/plugins/dgap"
 	//_ "megaCrawler/plugins/transparency"
-	_ "megaCrawler/plugins/kas"
+	//_ "megaCrawler/plugins/kas"
+	_ "megaCrawler/plugins/crisisgroup"
 )
