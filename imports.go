@@ -40,5 +40,6 @@ import (
 	//_ "megaCrawler/plugins/dgap"
 	//_ "megaCrawler/plugins/transparency"
 	//_ "megaCrawler/plugins/kas"
-	_ "megaCrawler/plugins/crisisgroup"
+	//_ "megaCrawler/plugins/crisisgroup"
+	_ "megaCrawler/plugins/egmontinstitute"
 )
