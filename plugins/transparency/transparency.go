@@ -8,7 +8,7 @@ import (
 
 func init() {
 	w := Crawler.Register("transparency", "透明国际", "https://www.transparency.org/")
-	
+
 	w.SetStartingUrls([]string{
 		"https://www.transparency.org/en/news",
 		"https://www.transparency.org/en/blog",
@@ -103,25 +103,25 @@ func init() {
 	// 获取 Content
 	w.OnHTML(`#content > article > div > div.js-full-width-column > div:nth-child(1)`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.ChildText("p h1 h2 h3"))
+			ctx.Content = strings.TrimSpace(element.Text)
 		})
 
 	// 获取 Content
 	w.OnHTML(`#content > article > div.container > div > div > div.mb-16:nth-child(1)`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.ChildText("p h1 h2 h3"))
+			ctx.Content = strings.TrimSpace(element.Text)
 		})
 
 	// 获取 Content
 	w.OnHTML(`#content > article > div[class="copy wysiwyg mb-16 text-left"]`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.ChildText("p h1 h2 h3"))
+			ctx.Content = strings.TrimSpace(element.Text)
 		})
 
 	// 获取 Content
 	w.OnHTML(`#content > div.container > div > div > div.mb-16 > div > div`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.ChildText("p h1 h2 h3"))
+			ctx.Content = strings.TrimSpace(element.Text)
 		})
 
 	// 获取 Tags
