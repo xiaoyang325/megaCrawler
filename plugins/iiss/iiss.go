@@ -84,9 +84,9 @@ func init() {
 	w.OnHTML(`div[class="richtext component"]:nth-child(1)`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			if ctx.PageType != Crawler.Expert {
-				ctx.Content = strings.TrimSpace(element.ChildText("p h1 h2 h3"))
+				ctx.Content = strings.TrimSpace(element.ChildText("p, h1, h2, h3"))
 			} else {
-				ctx.Description = strings.TrimSpace(element.ChildText("p h1 h2 h3"))
+				ctx.Description = strings.TrimSpace(element.ChildText("p, h1, h2, h3"))
 			}
 		})
 
