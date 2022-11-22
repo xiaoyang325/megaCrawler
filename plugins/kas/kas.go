@@ -8,7 +8,7 @@ import (
 
 func init() {
 	w := Crawler.Register("kas", "康拉德·阿登纳基金会", "https://www.kas.de/")
-	
+
 	w.SetStartingUrls([]string{
 		"https://www.kas.de/de/publikationen",
 	})
@@ -20,7 +20,7 @@ func init() {
 		})
 
 	// 访问 Report 从 Index
-	w.OnHTML(`div a[class="c-publication-tiles__tile o-tile "]`,
+	w.OnHTML(`#column-2 a.c-publication-tiles__tile`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			w.Visit(element.Attr("href"), Crawler.Report)
 		})
@@ -77,7 +77,7 @@ func init() {
 	// 获取 File
 	w.OnHTML(`div.c-aside-teaser.c-aside-teaser--links.c-aside-teaser--covermedia > div.c-aside-teaser__entry > a`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			file_url := "https://www.kas.de" + element.Attr("href")
-			ctx.File = append(ctx.File, file_url)
+			fileUrl := "https://www.kas.de" + element.Attr("href")
+			ctx.File = append(ctx.File, fileUrl)
 		})
 }

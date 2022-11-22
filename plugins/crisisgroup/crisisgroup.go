@@ -3,29 +3,29 @@ package crisisgroup
 import (
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
-	"strings"
-	"strconv"
 	"net/url"
+	"strconv"
+	"strings"
 )
 
 // 这个函数修改当前 Index 页面的查询参数，以获取下一页 Index，并返回相应的 URL
-func getNextIndexURL(current_url string, current_page_num string, 
-							param_name string) (string) {
-	this_url, _ := url.Parse(current_url)
-	param_list := this_url.Query()
+func getNextIndexURL(currentUrl string, currentPageNum string,
+	paramName string) string {
+	thisUrl, _ := url.Parse(currentUrl)
+	paramList := thisUrl.Query()
 
-	current_num, _ := strconv.Atoi(current_page_num)
-	current_num++
+	currentNum, _ := strconv.Atoi(currentPageNum)
+	currentNum++
 
-	param_list.Set(param_name, strconv.Itoa(current_num))
-	this_url.RawQuery = param_list.Encode()
+	paramList.Set(paramName, strconv.Itoa(currentNum))
+	thisUrl.RawQuery = paramList.Encode()
 
-	return this_url.String()
+	return thisUrl.String()
 }
 
 func init() {
 	w := Crawler.Register("crisisgroup", "国际危机组织", "https://www.crisisgroup.org/")
-	
+
 	w.SetStartingUrls([]string{
 		"https://www.crisisgroup.org/latest-updates?page=0",
 		"https://www.crisisgroup.org/who-we-are/our-people",
@@ -34,12 +34,11 @@ func init() {
 	// 访问下一页 Index //
 	w.OnHTML(`body > div.dialog-off-canvas-main-canvas > main > div > div.s-component.c-news-list.o-container.o-container--cols1 > div.o-pagination-container.\[.u-df.u-jcc.\] > ul > li.u-mar-l15.u-mar-r15.u-mar-l25\@m.u-mar-r25\@m > span`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			num_list := strings.Split(element.Text, "of")
-			current_num, _ := strconv.Atoi(strings.TrimSpace(num_list[0]))
-			max_num, _ := strconv.Atoi(strings.TrimSpace(num_list[1]))
-			if current_num <= max_num {
-				url := getNextIndexURL(ctx.Url, strings.TrimSpace(num_list[0]), "page")
-				w.Visit(url, Crawler.Index)
+			numList := strings.Split(element.Text, "of")
+			currentNum, _ := strconv.Atoi(strings.TrimSpace(numList[0]))
+			maxNum, _ := strconv.Atoi(strings.TrimSpace(numList[1]))
+			if currentNum <= maxNum {
+				w.Visit(getNextIndexURL(ctx.Url, strings.TrimSpace(numList[0]), "page"), Crawler.Index)
 			}
 		})
 
