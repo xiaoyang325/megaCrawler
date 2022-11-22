@@ -41,5 +41,6 @@ import (
 	//_ "megaCrawler/plugins/transparency"
 	//_ "megaCrawler/plugins/kas"
 	//_ "megaCrawler/plugins/crisisgroup"
-	_ "megaCrawler/plugins/egmontinstitute"
+	//_ "megaCrawler/plugins/egmontinstitute"
+	_ "megaCrawler/plugins/iiss"
 )
