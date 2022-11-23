@@ -94,9 +94,8 @@ func (w *WebsiteEngine) OnResponse(callback func(response *colly.Response, ctx *
 	return w
 }
 
-func (w *WebsiteEngine) ApplyTemplate(template Template) *WebsiteEngine {
-	w.UrlProcessor.htmlHandlers = combineSlice(w.UrlProcessor.htmlHandlers, template.htmlHandlers)
-	w.UrlProcessor.xmlHandlers = combineSlice(w.UrlProcessor.xmlHandlers, template.xmlHandlers)
+func (w *WebsiteEngine) OnLaunch(callback func()) *WebsiteEngine {
+	w.UrlProcessor.launchHandler = callback
 	return w
 }
 
