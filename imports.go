@@ -43,5 +43,6 @@ import (
 	//_ "megaCrawler/plugins/crisisgroup"
 	//_ "megaCrawler/plugins/egmontinstitute"
 	//_ "megaCrawler/plugins/iiss"
-	_ "megaCrawler/plugins/cejil"
+	//_ "megaCrawler/plugins/cejil"
+	_ "megaCrawler/plugins/summa_cejil"
 )
