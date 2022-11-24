@@ -45,5 +45,6 @@ import (
 	//_ "megaCrawler/plugins/iiss"
 	//_ "megaCrawler/plugins/cejil"
 	//_ "megaCrawler/plugins/summa_cejil"
-	_ "megaCrawler/plugins/reproductiverights"
+	//_ "megaCrawler/plugins/reproductiverights"
+	_ "megaCrawler/plugins/centerforsecuritypolicy"
 )
