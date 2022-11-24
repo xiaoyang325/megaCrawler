@@ -13,7 +13,7 @@ import (
 	//_ "megaCrawler/plugins/ids"
 	//_ "megaCrawler/plugins/ipcs"
 	//_ "megaCrawler/plugins/ips"
-	_ "megaCrawler/plugins/kiep"
+	_ "megaCrawler/plugins/fraserinstitute"
 	//_ "megaCrawler/plugins/maritimeindia"
 	//_ "megaCrawler/plugins/piie"
 	//_ "megaCrawler/plugins/prri"

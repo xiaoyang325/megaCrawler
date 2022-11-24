@@ -3,6 +3,7 @@ package fraserinstitute
 import (
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
+	"megaCrawler/Extractors"
 	"strings"
 )
 
@@ -39,7 +40,8 @@ func init() {
 		"https://www.fraserinstitute.org/blogs/category/health-care",
 		"https://www.fraserinstitute.org/blogs/category/mmt",
 		"https://www.fraserinstitute.org/blogs/category/natural-resources",
-		"https://www.fraserinstitute.org/blogs/category/other-topics"})
+		"https://www.fraserinstitute.org/blogs/category/other-topics"},
+	)
 
 	// 尝试寻找下载pdf的按钮，并如果存在则将页面类型转换为报告
 	w.OnHTML("a.button", func(element *colly.HTMLElement, ctx *Crawler.Context) {
@@ -49,14 +51,21 @@ func init() {
 		}
 	})
 
+	w.OnHTML("html", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		Extractors.Authors(ctx, element)
+		Extractors.PublishingDate(ctx, element)
+	})
+
 	// 从翻页器获取链接并访问
 	w.OnHTML("div.archive-links>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		w.Visit(element.Attr("href"), Crawler.Index)
 	})
+
 	// 从翻页器获取链接并访问
 	w.OnHTML("div.text-center>ul>li>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		w.Visit(element.Attr("href"), Crawler.Index)
 	})
+
 	// 从index访问新闻
 	w.OnHTML("span.field-content>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		w.Visit(element.Attr("href"), Crawler.News)
@@ -67,25 +76,21 @@ func init() {
 		ctx.Title = element.Text
 	})
 
-	//report.publish time
-	w.OnHTML("div.submitted", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.PublicationTime = element.Text
-	})
 	// report .content
 	w.OnHTML("div.tab-content", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Content = element.Text
 	})
+
 	// report .content
 	w.OnHTML("div.field-name-body", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Content = element.Text
 	})
+
 	// report.author
-	w.OnHTML("div.node-author-fullname>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.node-author-fullname>a, div.field-content-author-authors>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Authors = append(ctx.Authors, element.Text)
 	})
-	w.OnHTML("div.field-content-author-authors>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Authors = append(ctx.Authors, element.Text)
-	})
+
 	//内含Expert
 	w.OnHTML("div.node-author-fullname>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		w.Visit(element.Attr("href"), Crawler.Expert)
@@ -100,13 +105,14 @@ func init() {
 	w.OnHTML(" div.main-author-content > h3 > div > div > div", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Title = element.Text
 	})
+
 	// expert.description
 	w.OnHTML(" div.main-author-content > div > div > div > div", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Content = element.Text
 	})
+
 	// expert.link
 	w.OnHTML(" div.field-name-field-email > div > div > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Link = append(ctx.Link, element.Attr("href"))
 	})
-
 }
