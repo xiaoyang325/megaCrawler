@@ -48,5 +48,6 @@ import (
 	//_ "megaCrawler/plugins/reproductiverights"
 	//_ "megaCrawler/plugins/centerforsecuritypolicy"
 	//_ "megaCrawler/plugins/cyber_fsi_stanford"
-	_ "megaCrawler/plugins/demandprogress"
+	//_ "megaCrawler/plugins/demandprogress"
+	_ "megaCrawler/plugins/humanrights_uconn"
 )
