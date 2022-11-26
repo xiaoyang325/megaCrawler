@@ -51,5 +51,6 @@ import (
 	//_ "megaCrawler/plugins/demandprogress"
 	//_ "megaCrawler/plugins/humanrights_uconn"
 	//_ "megaCrawler/plugins/stimson"
-	_ "megaCrawler/plugins/news_fit"
+	//_ "megaCrawler/plugins/news_fit"
+	_ "megaCrawler/plugins/fau"
 )
