@@ -94,8 +94,6 @@ func getPublishingDate(dom *colly.HTMLElement) string {
 		if obj, err := pareDateStr(dateMatch); err == nil {
 			return obj.Format(time.RFC3339)
 		}
-	} else {
-		Crawler.Sugar.Warn(dom.Request.URL.String())
 	}
 	return ""
 }

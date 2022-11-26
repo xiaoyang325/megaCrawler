@@ -94,9 +94,8 @@ func (w *WebsiteEngine) OnResponse(callback func(response *colly.Response, ctx *
 	return w
 }
 
-func (w *WebsiteEngine) ApplyTemplate(template Template) *WebsiteEngine {
-	w.UrlProcessor.htmlHandlers = combineSlice(w.UrlProcessor.htmlHandlers, template.htmlHandlers)
-	w.UrlProcessor.xmlHandlers = combineSlice(w.UrlProcessor.xmlHandlers, template.xmlHandlers)
+func (w *WebsiteEngine) OnLaunch(callback func()) *WebsiteEngine {
+	w.UrlProcessor.launchHandler = callback
 	return w
 }
 
@@ -148,15 +147,6 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 		}
 		RetryRequest(r.Request, err, w)
 	})
-
-	if w.UrlProcessor.launchHandler != nil {
-		c.OnRequest(func(request *colly.Request) {
-			if w.doneLaunch {
-				w.doneLaunch = true
-				w.UrlProcessor.launchHandler()
-			}
-		})
-	}
 	return
 }
 
@@ -238,6 +228,15 @@ func (w *WebsiteEngine) processUrl() (err error) {
 
 	for _, startingUrl := range w.UrlProcessor.startingUrls {
 		w.Visit(startingUrl, Index)
+	}
+
+	if w.UrlProcessor.launchHandler != nil {
+		go func() {
+			w.UrlProcessor.launchHandler()
+			w.WG.Done()
+		}()
+
+		w.WG.Add(1)
 	}
 
 	if w.UrlProcessor.robotTxt != "" {

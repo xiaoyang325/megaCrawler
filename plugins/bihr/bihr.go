@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	w := Crawler.Register("bihr", "", "https://www.bihr.org.uk/")
+	w := Crawler.Register("bihr", "British Institute of Human Rights", "https://www.bihr.org.uk/")
 
 	w.SetStartingUrls([]string{
 		"https://www.bihr.org.uk/the-human-rights-act-the-icescr",
