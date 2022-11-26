@@ -50,5 +50,6 @@ import (
 	//_ "megaCrawler/plugins/cyber_fsi_stanford"
 	//_ "megaCrawler/plugins/demandprogress"
 	//_ "megaCrawler/plugins/humanrights_uconn"
-	_ "megaCrawler/plugins/stimson"
+	//_ "megaCrawler/plugins/stimson"
+	_ "megaCrawler/plugins/news_fit"
 )
