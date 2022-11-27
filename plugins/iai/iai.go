@@ -95,7 +95,7 @@ func init() {
 	})
 	// expert.description
 	w.OnHTML("div.field-body", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Content = element.Text
+		ctx.Description = element.Text
 	})
 	// expert.link
 	w.OnHTML("div.riga-social>span>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
