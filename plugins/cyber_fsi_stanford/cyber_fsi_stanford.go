@@ -3,16 +3,21 @@ package cyber_fsi_stanford
 import (
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
+	"megaCrawler/Extractors"
 	"strings"
 )
 
 func init() {
 	w := Crawler.Register("cyber_fsi_stanford", "网络政策研究所",
-			"https://cyber.fsi.stanford.edu/")
-	
+		"https://cyber.fsi.stanford.edu/")
+
 	w.SetStartingUrls([]string{
 		"https://cyber.fsi.stanford.edu/io",
 		"https://cyber.fsi.stanford.edu/people",
+	})
+
+	w.OnHTML("html", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		Extractors.Titles(ctx, element)
 	})
 
 	// 访问下一页 Index
@@ -31,12 +36,6 @@ func init() {
 	w.OnHTML(`.block-peoples__title > a`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			w.Visit(element.Attr("href"), Crawler.Expert)
-		})
-
-	// 获取 Title
-	w.OnHTML(`.news-header__title`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
 		})
 
 	// 获取 Name
@@ -73,7 +72,6 @@ func init() {
 			ctx.Title = strings.TrimSpace(element.Text)
 		})
 
-
 	// 获取 CategoryText
 	w.OnHTML(`[class="news-header__date text--red"]`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
@@ -99,13 +97,7 @@ func init() {
 		})
 
 	// 获取 Content
-	w.OnHTML(`div[class="full-html font--large entity entity-paragraphs-item paragraphs-item-full-html"]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.ChildText("p"))
-		})
-
-	// 获取 Content
-	w.OnHTML(`div[class="full-html font--large entity entity-paragraphs-item paragraphs-item-full-html full-html--first-character-big"]`,
+	w.OnHTML(`.field-type-text-long, .story-content`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.Content = strings.TrimSpace(element.ChildText("p"))
 		})
