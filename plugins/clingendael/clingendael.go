@@ -77,7 +77,7 @@ func init() {
 		w.Visit(element.Attr("href"), Crawler.News)
 	})
 	// report.title
-	w.OnHTML("h1.block-title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".block-title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Title = element.Text
 	})
 
@@ -94,7 +94,7 @@ func init() {
 		w.Visit(element.Attr("href"), Crawler.Expert)
 	})
 	// report .content
-	w.OnHTML("div.publication-content", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.publication-content, .event-content-wrapper, .training-content", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Content = element.Text
 	})
 	// report.category
