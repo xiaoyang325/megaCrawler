@@ -86,11 +86,11 @@ func init() {
 		ctx.Content = element.Text
 	})
 	// expert.Name
-	w.OnHTML(" h1.page-header > font > font", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(" h1.page-header", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Name = element.Text
 	})
 	// expert.title
-	w.OnHTML("div.field-autore-qualifica > font > font", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.field-autore-qualifica", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Title = element.Text
 	})
 	// expert.description
@@ -102,7 +102,7 @@ func init() {
 		ctx.Link = append(ctx.Link, element.Attr("href"))
 	})
 	// expert.area
-	w.OnHTML("div.field-pub-keywords>font>font", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.field-pub-keywords", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Area = ctx.Area + "," + element.Text
 	})
 
