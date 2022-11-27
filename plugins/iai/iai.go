@@ -81,10 +81,6 @@ func init() {
 	w.OnHTML("div.data-r", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.PublicationTime = element.Text
 	})
-	// report .content
-	w.OnHTML("div.field-body", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Content = element.Text
-	})
 	// expert.Name
 	w.OnHTML(" h1.page-header", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Name = element.Text
@@ -95,7 +91,11 @@ func init() {
 	})
 	// expert.description
 	w.OnHTML("div.field-body", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Description = element.Text
+		if ctx.PageType == Crawler.Expert {
+			ctx.Description = element.Text
+		} else {
+			ctx.Content = element.Text
+		}
 	})
 	// expert.link
 	w.OnHTML("div.riga-social>span>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
