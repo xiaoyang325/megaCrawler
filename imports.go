@@ -10,5 +10,5 @@ import (
 	//_ "megaCrawler/plugins/news_fit"
 	//_ "megaCrawler/plugins/reproductiverights"
 	//_ "megaCrawler/plugins/stimson"
-	_ "megaCrawler/plugins/summa_cejil"
+	_ "megaCrawler/plugins/cepr"
 )
