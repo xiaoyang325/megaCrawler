@@ -17,6 +17,14 @@ func pareDateStr(date string) (time.Time, error) {
 	return parseAny, nil
 }
 
+func MustParseTime(format string, text string) time.Time {
+	if t, err := time.Parse(format, text); err != nil {
+		panic(err)
+	} else {
+		return t
+	}
+}
+
 func getPublishingDate(dom *colly.HTMLElement) string {
 	var strictDateRegex, err = regexp.Compile("\\d+/\\d+/\\d+")
 	if err != nil {
@@ -86,8 +94,6 @@ func getPublishingDate(dom *colly.HTMLElement) string {
 		if obj, err := pareDateStr(dateMatch); err == nil {
 			return obj.Format(time.RFC3339)
 		}
-	} else {
-		Crawler.Sugar.Warn(dom.Request.URL.String())
 	}
 	return ""
 }

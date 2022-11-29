@@ -2,6 +2,7 @@ package Crawler
 
 import (
 	"encoding/json"
+	"strings"
 	"time"
 )
 
@@ -193,20 +194,20 @@ func (ctx Context) process() (success bool) {
 	case News:
 		n := news{
 			Id:              ctx.Id,
-			Title:           ctx.Title,
-			SubTitle:        ctx.SubTitle,
+			Title:           strings.TrimSpace(ctx.Title),
+			SubTitle:        strings.TrimSpace(ctx.SubTitle),
 			Url:             ctx.Url,
 			Host:            ctx.Host,
 			Website:         ctx.Website,
-			CategoryText:    ctx.CategoryText,
+			CategoryText:    strings.TrimSpace(ctx.CategoryText),
 			CategoryId:      ctx.CategoryId,
 			Location:        ctx.Location,
 			CityISO:         ctx.CityISO,
 			Language:        ctx.Language,
-			Authors:         ctx.Authors,
-			PublicationTime: ctx.PublicationTime,
-			Description:     ctx.Description,
-			Content:         ctx.Content,
+			Authors:         Unique(ctx.Authors),
+			PublicationTime: strings.TrimSpace(ctx.PublicationTime),
+			Description:     strings.TrimSpace(ctx.Description),
+			Content:         strings.TrimSpace(ctx.Content),
 			Image:           ctx.Image,
 			Video:           ctx.Video,
 			Link:            ctx.Link,
@@ -236,8 +237,8 @@ func (ctx Context) process() (success bool) {
 	case Report:
 		n := report{
 			Id:              ctx.Id,
-			Title:           ctx.Title,
-			SubTitle:        ctx.SubTitle,
+			Title:           strings.TrimSpace(ctx.Title),
+			SubTitle:        strings.TrimSpace(ctx.SubTitle),
 			Url:             ctx.Url,
 			Host:            ctx.Host,
 			Website:         ctx.Website,
@@ -245,10 +246,10 @@ func (ctx Context) process() (success bool) {
 			CategoryId:      ctx.CategoryId,
 			CityISO:         ctx.CityISO,
 			Language:        ctx.Language,
-			Authors:         ctx.Authors,
-			PublicationTime: ctx.PublicationTime,
-			Description:     ctx.Description,
-			Content:         ctx.Content,
+			Authors:         Unique(ctx.Authors),
+			PublicationTime: strings.TrimSpace(ctx.PublicationTime),
+			Description:     strings.TrimSpace(ctx.Description),
+			Content:         strings.TrimSpace(ctx.Content),
 			Image:           ctx.Image,
 			Video:           ctx.Video,
 			Audio:           ctx.Audio,
@@ -280,17 +281,17 @@ func (ctx Context) process() (success bool) {
 		}
 		n := expert{
 			Id:              ctx.Id,
-			Title:           ctx.Title,
-			Name:            ctx.Name,
+			Title:           strings.TrimSpace(ctx.Title),
+			Name:            strings.TrimSpace(ctx.Name),
 			Url:             ctx.Url,
 			Host:            ctx.Host,
 			Website:         ctx.Website,
-			CategoryText:    ctx.CategoryText,
+			CategoryText:    strings.TrimSpace(ctx.CategoryText),
 			CategoryId:      ctx.CategoryId,
 			Location:        ctx.Location,
 			CityISO:         ctx.CityISO,
 			Language:        ctx.Language,
-			Description:     ctx.Description,
+			Description:     strings.TrimSpace(ctx.Description),
 			Image:           image,
 			Keywords:        ctx.Keywords,
 			Type:            ctx.Type,
