@@ -22,7 +22,7 @@ func init() {
 		subCtx.Title = element.ChildText("span.project_category")
 
 		match := regexp.MustCompile("paoc-popup-cust-(\\d+)").FindStringSubmatch(
-			element.ChildAttr(".paoc-popup-click", "class"),
+			element.Attr("class"),
 		)
 		if len(match) > 1 {
 			subCtx.Description = strings.TrimSpace(element.DOM.Find("paoc-popup-" + match[1]).Text())
