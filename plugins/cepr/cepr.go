@@ -59,7 +59,7 @@ func init() {
 	})
 
 	//正文
-	w.OnHTML("art-body-desc", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".art-body-desc", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Content = element.Text
 	})
 }
