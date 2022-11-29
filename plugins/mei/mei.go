@@ -1,8 +1,10 @@
 package mei
 
 import (
+	"github.com/araddon/dateparse"
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
+	"time"
 )
 
 func init() {
@@ -10,17 +12,17 @@ func init() {
 	w.SetStartingUrls([]string{"https://www.mei.edu/policy-analysis", "https://www.mei.edu/experts"})
 
 	//index
-	w.OnHTML(".pager__item>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".pager__item > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		w.Visit(element.Attr("href"), Crawler.Index)
 	})
 
 	//news
-	w.OnHTML("article.feature.feature-1>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("article.feature.feature-1 > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		w.Visit(element.Attr("href"), Crawler.News)
 	})
 
 	//标题
-	w.OnHTML(".title-wrapper.container>h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".title-wrapper.container > h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Title = element.Text
 	})
 
@@ -30,7 +32,7 @@ func init() {
 	})
 
 	//作者
-	w.OnHTML("post__author", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".post__author", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Authors = append(ctx.Authors, element.Text)
 	})
 
@@ -40,7 +42,7 @@ func init() {
 	})
 
 	//专家
-	w.OnHTML("figure.photo>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("figure.photo > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		w.Visit(element.Attr("href"), Crawler.Expert)
 	})
 
@@ -59,4 +61,11 @@ func init() {
 		ctx.Description += element.Text
 	})
 
+	w.OnHTML(".post__date", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		date, err := dateparse.ParseAny(element.Text)
+		if err != nil {
+			return
+		}
+		ctx.PublicationTime = date.Format(time.RFC3339)
+	})
 }
