@@ -6,11 +6,20 @@ import (
 	"regexp"
 )
 
+var emailRegex = regexp.MustCompile("Email: ([.-_@\\w]+)")
+var telRegex = regexp.MustCompile("Tel: ([.\\w]+)")
+
 func init() {
 	w := Crawler.Register("arinus", "亚洲研究所", "https://ari.nus.edu.sg/")
-	w.SetStartingUrls([]string{"https://ari.nus.edu.sg/about-ari/people/academic/",
+	w.SetStartingUrls([]string{
+		"https://ari.nus.edu.sg/about-ari/people/academic/",
 		"https://ari.nus.edu.sg/about-ari/people/administrative/",
-		"https://ari.nus.edu.sg/media/news/"})
+		"https://ari.nus.edu.sg/media/news/",
+	})
+
+	w.OnResponse(func(response *colly.Response, ctx *Crawler.Context) {
+		println(string(response.Body))
+	})
 
 	//index
 	w.OnHTML("a.page-link", func(element *colly.HTMLElement, ctx *Crawler.Context) {
@@ -18,7 +27,7 @@ func init() {
 	})
 
 	//访问人物
-	w.OnHTML("people-info", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".people-info", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		w.Visit(element.Attr("href"), Crawler.Expert)
 	})
 
@@ -28,7 +37,7 @@ func init() {
 	})
 
 	//人物姓名,新闻标题
-	w.OnHTML("people-title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".people-title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		if ctx.PageType == Crawler.Expert {
 			ctx.Name = element.Text
 		} else if ctx.PageType == Crawler.News {
@@ -51,8 +60,6 @@ func init() {
 	//邮箱与电话,新闻正文
 	w.OnHTML("table.table-borderless.table-people-info", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		if ctx.PageType == Crawler.Expert {
-			emailRegex, _ := regexp.Compile("Email: ([.@\\w]+)")
-			telRegex, _ := regexp.Compile("Tel: ([.\\w]+)")
 			emailMatch := emailRegex.FindStringSubmatch(element.Text)
 			telMatch := telRegex.FindStringSubmatch(element.Text)
 			if len(emailMatch) == 2 {
