@@ -8,8 +8,8 @@ import (
 
 func init() {
 	w := Crawler.Register("centerforsecuritypolicy", "安全政策中心",
-			"https://centerforsecuritypolicy.org/")
-	
+		"https://centerforsecuritypolicy.org/")
+
 	w.SetStartingUrls([]string{
 		"https://centerforsecuritypolicy.org/category/articles/",
 		"https://centerforsecuritypolicy.org/category/books-and-reports/",
@@ -29,7 +29,7 @@ func init() {
 	w.OnHTML(`[class="article-title article-title-1"] > a`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			url := element.Attr("href")
-			if (strings.Contains(ctx.Url, "/in-the-news/") || strings.Contains(ctx.Url, "/press-release/")) {
+			if strings.Contains(ctx.Url, "/in-the-news/") || strings.Contains(ctx.Url, "/press-release/") {
 				w.Visit(url, Crawler.News)
 			} else {
 				w.Visit(url, Crawler.Report)
@@ -55,7 +55,7 @@ func init() {
 		})
 
 	// 获取 Content
-	w.OnHTML(`.pf-content > article`,
+	w.OnHTML(`.pf-content > article, .entry-content`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.Content = strings.TrimSpace(element.Text)
 		})
@@ -69,8 +69,8 @@ func init() {
 	// 获取 File
 	w.OnHTML(`.pf-content a`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			file_url := element.Attr("href")
-			if strings.Contains(file_url, ".pdf") {
+			fileUrl := element.Attr("href")
+			if strings.Contains(fileUrl, ".pdf") {
 				ctx.File = append(ctx.File, element.Attr("href"))
 			}
 		})
