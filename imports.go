@@ -1,5 +1,5 @@
 package main
 
 import (
-	_"megaCrawler/plugins/csis_or_id"
+	_"megaCrawler/plugins/pids_gov_ph"
 )
