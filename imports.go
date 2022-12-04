@@ -1,5 +1,5 @@
 package main
 
 import (
-	_"megaCrawler/plugins/pids_gov_ph"
+	_"megaCrawler/plugins/dfa_gov_ph"
 )
