@@ -74,5 +74,5 @@ import (
 	//_ "megaCrawler/plugins/transparency"
 	//_ "megaCrawler/plugins/usni"
 	//_ "megaCrawler/plugins/vifindia"
-	_ "megaCrawler/plugins/ndi"
+	_ "megaCrawler/plugins/nilc"
 )
