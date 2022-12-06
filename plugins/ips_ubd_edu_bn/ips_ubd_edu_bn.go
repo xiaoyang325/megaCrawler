@@ -14,13 +14,13 @@ func init() {
 		"https://ips.ubd.edu.bn/category/seminar-series/",
 	})
 
-	// 访问下一页 Index $
+	// 访问下一页 Index
 	w.OnHTML(`.nav-next > a`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			w.Visit(element.Attr("href"), Crawler.Index)
 		})
 
-	// 访问 News 和 Report 从 Index $
+	// 访问 News 和 Report 从 Index
 	w.OnHTML(`div > p.read-more-wrap > a`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			if strings.Contains(ctx.Url, "/seminar-series") {
@@ -30,28 +30,21 @@ func init() {
 			}
 		})
 
-	// 获取 Title $
+	// 获取 Title
 	w.OnHTML(`[class="entry-title page-title h2"]`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.Title = strings.TrimSpace(element.Text)
 		})
 
-	// 获取 PublicationTime $
+	// 获取 PublicationTime
 	w.OnHTML(`.posted-on > time`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.PublicationTime = strings.TrimSpace(element.Text)
 		})
 
-	// 获取 Content $
+	// 获取 Content
 	w.OnHTML(`#main .entry-content`,
 		func(element *colly.HTMLElement, ctx *Crawler.Context) {
 			ctx.Content = strings.TrimSpace(element.Text)
-		})
-
-	// 获取 File
-	w.OnHTML(`a[type="application/pdf"]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			file_url := "https://www.demos.org" + element.Attr("href")
-			ctx.File = append(ctx.File, file_url)
 		})
 }
