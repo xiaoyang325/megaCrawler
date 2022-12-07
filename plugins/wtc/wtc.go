@@ -34,6 +34,5 @@ func init() {
 
 	w.OnHTML(".news-article-date", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.PublicationTime = element.ChildText("span")
-		println(ctx.PublicationTime)
 	})
 }
