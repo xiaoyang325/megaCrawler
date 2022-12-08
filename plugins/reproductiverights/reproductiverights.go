@@ -8,8 +8,8 @@ import (
 
 func init() {
 	w := Crawler.Register("reproductiverights", "生殖权利中心",
-			"https://reproductiverights.org/")
-	
+		"https://reproductiverights.org/")
+
 	w.SetStartingUrls([]string{
 		"https://reproductiverights.org/?s=",
 		"https://reproductiverights.org/covid-19-resources/",
@@ -58,7 +58,7 @@ func init() {
 			subCtx.PageType = Crawler.Report
 
 			file_url := element.ChildAttr("em > a", "href")
-			if strings.Contains(file_url, ".pdf"){
+			if strings.Contains(file_url, ".pdf") {
 				subCtx.File = append(subCtx.File, file_url)
 			}
 
