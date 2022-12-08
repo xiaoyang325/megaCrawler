@@ -19,12 +19,12 @@ func init() {
 	})
 
 	//姓名
-	w.OnHTML("header-expert__name", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".header-expert__name", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Name = element.Text
 	})
 
 	//头衔
-	w.OnHTML("header-expert__dek", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".header-expert__dek", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Title = element.Text
 	})
 
@@ -43,18 +43,17 @@ func init() {
 	})
 
 	//新闻标题
-	w.OnHTML("article-header__title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".article-header__title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Title = element.Text
 	})
 
 	//作者
-	w.OnHTML("article-header__link", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".article-header__link", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Authors = append(ctx.Authors, element.Text)
 	})
 
 	//时间
-	w.OnHTML("article-header__date-ttr", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".article-header__date-ttr", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.PublicationTime = element.Text
 	})
-
 }
