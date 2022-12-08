@@ -8,11 +8,10 @@ import (
 
 func init() {
 	w := Crawler.Register("egmontinstitute", "皇家国际关系研究所", "https://www.egmontinstitute.be/")
-	
+
 	w.SetStartingUrls([]string{
 		"https://www.egmontinstitute.be/topics/",
 		"https://www.egmontinstitute.be/publications/",
-
 	})
 
 	// 访问 Index 从频道入口 //
