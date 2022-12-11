@@ -8,7 +8,7 @@ import (
 
 func init() {
 	w := Crawler.Register("cejil", "国际法与司法中心", "https://cejil.org/")
-	
+
 	w.SetStartingUrls([]string{
 		"https://cejil.org/en/press-releases/",
 		"https://cejil.org/en/publications/",

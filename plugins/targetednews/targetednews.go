@@ -36,25 +36,21 @@ func init() {
 	})
 
 	// 访问 News 从 Index 通过 SubContext
-	w.OnHTML(`#content > div[id]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			sub_context := ctx.CreateSubContext()
-			sub_context.PageType = Crawler.News
+	w.OnHTML(`#content > div[id]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		subContext := ctx.CreateSubContext()
+		subContext.PageType = Crawler.News
 
-			sub_context.Title = element.ChildText(`div.subtitle`)
-			sub_context.Content = element.ChildText(`span:nth-last-child(1)`)
-
-		})
+		subContext.Title = element.ChildText(`div.subtitle`)
+		subContext.Content = element.ChildText(`span:nth-last-child(1)`)
+	})
 
 	// 访问 News 从 Index 通过 SubContext
-	w.OnHTML(`div.sample_box`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			sub_context := ctx.CreateSubContext()
-			sub_context.PageType = Crawler.News
+	w.OnHTML(`div.sample_box`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		subContext := ctx.CreateSubContext()
+		subContext.PageType = Crawler.News
 
-			sub_context.Title = element.ChildText(`h1`)
-			sub_context.PublicationTime = element.ChildText(`.dateline:nth-child(3)`)
-			sub_context.Content = element.ChildText(`.story_body`)
-
-		})
+		subContext.Title = element.ChildText(`h1`)
+		subContext.PublicationTime = element.ChildText(`.dateline:nth-child(3)`)
+		subContext.Content = element.ChildText(`.story_body`)
+	})
 }
