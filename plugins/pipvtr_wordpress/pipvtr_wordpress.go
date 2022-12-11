@@ -4,6 +4,7 @@ import (
 	"github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
 	"strings"
+	"net/url"
 )
 
 func init() {
