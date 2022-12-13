@@ -26,16 +26,14 @@ func init() {
 	})
 
 	// 从子频道入口访问 All Program Publications
-	w.OnHTML("div[class=\"section research\"]>.foreground>.center>a[class=\"button teal\"]",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Index)
-		})
+	w.OnHTML("div[class=\"section research\"]>.foreground>.center>a[class=\"button teal\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Index)
+	})
 
 	// 从翻页器获取下一页 Index 并访问
-	w.OnHTML("div[class=\"center section\"]>div>a[class=\"page-links__next tag uppercase\"]",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Index)
-		})
+	w.OnHTML("div[class=\"center section\"]>div>a[class=\"page-links__next tag uppercase\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Index)
+	})
 
 	// 尝试寻找下载pdf的按钮，并如果存在则将页面类型转换为报告
 	w.OnHTML("a.button", func(element *colly.HTMLElement, ctx *Crawler.Context) {
@@ -46,28 +44,24 @@ func init() {
 	})
 
 	// 从 Index 访问 Report
-	w.OnHTML(".clearfix>.no-margin>a",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Report)
-		})
+	w.OnHTML(".clearfix>.no-margin>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Report)
+	})
 
 	// 添加 Title 到 ctx
-	w.OnHTML(".headline",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(".headline", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = strings.TrimSpace(element.Text)
+	})
 
 	// 添加 Author 到 ctx （第二种情况）
-	w.OnHTML("div[class=\"post-author col col-75\"]>a",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
-		})
+	w.OnHTML("div[class=\"post-author col col-75\"]>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
+	})
 
 	// 添加 Author 到 ctx （第一种情况）
-	w.OnHTML("div[class=\"post-author col col-75\"]",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
-		})
+	w.OnHTML("div[class=\"post-author col col-75\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
+	})
 
 	// 添加 Content 到 ctx
 	w.OnHTML("div.article-body", func(element *colly.HTMLElement, ctx *Crawler.Context) {

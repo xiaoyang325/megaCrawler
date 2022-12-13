@@ -18,31 +18,27 @@ func init() {
 	})
 
 	// 添加 Title 到ctx
-	w.OnHTML(".title",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = element.Text
-		})
+	w.OnHTML(".title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = element.Text
+	})
 
 	// 添加 Author 到ctx
-	w.OnHTML("h2[class=\"memberName blogOwner\"]",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Authors = append(ctx.Authors, element.Text)
-		})
+	w.OnHTML("h2[class=\"memberName blogOwner\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Authors = append(ctx.Authors, element.Text)
+	})
 
 	// 添加 Content 到ctx
-	w.OnHTML("div[class=\"content postContent pageContent\"]",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = element.Text
-		})
+	w.OnHTML("div[class=\"content postContent pageContent\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Content = element.Text
+	})
 
 	// 通过图片获取 File 和 新的Report
-	w.OnHTML("div[class=\"content postContent pageContent\"]>p>a",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			url := element.Attr("href")
-			if strings.Contains(url, "Download") {
-				ctx.File = append(ctx.File, url)
-			} else {
-				w.Visit(url, Crawler.Report)
-			}
-		})
+	w.OnHTML("div[class=\"content postContent pageContent\"]>p>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		url := element.Attr("href")
+		if strings.Contains(url, "Download") {
+			ctx.File = append(ctx.File, url)
+		} else {
+			w.Visit(url, Crawler.Report)
+		}
+	})
 }

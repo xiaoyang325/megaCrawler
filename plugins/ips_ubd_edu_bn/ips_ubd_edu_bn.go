@@ -15,36 +15,31 @@ func init() {
 	})
 
 	// 访问下一页 Index
-	w.OnHTML(`.nav-next > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Index)
-		})
+	w.OnHTML(`.nav-next > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Index)
+	})
 
 	// 访问 News 和 Report 从 Index
-	w.OnHTML(`div > p.read-more-wrap > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			if strings.Contains(ctx.Url, "/seminar-series") {
-				w.Visit(element.Attr("href"), Crawler.Report)
-			} else {
-				w.Visit(element.Attr("href"), Crawler.News)
-			}
-		})
+	w.OnHTML(`div > p.read-more-wrap > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		if strings.Contains(ctx.Url, "/seminar-series") {
+			w.Visit(element.Attr("href"), Crawler.Report)
+		} else {
+			w.Visit(element.Attr("href"), Crawler.News)
+		}
+	})
 
 	// 获取 Title
-	w.OnHTML(`[class="entry-title page-title h2"]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`[class="entry-title page-title h2"]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 PublicationTime
-	w.OnHTML(`.posted-on > time`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.PublicationTime = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.posted-on > time`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.PublicationTime = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Content
-	w.OnHTML(`#main .entry-content`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`#main .entry-content`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Content = strings.TrimSpace(element.Text)
+	})
 }

@@ -21,37 +21,32 @@ func init() {
 	})
 
 	// 从 Index 访问 News
-	w.OnHTML(".articleTitle>a",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			path := strings.Replace(element.Attr("href"), "../../", "", 1)
-			url := "https://www.cartercenter.org/" + path
-			w.Visit(url, Crawler.News)
-		})
+	w.OnHTML(".articleTitle>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		path := strings.Replace(element.Attr("href"), "../../", "", 1)
+		url := "https://www.cartercenter.org/" + path
+		w.Visit(url, Crawler.News)
+	})
 
 	// 从 /health/index.html 访问 Report
-	w.OnHTML("div[class=\"columns four\"]>a[target=\"_self\"]",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			url := "https://www.cartercenter.org/health/" + element.Attr("href")
-			w.Visit(url, Crawler.Report)
-		})
+	w.OnHTML("div[class=\"columns four\"]>a[target=\"_self\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		url := "https://www.cartercenter.org/health/" + element.Attr("href")
+		w.Visit(url, Crawler.Report)
+	})
 
 	// 添加 Title 到 ctx
-	w.OnHTML("#brand>h1",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML("#brand>h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = strings.TrimSpace(element.Text)
+	})
 
 	// 添加 Content 到 ctx
-	w.OnHTML(".wysiwyg",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(".wysiwyg", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Content = strings.TrimSpace(element.Text)
+	})
 
 	// 添加 File 到 ctx
-	w.OnHTML(".imageWidget>a",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.File = append(ctx.File, element.Attr("href"))
-		})
+	w.OnHTML(".imageWidget>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.File = append(ctx.File, element.Attr("href"))
+	})
 
 	// 添加 PublicationTime 到 ctx
 	w.OnHTML(".articleDate", func(element *colly.HTMLElement, ctx *Crawler.Context) {

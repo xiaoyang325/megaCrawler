@@ -49,14 +49,13 @@ func init() {
 	})
 
 	// 添加标题到ctx
-	w.OnHTML("h1",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			if ctx.PageType == Crawler.Expert {
-				ctx.Name = element.Text
-			} else if ctx.PageType == Crawler.Report || ctx.PageType == Crawler.News {
-				ctx.Title = element.Text
-			}
-		})
+	w.OnHTML("h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		if ctx.PageType == Crawler.Expert {
+			ctx.Name = element.Text
+		} else if ctx.PageType == Crawler.Report || ctx.PageType == Crawler.News {
+			ctx.Title = element.Text
+		}
+	})
 
 	// 添加正文到ctx
 	w.OnHTML("article[role=\"article\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {

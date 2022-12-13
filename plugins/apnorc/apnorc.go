@@ -21,46 +21,39 @@ func init() {
 	})
 
 	// 访问下一页 Index
-	w.OnHTML(`a[class="next page-numbers"]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Index)
-		})
+	w.OnHTML(`a[class="next page-numbers"]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Index)
+	})
 
 	// 访问 Report 从 Index
-	w.OnHTML(`header > h2 > a[rel="bookmark"]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Report)
-		})
+	w.OnHTML(`header > h2 > a[rel="bookmark"]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Report)
+	})
 
 	// 获取 Title
-	w.OnHTML(`header > div > div > h1[class="entry-title heading--single-project"]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`header > div > div > h1[class="entry-title heading--single-project"]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Description
-	w.OnHTML(`div.entry-summary > p`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Description = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`div.entry-summary > p`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Description = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 PublicationTime
-	w.OnHTML(`div[class="row align-center"] > div > div > p:nth-child(2) > em`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.PublicationTime = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`div[class="row align-center"] > div > div > p:nth-child(2) > em`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.PublicationTime = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 CategoryText
-	w.OnHTML(`header > div > div > div.term-name > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.CategoryText = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`header > div > div > div.term-name > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.CategoryText = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Content
-	w.OnHTML(`div[class="entry-content clearfix"]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`div[class="entry-content clearfix"]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Content = strings.TrimSpace(element.Text)
+	})
 
 	w.OnHTML(".experts-list", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		subCtx := ctx.CreateSubContext()

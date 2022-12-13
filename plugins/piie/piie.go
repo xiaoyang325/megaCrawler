@@ -147,105 +147,91 @@ func init() {
 	})
 
 	// 从翻页器中获取新的Index
-	w.OnHTML("a[title=\"Go to next page\"]",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			toUrl := strings.Split(ctx.Url, "?")[0] + element.Attr("href")
-			w.Visit(toUrl, Crawler.Index)
-		})
+	w.OnHTML("a[title=\"Go to next page\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		toUrl := strings.Split(ctx.Url, "?")[0] + element.Attr("href")
+		w.Visit(toUrl, Crawler.Index)
+	})
 
 	// 从Index中进入文章（情况一）
-	w.OnHTML(".view__row>article>.teaser__body>.teaser__title>span>a",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".view__row>article>.teaser__body>.teaser__title>span>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		toUrl := "https://www.piie.com/" + element.Attr("href")
+		if strings.Contains(toUrl, "/blogs/") || strings.Contains(toUrl, "/events/") {
+			w.Visit(element.Attr("href"), Crawler.News)
+		} else {
+			w.Visit(element.Attr("href"), Crawler.Report)
+		}
+	})
+
+	// 从Index中进入文章（情况二）
+	w.OnHTML(".view__row>article>.teaser__body>.teaser__title>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		if strings.Contains(element.Attr("href"), "https:") {
+			// 对于网站外的链接，什么也不做。
+		} else {
 			toUrl := "https://www.piie.com/" + element.Attr("href")
 			if strings.Contains(toUrl, "/blogs/") || strings.Contains(toUrl, "/events/") {
 				w.Visit(element.Attr("href"), Crawler.News)
 			} else {
 				w.Visit(element.Attr("href"), Crawler.Report)
 			}
-		})
-
-	// 从Index中进入文章（情况二）
-	w.OnHTML(".view__row>article>.teaser__body>.teaser__title>a",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			if strings.Contains(element.Attr("href"), "https:") {
-				// 对于网站外的链接，什么也不做。
-			} else {
-				toUrl := "https://www.piie.com/" + element.Attr("href")
-				if strings.Contains(toUrl, "/blogs/") || strings.Contains(toUrl, "/events/") {
-					w.Visit(element.Attr("href"), Crawler.News)
-				} else {
-					w.Visit(element.Attr("href"), Crawler.Report)
-				}
-			}
-		})
+		}
+	})
 
 	// 从文章中添加标题（Title）到ctx。（/events/）
-	w.OnHTML(".hero-banner-event__title",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = element.Text
-		})
+	w.OnHTML(".hero-banner-event__title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = element.Text
+	})
 
 	// 从文章中添加标题（Title）到ctx。（/blogs/）（/publications/）（/research/）（/commentary/）
-	w.OnHTML(".hero-banner-publication__title",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = element.Text
-		})
+	w.OnHTML(".hero-banner-publication__title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = element.Text
+	})
 
 	// 从文章中添加位置（Location）到ctx。（/events/）
-	w.OnHTML(".location>span",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Location = element.Text
-		})
+	w.OnHTML(".location>span", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Location = element.Text
+	})
 
 	// 从文章中添加作者（Authors）到ctx。（/events/）
-	w.OnHTML(".hero-banner-event__speakers>div>.field__item>p",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Authors = append(ctx.Authors, cutOutNames(element.Text)...)
-		})
+	w.OnHTML(".hero-banner-event__speakers>div>.field__item>p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Authors = append(ctx.Authors, cutOutNames(element.Text)...)
+	})
 
 	// 从文章中添加作者（Authors）到ctx。（/blogs/）（/publications/）（/research/）（/commentary/）
-	w.OnHTML(".hero-banner-publication__authors>div>div>p",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Authors = append(ctx.Authors, cutOutNames(element.Text)...)
-		})
+	w.OnHTML(".hero-banner-publication__authors>div>div>p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Authors = append(ctx.Authors, cutOutNames(element.Text)...)
+	})
 
 	// 从文章中添加作者（Authors）到ctx。（/blogs/）（/publications/）（/research/）（/commentary/）
-	w.OnHTML(".hero-banner-publication__authors>.author-list",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Authors = append(ctx.Authors, cutOutNames(element.Text)...)
-		})
+	w.OnHTML(".hero-banner-publication__authors>.author-list", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Authors = append(ctx.Authors, cutOutNames(element.Text)...)
+	})
 
 	// 从文章中添加作者（Authors）到ctx。（/events/）
-	w.OnHTML(".hero-banner-event__speakers>.author-list>.author-list__author>.author-list__link",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
-		})
+	w.OnHTML(".hero-banner-event__speakers>.author-list>.author-list__author>.author-list__link", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
+	})
 
 	// 从文章中添加正文（Content）到ctx。（/events/）
-	w.OnHTML(".content-block__inner",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = element.Text
-		})
+	w.OnHTML(".content-block__inner", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Content = element.Text
+	})
 
 	// 从文章中添加正文（Content）到ctx。（/blogs/）（/publications/）（/research/）（/commentary/）
-	w.OnHTML(".content-block__inner>div>div",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = element.Text
-		})
+	w.OnHTML(".content-block__inner>div>div", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Content = element.Text
+	})
 
 	// 从文章中添加文件（File）到ctx。（/publications/）（/commentary/）
-	w.OnHTML(".download-button>a",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			fileUrl := "https://www.piie.com" + element.Attr("href")
-			ctx.File = append(ctx.File, fileUrl)
-		})
+	w.OnHTML(".download-button>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		fileUrl := "https://www.piie.com" + element.Attr("href")
+		ctx.File = append(ctx.File, fileUrl)
+	})
 
 	// 从文章中添加文件（File）到ctx。（/events/）
-	w.OnHTML("a[type=\"application/pdf\"]",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			fileUrl := "https://www.piie.com" + element.Attr("href")
-			ctx.File = append(ctx.File, fileUrl)
-		})
+	w.OnHTML("a[type=\"application/pdf\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		fileUrl := "https://www.piie.com" + element.Attr("href")
+		ctx.File = append(ctx.File, fileUrl)
+	})
 
 	w.OnHTML("meta[property=\"og:description\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Description = element.Attr("content")
