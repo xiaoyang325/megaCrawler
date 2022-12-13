@@ -68,20 +68,19 @@ func init() {
 	})
 
 	// 访问文章从 sitemap
-	w.OnXML(`//loc`,
-		func(element *colly.XMLElement, ctx *Crawler.Context) {
-			if strings.Contains(element.Text, "/blogs/") {
-				//w.Visit(element.Text, Crawler.Report)
-			} else if strings.Contains(element.Text, "/press/") {
-				//w.Visit(element.Text, Crawler.News)
-			} else if strings.Contains(element.Text, "/publications/") {
-				//w.Visit(element.Text, Crawler.Report)
-			} else if strings.Contains(element.Text, "/events/") {
-				//w.Visit(element.Text, Crawler.Report)
-			} else if strings.Contains(element.Text, "/people/") {
-				w.Visit(element.Text, Crawler.Expert)
-			}
-		})
+	w.OnXML(`//loc`, func(element *colly.XMLElement, ctx *Crawler.Context) {
+		if strings.Contains(element.Text, "/blogs/") {
+			//w.Visit(element.Text, Crawler.Report)
+		} else if strings.Contains(element.Text, "/press/") {
+			//w.Visit(element.Text, Crawler.News)
+		} else if strings.Contains(element.Text, "/publications/") {
+			//w.Visit(element.Text, Crawler.Report)
+		} else if strings.Contains(element.Text, "/events/") {
+			//w.Visit(element.Text, Crawler.Report)
+		} else if strings.Contains(element.Text, "/people/") {
+			w.Visit(element.Text, Crawler.Expert)
+		}
+	})
 
 	w.OnHTML(".container--main script", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		if !strings.HasPrefix(element.Text, "componentRenderQueue") {

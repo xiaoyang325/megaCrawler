@@ -31,146 +31,125 @@ func init() {
 	})
 
 	// 访问 Report 从 Index
-	w.OnHTML(`.board_report > li > a.title`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Report)
-		})
+	w.OnHTML(`.board_report > li > a.title`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Report)
+	})
 
 	// 访问 Report 从 Index (Type 2)
-	w.OnHTML(`.board_book .desc > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Report)
-		})
+	w.OnHTML(`.board_book .desc > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Report)
+	})
 
 	// 访问 Report 从 Index (Type 3)
-	w.OnHTML(`.txt_left[aria-label="Title"] > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Report)
-		})
+	w.OnHTML(`.txt_left[aria-label="Title"] > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Report)
+	})
 
 	// 访问下一页 Index
-	w.OnHTML(`.board_pager > a[class="arr next"]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Index)
-		})
+	w.OnHTML(`.board_pager > a[class="arr next"]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Index)
+	})
 
 	// 获取 Title
-	w.OnHTML(`.board_view > h2.title`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.board_view > h2.title`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Title (Type 2)
-	w.OnHTML(`.board_book .desc > strong.title`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.board_book .desc > strong.title`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Description
-	w.OnHTML(`.contents > div`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Description = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.contents > div`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Description = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Description (Type 2)
-	w.OnHTML(`.cont > div > div.txt`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Description = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.cont > div > div.txt`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Description = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Description (Type 3)
-	w.OnHTML(`#contents_body > article.board_view > div.contents`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Description = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`#contents_body > article.board_view > div.contents`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Description = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Description (Type 4)
-	w.OnHTML(`#contents_body > div > div.contents`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Description = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`#contents_body > div > div.contents`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Description = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 PublicationTime
-	w.OnHTML(`.info > li.date > span`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.PublicationTime = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.info > li.date > span`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.PublicationTime = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 PublicationTime (Type 2)
-	w.OnHTML(`.board_book .desc > .info > span:nth-child(4) > strong`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.PublicationTime = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.board_book .desc > .info > span:nth-child(4) > strong`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.PublicationTime = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Authors
-	w.OnHTML(`.info > li.write > span`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			// 若有 "," 或者 "and" 则为多人作者
-			if strings.Contains(element.Text, ",") {
-				ctx.Authors = append(ctx.Authors, cutToList(element.Text)...)
-			} else {
-				ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
-			}
-		})
+	w.OnHTML(`.info > li.write > span`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		// 若有 "," 或者 "and" 则为多人作者
+		if strings.Contains(element.Text, ",") {
+			ctx.Authors = append(ctx.Authors, cutToList(element.Text)...)
+		} else {
+			ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
+		}
+	})
 
 	// 获取 Authors (Type 2)
-	w.OnHTML(`.board_book .desc > .info > span:nth-child(1) > strong`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			// 若有 "," 或者 "and" 则为多人作者
-			if strings.Contains(element.Text, ",") {
-				ctx.Authors = append(ctx.Authors, cutToList(element.Text)...)
-			} else {
-				ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
-			}
-		})
+	w.OnHTML(`.board_book .desc > .info > span:nth-child(1) > strong`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		// 若有 "," 或者 "and" 则为多人作者
+		if strings.Contains(element.Text, ",") {
+			ctx.Authors = append(ctx.Authors, cutToList(element.Text)...)
+		} else {
+			ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
+		}
+	})
 
 	// 获取 Language
-	w.OnHTML(`.board_book .desc > .info > span:nth-child(3) > strong`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Language = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.board_book .desc > .info > span:nth-child(3) > strong`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Language = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Content
-	w.OnHTML(`div.elementor-widget-container`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`div.elementor-widget-container`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Content = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Tags
-	w.OnHTML(`.board_book .desc > .category`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			// 若有 "," 或者 "and" 则为多个 Tag
-			if strings.Contains(element.Text, ",") {
-				ctx.Tags = append(ctx.Tags, cutToList(element.Text)...)
-			} else {
-				ctx.Tags = append(ctx.Tags, strings.TrimSpace(element.Text))
-			}
-		})
+	w.OnHTML(`.board_book .desc > .category`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		// 若有 "," 或者 "and" 则为多个 Tag
+		if strings.Contains(element.Text, ",") {
+			ctx.Tags = append(ctx.Tags, cutToList(element.Text)...)
+		} else {
+			ctx.Tags = append(ctx.Tags, strings.TrimSpace(element.Text))
+		}
+	})
 
 	// 获取 File
-	w.OnHTML(`.file > .list .link > .btn_line`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			file_url := "https://www.kiep.go.kr" + element.Attr("href")
-			ctx.File = append(ctx.File, file_url)
-		})
+	w.OnHTML(`.file > .list .link > .btn_line`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		file_url := "https://www.kiep.go.kr" + element.Attr("href")
+		ctx.File = append(ctx.File, file_url)
+	})
 
 	// 获取 File (Type 2)
-	w.OnHTML(`p[class="btns txt_left"] > a.btn1`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			file_url := "https://www.kiep.go.kr" + element.Attr("href")
-			ctx.File = append(ctx.File, file_url)
-		})
+	w.OnHTML(`p[class="btns txt_left"] > a.btn1`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		file_url := "https://www.kiep.go.kr" + element.Attr("href")
+		ctx.File = append(ctx.File, file_url)
+	})
 
 	// 获取 Location
-	w.OnHTML(`#contents_body > article.board_view > ul > li:nth-child(4) > span`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Location = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`#contents_body > article.board_view > ul > li:nth-child(4) > span`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Location = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 ViewCount
-	w.OnHTML(`#contents_body > article > ul > li.hit > span`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			num, _ := strconv.Atoi(strings.TrimSpace(element.Text))
-			ctx.ViewCount = num
-		})
+	w.OnHTML(`#contents_body > article > ul > li.hit > span`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		num, _ := strconv.Atoi(strings.TrimSpace(element.Text))
+		ctx.ViewCount = num
+	})
 }

@@ -9,18 +9,17 @@ import (
 )
 
 // 这个函数修改当前 Index 页面的查询参数，以获取下一页 Index，并返回相应的 URL
-func getNextIndexURL(current_url string, current_page_num string,
-	param_name string) string {
-	this_url, _ := url.Parse(current_url)
-	param_list := this_url.Query()
+func getNextIndexURL(currentUrl string, currentPageNum string, paramName string) string {
+	thisUrl, _ := url.Parse(currentUrl)
+	paramList := thisUrl.Query()
 
-	current_num, _ := strconv.Atoi(current_page_num)
-	current_num++
+	currentNum, _ := strconv.Atoi(currentPageNum)
+	currentNum++
 
-	param_list.Set(param_name, strconv.Itoa(current_num))
-	this_url.RawQuery = param_list.Encode()
+	paramList.Set(paramName, strconv.Itoa(currentNum))
+	thisUrl.RawQuery = paramList.Encode()
 
-	return this_url.String()
+	return thisUrl.String()
 }
 
 func init() {
@@ -33,45 +32,38 @@ func init() {
 	})
 
 	// 访问下一页 Index
-	w.OnHTML(`[class="page-item active"] > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			url := getNextIndexURL(ctx.Url, element.Text, "trang")
-			w.Visit(url, Crawler.Index)
-		})
+	w.OnHTML(`[class="page-item active"] > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		indexURL := getNextIndexURL(ctx.Url, element.Text, "trang")
+		w.Visit(indexURL, Crawler.Index)
+	})
 
 	// 访问 Report 从 Index
-	w.OnHTML(`.row .story__title > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Report)
-		})
+	w.OnHTML(`.row .story__title > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Report)
+	})
 
 	// 获取 Title
-	w.OnHTML(`.detail__title`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.detail__title`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Description
-	w.OnHTML(`.detail__summary`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Description = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.detail__summary`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Description = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 PublicationTime
-	w.OnHTML(`.detail__meta`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.PublicationTime = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.detail__meta`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.PublicationTime = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 CategoryText
-	w.OnHTML(`li[class="breadcrumb-item active"] > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.CategoryText = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`li[class="breadcrumb-item active"] > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.CategoryText = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Content
-	w.OnHTML(`html .detail__content`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`html .detail__content`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Content = strings.TrimSpace(element.Text)
+	})
 }

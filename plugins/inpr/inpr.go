@@ -17,21 +17,18 @@ func init() {
 	})
 
 	// 从 Index 访问 Report
-	w.OnHTML(".d-img>a",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Report)
-		})
+	w.OnHTML(".d-img>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Report)
+	})
 
 	// 添加 Title 到 ctx
-	w.OnHTML(".mpgtitle>h3",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(".mpgtitle>h3", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = strings.TrimSpace(element.Text)
+	})
 
 	// 添加 Content 到 ctx
-	w.OnHTML("div.mpgdetail",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML("div.mpgdetail", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Content = strings.TrimSpace(element.Text)
+	})
 
 }

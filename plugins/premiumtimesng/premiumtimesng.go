@@ -41,57 +41,49 @@ func init() {
 	})
 
 	// 访问下一页 Index
-	w.OnHTML(`.jeg_block_navigation a[class="page_nav next"]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Index)
-		})
+	w.OnHTML(`.jeg_block_navigation a[class="page_nav next"]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Index)
+	})
 
 	// 访问 Report & News 从 Index
-	w.OnHTML(`[class="jeg_cat_content row"] .jeg_thumb > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			if strings.Contains(element.Attr("href"), "news/") {
-				w.Visit(element.Attr("href"), Crawler.News)
-			} else {
-				w.Visit(element.Attr("href"), Crawler.Report)
-			}
-		})
+	w.OnHTML(`[class="jeg_cat_content row"] .jeg_thumb > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		if strings.Contains(element.Attr("href"), "news/") {
+			w.Visit(element.Attr("href"), Crawler.News)
+		} else {
+			w.Visit(element.Attr("href"), Crawler.Report)
+		}
+	})
 
 	// 获取 Title
-	w.OnHTML(`h1.jeg_post_title`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`h1.jeg_post_title`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 SubTitle
-	w.OnHTML(`h2.jeg_post_subtitle`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.SubTitle = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`h2.jeg_post_subtitle`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.SubTitle = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 PublicationTime
-	w.OnHTML(`.entry-header .jeg_meta_date > a:nth-child(1)`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.PublicationTime = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.entry-header .jeg_meta_date > a:nth-child(1)`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.PublicationTime = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Authors
-	w.OnHTML(`[class="jeg_meta_author coauthor"] > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
-		})
+	w.OnHTML(`[class="jeg_meta_author coauthor"] > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
+	})
 
 	// 获取 CommentCount
-	w.OnHTML(`.comment-count`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			var str = strings.Replace(element.Text, "comments", "", 1)
-			str = strings.TrimSpace(str)
-			num, _ := strconv.Atoi(str)
-			ctx.CommentCount = num
-		})
+	w.OnHTML(`.comment-count`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		var str = strings.Replace(element.Text, "comments", "", 1)
+		str = strings.TrimSpace(str)
+		num, _ := strconv.Atoi(str)
+		ctx.CommentCount = num
+	})
 
 	// 获取 Content
-	w.OnHTML(`[class="content-inner "]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.ChildText("p, h2, h3"))
-		})
+	w.OnHTML(`[class="content-inner "]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Content = strings.TrimSpace(element.ChildText("p, h2, h3"))
+	})
 }

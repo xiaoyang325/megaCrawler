@@ -112,123 +112,106 @@ func init() {
 	})
 
 	// 从 Index 访问 News & Report
-	w.OnHTML(`a[class="no-external-link-icon teaser__link"]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			if strings.Contains(element.Attr("href"), "/events") {
-				w.Visit(element.Attr("href"), Crawler.Report)
-			} else {
-				w.Visit(element.Attr("href"), Crawler.News)
-			}
-		})
+	w.OnHTML(`a[class="no-external-link-icon teaser__link"]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		if strings.Contains(element.Attr("href"), "/events") {
+			w.Visit(element.Attr("href"), Crawler.Report)
+		} else {
+			w.Visit(element.Attr("href"), Crawler.News)
+		}
+	})
 
 	// 从 Index 访问 News & Report
-	w.OnHTML(`.event-teaser > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			if strings.Contains(element.Attr("href"), "/events") {
-				w.Visit(element.Attr("href"), Crawler.Report)
-			} else {
-				w.Visit(element.Attr("href"), Crawler.News)
-			}
-		})
+	w.OnHTML(`.event-teaser > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		if strings.Contains(element.Attr("href"), "/events") {
+			w.Visit(element.Attr("href"), Crawler.Report)
+		} else {
+			w.Visit(element.Attr("href"), Crawler.News)
+		}
+	})
 
 	// 从 News 访问 Expert
-	w.OnHTML(`h3[class="h4 person-teaser__title"] > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Expert)
-		})
+	w.OnHTML(`h3[class="h4 person-teaser__title"] > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Expert)
+	})
 
 	// 获取 Title
-	w.OnHTML(`.hero__title > span`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.hero__title > span`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 SubTitle
-	w.OnHTML(`div.hero__subtitle > p`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.SubTitle = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`div.hero__subtitle > p`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.SubTitle = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Publication Time（/events/）
-	w.OnHTML(".event-details__date",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.PublicationTime = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(".event-details__date", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.PublicationTime = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Publication Time
-	w.OnHTML(".hero__meta-date > time",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.PublicationTime = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(".hero__meta-date > time", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.PublicationTime = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 CategoryText（/events/）
-	w.OnHTML(".event-details__type-text",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.CategoryText = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(".event-details__type-text", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.CategoryText = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 CategoryText
-	w.OnHTML(".hero__meta-label > span",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.CategoryText = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(".hero__meta-label > span", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.CategoryText = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Location（/events/）
-	w.OnHTML("address.event-details__location > span",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Location = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML("address.event-details__location > span", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Location = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Tags
-	w.OnHTML(".sidebar-taxonomy__list > li > a",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Tags = append(ctx.Tags, strings.TrimSpace(element.Text))
-		})
+	w.OnHTML(".sidebar-taxonomy__list > li > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Tags = append(ctx.Tags, strings.TrimSpace(element.Text))
+	})
 
 	// 获取 Authors
-	w.OnHTML(`h3[class="h4 person-teaser__title"]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Authors = append(ctx.Authors, Crawler.StandardizeSpaces(element.Text))
-		})
+	w.OnHTML(`h3[class="h4 person-teaser__title"]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Authors = append(ctx.Authors, Crawler.StandardizeSpaces(element.Text))
+	})
 
 	// 获取 Content
-	w.OnHTML("body > div.dialog-off-canvas-main-canvas > div.layout-container > main > section.bg-white.section-bottom-padding.body-content > div > article > div > div.wysiwyg",
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = element.Text
-		})
+	w.OnHTML("body > div.dialog-off-canvas-main-canvas > div.layout-container > main > section.bg-white.section-bottom-padding.body-content > div > article > div > div.wysiwyg", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Content = element.Text
+	})
 
 	// Expert 获取 Name
-	w.OnHTML(`.person-bio__header > .person-bio__title`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Name = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.person-bio__header > .person-bio__title`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Name = strings.TrimSpace(element.Text)
+	})
 
 	// Expert 获取 Title
-	w.OnHTML(`.person-bio__header > .person-bio__role`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.person-bio__header > .person-bio__role`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = strings.TrimSpace(element.Text)
+	})
 
 	// Expert 获取 Phone
-	w.OnHTML(`.person-bio__contact-item:nth-child(1) > a >span`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Phone = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`.person-bio__contact-item:nth-child(1) > a >span`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Phone = strings.TrimSpace(element.Text)
+	})
 
 	// Expert 获取 TwitterId, Email, LinkedIn
-	w.OnHTML(`.person-bio__contact-item > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			if strings.Contains(element.Attr("href"), "https://twitter.com/") {
-				t := strings.ReplaceAll(element.Attr("href"), "https://twitter.com/", "")
-				ctx.TwitterId = strings.TrimSpace(t)
-			}
-			if strings.Contains(element.Attr("href"), "mailto:") {
-				e := strings.ReplaceAll(element.Attr("href"), "mailto:", "")
-				ctx.Email = strings.TrimSpace(e)
-			}
-			if strings.Contains(element.Attr("href"), "https://www.linkedin.com/in/") {
-				l := strings.ReplaceAll(element.Attr("href"), "https://www.linkedin.com/in/", "")
-				ctx.LinkedInId = l
-			}
-		})
+	w.OnHTML(`.person-bio__contact-item > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		if strings.Contains(element.Attr("href"), "https://twitter.com/") {
+			t := strings.ReplaceAll(element.Attr("href"), "https://twitter.com/", "")
+			ctx.TwitterId = strings.TrimSpace(t)
+		}
+		if strings.Contains(element.Attr("href"), "mailto:") {
+			e := strings.ReplaceAll(element.Attr("href"), "mailto:", "")
+			ctx.Email = strings.TrimSpace(e)
+		}
+		if strings.Contains(element.Attr("href"), "https://www.linkedin.com/in/") {
+			l := strings.ReplaceAll(element.Attr("href"), "https://www.linkedin.com/in/", "")
+			ctx.LinkedInId = l
+		}
+	})
 }

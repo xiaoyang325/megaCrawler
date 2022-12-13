@@ -38,85 +38,72 @@ func init() {
 	})
 
 	// 访问下一页 Index
-	w.OnHTML(`#content > div > div.paging > ul > li > a[class="next page-numbers"]`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Index)
-		})
+	w.OnHTML(`#content > div > div.paging > ul > li > a[class="next page-numbers"]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Index)
+	})
 
 	// 访问 Report 从 Index
-	w.OnHTML(`#content > div > div:nth-child(3) > article > div.post_desc.right > h3 > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Report)
-		})
+	w.OnHTML(`#content > div > div:nth-child(3) > article > div.post_desc.right > h3 > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Report)
+	})
 
 	// 访问 Expert 从 Report
-	w.OnHTML(`#content div.post_export_wrap.bg_gray > div > div.author_desc.right > h5 > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			w.Visit(element.Attr("href"), Crawler.Expert)
-		})
+	w.OnHTML(`#content div.post_export_wrap.bg_gray > div > div.author_desc.right > h5 > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		w.Visit(element.Attr("href"), Crawler.Expert)
+	})
 
 	// 获取 Title
-	w.OnHTML(`#content header > div.single_post_info > h3`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Title = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`#content header > div.single_post_info > h3`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Title = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 PublicationTime
-	w.OnHTML(`#content header > div.post_date_big`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.PublicationTime = Extractors.MustParseTime("2006Jan02", element.Text).Format(time.RFC3339)
-		})
+	w.OnHTML(`#content header > div.post_date_big`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.PublicationTime = Extractors.MustParseTime("2006Jan02", element.Text).Format(time.RFC3339)
+	})
 
 	// 获取 Authors
-	w.OnHTML(`#content header > div.single_post_info > ul > li:nth-child(2) > div > span > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
-		})
+	w.OnHTML(`#content header > div.single_post_info > ul > li:nth-child(2) > div > span > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
+	})
 
 	// 获取 CategoryText
-	w.OnHTML(`#content > header > h2.archive-title`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.CategoryText = strings.TrimSpace(element.Text)
-		})
+	w.OnHTML(`#content > header > h2.archive-title`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.CategoryText = strings.TrimSpace(element.Text)
+	})
 
 	// 获取 Content
-	w.OnHTML(`#content > article > div.entry-content`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Content = strings.TrimSpace(element.ChildText("p"))
-		})
+	w.OnHTML(`#content > article > div.entry-content`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Content = strings.TrimSpace(element.ChildText("p"))
+	})
 
 	// 获取 Tags
-	w.OnHTML(`#content header > div.single_post_info > ul > li > div`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			// 将字符串切成 []string 并填入
-			ctx.Tags = append(ctx.Tags, cutToList(element.Text)...)
-		})
+	w.OnHTML(`#content header > div.single_post_info > ul > li > div`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		// 将字符串切成 []string 并填入
+		ctx.Tags = append(ctx.Tags, cutToList(element.Text)...)
+	})
 
 	// 获取 Tags
-	w.OnHTML(`#tertiary > div > div > aside:nth-child(4) > div > div.tag_wrap > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Tags = append(ctx.Tags, element.Text)
-		})
+	w.OnHTML(`#tertiary > div > div > aside:nth-child(4) > div > div.tag_wrap > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Tags = append(ctx.Tags, element.Text)
+	})
 
 	// 获取 Tags
-	w.OnHTML(`#content div.tag_wrap > div > a`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Tags = append(ctx.Tags, element.Text)
-		})
+	w.OnHTML(`#content div.tag_wrap > div > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Tags = append(ctx.Tags, element.Text)
+	})
 
 	// 获取 File
-	w.OnHTML(`#content div.entry-meta > div.post_download > a.pdf`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.File = append(ctx.File, element.Attr("href"))
-		})
+	w.OnHTML(`#content div.entry-meta > div.post_download > a.pdf`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.File = append(ctx.File, element.Attr("href"))
+	})
 
 	// 获取 Expert 的相关信息
-	w.OnHTML(`#content > div > div.list_experts > article > div.member_desc.right`,
-		func(element *colly.HTMLElement, ctx *Crawler.Context) {
-			ctx.Name = strings.TrimSpace(element.ChildText("h3"))
-			// 去除其他信息以得到 Expert 的 Title
-			titleRaw := strings.Replace(element.Text, ctx.Name, "", 1)
-			titleRaw = strings.Replace(element.Text, element.ChildText("p"), "", 1)
-			ctx.Title = strings.TrimSpace(titleRaw)
-		})
+	w.OnHTML(`#content > div > div.list_experts > article > div.member_desc.right`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+		ctx.Name = strings.TrimSpace(element.ChildText("h3"))
+		// 去除其他信息以得到 Expert 的 Title
+		titleRaw := strings.Replace(element.Text, ctx.Name, "", 1)
+		titleRaw = strings.Replace(element.Text, element.ChildText("p"), "", 1)
+		ctx.Title = strings.TrimSpace(titleRaw)
+	})
 }
