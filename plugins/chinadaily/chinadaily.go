@@ -7,13 +7,15 @@ import (
 
 func init() {
 	w := Crawler.Register("chinadaily", "中国日报", "https://www.chinadaily.com.cn/")
-	w.SetStartingUrls([]string{"https://www.chinadaily.com.cn/china/governmentandpolicy",
+	w.SetStartingUrls([]string{
+		"https://www.chinadaily.com.cn/china/governmentandpolicy",
 		"https://www.chinadaily.com.cn/china/society",
 		"https://www.chinadaily.com.cn/china/scitech",
 		"https://www.chinadaily.com.cn/world/america/",
 		"https://www.chinadaily.com.cn/world/europe",
 		"https://www.chinadaily.com.cn/world/middle_east",
-		"https://www.chinadaily.com.cn/world/africa"})
+		"https://www.chinadaily.com.cn/world/africa",
+	})
 
 	//index
 	w.OnHTML(".next > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
@@ -26,7 +28,7 @@ func init() {
 	})
 
 	//标题
-	w.OnHTML(".lft_art > h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		ctx.Title = element.Text
 	})
 
