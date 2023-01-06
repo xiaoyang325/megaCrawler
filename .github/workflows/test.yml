@@ -19,6 +19,16 @@ jobs:
         with:
           text: ${{ github.event.comment.body }}
           regex: ^/test\s*(.*?)\s*$
+      - name: Create comment
+        uses: peter-evans/create-or-update-comment@v2
+        if: ${{ steps.regex-match.outputs.match != '' }}
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            A test action on ${{ steps.regex-match.outputs.group1 }} is triggered.
+            - You can view thr run [here](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+            - Created by [test-action](https://github.com/foxwhite25/megaCrawler/blob/master/.github/workflows/test.yml).
+          reactions: '+1'
       - name: Setup Go
         uses: actions/setup-go@v3
         if: ${{ steps.regex-match.outputs.match != '' }}
@@ -33,14 +43,16 @@ jobs:
       - name: Test with Go
         id: test
         if: ${{ steps.regex-match.outputs.match != '' }}
-        run: echo "RESULT=$(go test)" >> $GITHUB_OUTPUT
+        run: go test > RunResult.txt
       - name: Upload Go log
         uses: actions/upload-artifact@v3
         if: ${{ steps.regex-match.outputs.match != '' }}
         with:
           name: Go-log-${{ matrix.go-version }}
           path: ./log/debug.jsonl
-      - uses: mshick/add-pr-comment@v2
+      - name: Upload Go Result
+        uses: actions/upload-artifact@v3
         if: ${{ steps.regex-match.outputs.match != '' }}
         with:
-          message: \`\`\`\n${{ steps.test.outputs.RESULT }}\n\`\`\`
+          name: Go-result-${{ matrix.go-version }}
+          path: result.txt
