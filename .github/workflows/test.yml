@@ -20,13 +20,14 @@ jobs:
           text: ${{ github.event.comment.body }}
           regex: ^/test\s*(.*?)\s*$
       - name: Create comment
+        id: create_comment
         uses: peter-evans/create-or-update-comment@v2
         if: ${{ steps.regex-match.outputs.match != '' }}
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
             A test action on ${{ steps.regex-match.outputs.group1 }} is triggered.
-            - You can view thr run [here](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+            - You can view the run [here](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
             - Created by [test-action](https://github.com/foxwhite25/megaCrawler/blob/master/.github/workflows/test.yml).
           reactions: '+1'
       - name: Setup Go
@@ -43,16 +44,20 @@ jobs:
       - name: Test with Go
         id: test
         if: ${{ steps.regex-match.outputs.match != '' }}
-        run: go test > RunResult.txt
-      - name: Upload Go log
-        uses: actions/upload-artifact@v3
+        run: go test
+      - name: Get File into OUTPUT
         if: ${{ steps.regex-match.outputs.match != '' }}
-        with:
-          name: Go-log-${{ matrix.go-version }}
-          path: ./log/debug.jsonl
-      - name: Upload Go Result
-        uses: actions/upload-artifact@v3
+        run: echo "RESULT=$(cat ./log/debug.jsonl)" >> $GITHUB_ENV
+      - name: Update comment
         if: ${{ steps.regex-match.outputs.match != '' }}
+        uses: peter-evans/create-or-update-comment@v2
         with:
-          name: Go-result-${{ matrix.go-version }}
-          path: RunResult.txt
+          comment-id: ${{ steps.create_comment.outputs.comment-id }}
+          body: |
+            The run on ${{ steps.regex-match.outputs.group1 }} has finished.
+            - You can view the run [here](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+            - Created by [test-action](https://github.com/foxwhite25/megaCrawler/blob/master/.github/workflows/test.yml).
+            # Result:
+            ```yaml
+            ${{ env.RESULT }}
+            ```

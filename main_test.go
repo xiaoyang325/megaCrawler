@@ -9,6 +9,7 @@ import (
 	"os"
 	"sync"
 	"testing"
+	"time"
 )
 
 func TestTester(t *testing.T) {
@@ -51,8 +52,9 @@ func TestTester(t *testing.T) {
 	Crawler.Sugar = logger.Sugar()
 	go Crawler.StartEngine(c, true)
 	Crawler.Test.WG.Wait()
-	t.Log("News: ", Crawler.Test.News.Count, Crawler.Test.News.FilledCount)
-	t.Log("Index: ", Crawler.Test.Index.Count, Crawler.Test.Index.FilledCount)
-	t.Log("Expert: ", Crawler.Test.Expert.Count, Crawler.Test.Expert.FilledCount)
-	t.Log("Report: ", Crawler.Test.Report.Count, Crawler.Test.Report.FilledCount)
+	time.Sleep(time.Second * 5)
+	Crawler.Sugar.Info("News: ", Crawler.Test.News.Count, Crawler.Test.News.FilledCount)
+	Crawler.Sugar.Info("Index: ", Crawler.Test.Index.Count, Crawler.Test.Index.FilledCount)
+	Crawler.Sugar.Info("Expert: ", Crawler.Test.Expert.Count, Crawler.Test.Expert.FilledCount)
+	Crawler.Sugar.Info("Report: ", Crawler.Test.Report.Count, Crawler.Test.Report.FilledCount)
 }
