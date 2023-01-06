@@ -49,8 +49,14 @@ jobs:
         if: ${{ steps.regex-match.outputs.match != '' }}
         run: |
           echo 'RESULT<<EOF' >> $GITHUB_ENV
-          cat ./log/debug.jsonl >> $GITHUB_ENV
+          cat table.txt >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
+      - name: Upload Go log
+        uses: actions/upload-artifact@v3
+        if: ${{ steps.regex-match.outputs.match != '' }}
+        with:
+          name: Go-log-${{ matrix.go-version }}
+          path: ./log/debug.jsonl
       - name: Update comment
         if: ${{ steps.regex-match.outputs.match != '' }}
         uses: peter-evans/create-or-update-comment@v2
@@ -64,7 +70,7 @@ jobs:
             <details>
               <summary>Result</summary>
             
-              ```yaml
+              ```
               ${{ env.RESULT }}
               ```
             </details>

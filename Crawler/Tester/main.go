@@ -1,22 +1,25 @@
 package Tester
 
 import (
+	"github.com/olekukonko/tablewriter"
+	"strconv"
 	"sync"
 	"sync/atomic"
 )
 
 type Status struct {
-	Count       int64 `json:"count,omitempty"`
-	FilledCount int64 `json:"filledCount,omitempty"`
+	Name        string
+	Count       int64
+	FilledCount int64
 }
 
 type Tester struct {
 	Done   bool
 	WG     *sync.WaitGroup
-	News   Status `json:"news,omitempty"`
-	Index  Status `json:"index,omitempty"`
-	Expert Status `json:"expert,omitempty"`
-	Report Status `json:"report,omitempty"`
+	News   Status
+	Index  Status
+	Expert Status
+	Report Status
 }
 
 func (s *Status) AddFilled(delta int64) *Status {
@@ -27,4 +30,13 @@ func (s *Status) AddFilled(delta int64) *Status {
 func (s *Status) Add(delta int64) *Status {
 	atomic.AddInt64(&s.Count, delta)
 	return s
+}
+
+func (s *Status) FillTable(table *tablewriter.Table) {
+	table.Append([]string{
+		s.Name,
+		strconv.Itoa(int(s.Count)),
+		strconv.Itoa(int(s.FilledCount)),
+		strconv.FormatFloat(float64(s.FilledCount)/float64(s.Count)*100, 'f', 2, 64) + "%",
+	})
 }
