@@ -37,7 +37,7 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Set ENV
         if: ${{ steps.regex-match.outputs.match != '' }}
-        run: echo "TARGET=${{ steps.regex-match.outputs.group1 }}" >> $GITHUB_ENV
+        run: echo "TARGET='${{ steps.regex-match.outputs.group1 }}'" >> $GITHUB_ENV
       - name: Install dependencies
         if: ${{ steps.regex-match.outputs.match != '' }}
         run: go get .
@@ -47,7 +47,10 @@ jobs:
         run: go test
       - name: Get File into OUTPUT
         if: ${{ steps.regex-match.outputs.match != '' }}
-        run: echo "RESULT=$(cat ./log/debug.jsonl)" >> $GITHUB_ENV
+        run: |
+          echo 'RESULT<<EOF' >> $GITHUB_ENV
+          cat ./log/debug.jsonl >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
       - name: Update comment
         if: ${{ steps.regex-match.outputs.match != '' }}
         uses: peter-evans/create-or-update-comment@v2
