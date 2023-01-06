@@ -178,11 +178,18 @@ func (ctx *Context) CreateSubContext() (k *Context) {
 	return k
 }
 
-func (ctx Context) process() (success bool) {
+func (ctx *Context) process() (success bool) {
 	var err error
 	var marshal []byte
 	now := time.Now()
 	success = true
+
+	if Test.Report.Count+Test.News.Count+Test.Expert.Count > 100 && !Test.Done {
+		Test.Done = true
+		Sugar.Info("Test limit reached")
+		Test.WG.Done()
+		return false
+	}
 
 	for _, context := range ctx.SubContext {
 		go context.process()
@@ -190,6 +197,9 @@ func (ctx Context) process() (success bool) {
 
 	switch ctx.PageType {
 	case Index:
+		if Test != nil {
+			Test.Index.Add(1)
+		}
 		return
 	case News:
 		n := news{
@@ -224,9 +234,11 @@ func (ctx Context) process() (success bool) {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		}
+		Test.News.Add(1)
 		if n.Title == "" || n.Content == "" {
 			return false
 		}
+		Test.News.AddFilled(1)
 		marshal, err = json.Marshal(n)
 		if !Kafka {
 			Sugar.Debugw("Got News Type", spread(n)...)
@@ -264,9 +276,11 @@ func (ctx Context) process() (success bool) {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		}
+		Test.Report.Add(1)
 		if n.Title == "" || (n.Content == "" && len(n.File) == 0) {
 			return false
 		}
+		Test.Report.AddFilled(1)
 		marshal, err = json.Marshal(n)
 		if !Kafka {
 			Sugar.Debugw("Got Report type", spread(n)...)
@@ -310,9 +324,11 @@ func (ctx Context) process() (success bool) {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		}
+		Test.Expert.Add(1)
 		if n.Name == "" {
 			return false
 		}
+		Test.Expert.AddFilled(1)
 		marshal, err = json.Marshal(n)
 		if !Kafka {
 			Sugar.Debugw("Got Expert type", spread(n)...)

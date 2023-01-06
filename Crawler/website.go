@@ -79,6 +79,9 @@ func (w *WebsiteEngine) SetDomain(domain string) *WebsiteEngine {
 
 func (w *WebsiteEngine) OnHTML(selector string, callback func(element *colly.HTMLElement, ctx *Context)) *WebsiteEngine {
 	w.UrlProcessor.htmlHandlers = append(w.UrlProcessor.htmlHandlers, CollyHTMLPair{func(element *colly.HTMLElement) {
+		if Test != nil && Test.Done {
+			return
+		}
 		callback(element, element.Request.Ctx.GetAny("ctx").(*Context))
 	}, selector})
 	return w
@@ -131,6 +134,9 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 
 	for _, xmlCallback := range cc.xmlHandlers {
 		c.OnXML(xmlCallback.selector, func(element *colly.XMLElement) {
+			if Test != nil && Test.Done {
+				return
+			}
 			xmlCallback.callback(element, element.Request.Ctx.GetAny("ctx").(*Context))
 		})
 	}
@@ -152,6 +158,9 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 
 func RetryRequest(r *colly.Request, err error, w *WebsiteEngine) {
 	left := retryRequest(r, 10)
+	if Test != nil && Test.Done {
+		return
+	}
 
 	if left == 0 {
 		_ = w.bar.Add(1)
@@ -175,6 +184,9 @@ func (w *WebsiteEngine) processUrl() (err error) {
 	w.UrlData = make(chan urlData)
 
 	c.OnScraped(func(response *colly.Response) {
+		if Test != nil && Test.Done {
+			return
+		}
 		if strings.Contains(response.Ctx.Get("title"), "Internal server error") {
 			time.Sleep(10 * time.Second)
 			_ = response.Request.Retry()
@@ -196,6 +208,9 @@ func (w *WebsiteEngine) processUrl() (err error) {
 	go func() {
 		for true {
 			k := <-w.UrlData
+			if Test != nil && Test.Done {
+				return
+			}
 			if k.Url == nil {
 				break
 			}
@@ -265,10 +280,17 @@ func (w *WebsiteEngine) processUrl() (err error) {
 
 	time.Sleep(5 * time.Second)
 	w.WG.Wait()
+	if Test != nil && !Test.Done {
+		Test.WG.Done()
+		Test.Done = true
+	}
 	return
 }
 
-func startEngine(w *WebsiteEngine) {
+func StartEngine(w *WebsiteEngine, test bool) {
+	if !test && Test != nil {
+		return
+	}
 	if w.IsRunning {
 		Sugar.Info("Already running id \"" + w.Id + "\"")
 		return

@@ -11,6 +11,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"log"
+	"megaCrawler/Crawler/Tester"
 	"megaCrawler/Crawler/commands"
 	"megaCrawler/Crawler/config"
 	"net/http"
@@ -26,14 +27,15 @@ var Debug bool
 var Threads int
 var Kafka bool
 var Proxy *url.URL
+var Test *Tester.Tester
 
-// CrawlerManager Program structures.
+// Manager Program structures.
 // Define Start and Stop methods.
-type CrawlerManager struct {
+type Manager struct {
 	exit chan struct{}
 }
 
-func (c *CrawlerManager) Start(_ service.Service) error {
+func (c *Manager) Start(_ service.Service) error {
 	if service.Interactive() {
 		Sugar.Info("Running in terminal.")
 	} else {
@@ -51,7 +53,7 @@ func (c *CrawlerManager) Start(_ service.Service) error {
 	return nil
 }
 
-func (c *CrawlerManager) run() error {
+func (c *Manager) run() error {
 	Sugar.Infof("I'm running %v.", service.Platform())
 	StartWebServer()
 
@@ -65,7 +67,7 @@ func (c *CrawlerManager) run() error {
 	}
 }
 
-func (c *CrawlerManager) Stop(_ service.Service) error {
+func (c *Manager) Stop(_ service.Service) error {
 	// Any work in Stop should be quick, usually a few seconds at most.
 	Sugar.Info("CrawlerManager are Stopping!")
 	close(c.exit)
@@ -74,10 +76,6 @@ func (c *CrawlerManager) Stop(_ service.Service) error {
 		return err
 	}
 	return nil
-}
-
-func getProxy() {
-
 }
 
 // Start is a blocking function that starts the crawler
@@ -260,7 +258,7 @@ func Start() {
 		}
 	}
 
-	prg := &CrawlerManager{}
+	prg := &Manager{}
 	s, err := service.New(prg, svcConfig)
 	if err != nil {
 		log.Fatal(err)

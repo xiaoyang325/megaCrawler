@@ -33,7 +33,7 @@ func Register(service string, name string, baseUrl string) *WebsiteEngine {
 	}
 	go func() {
 		timeMutex.Lock()
-		engine.Scheduler.Every(168).Hour().StartAt(nextTime).Do(startEngine, engine)
+		engine.Scheduler.Every(168).Hour().StartAt(nextTime).Do(StartEngine, engine, false)
 		nextTime = nextTime.Add(1 * time.Minute)
 		engine.Scheduler.StartAsync()
 		timeMutex.Unlock()
