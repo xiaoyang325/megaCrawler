@@ -39,12 +39,12 @@ func TestTester(t *testing.T) {
 	Crawler.Test.WG.Add(1)
 	target := os.Getenv("TARGET")
 	if target == "" {
-		_, _ = buf.WriteString("No target specified.")
+		_, _ = buf.WriteString("No target specified.\nFailed to run tests.\n")
 		return
 	}
 	c, ok := Crawler.WebMap[target]
 	if !ok {
-		_, _ = buf.WriteString("No such target.")
+		_, _ = buf.WriteString("No such target.\nFailed to start.\n")
 		return
 	}
 
