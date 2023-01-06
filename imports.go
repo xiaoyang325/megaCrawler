@@ -1,5 +1,5 @@
 package main
 
 import (
-	_ "megaCrawler/plugins/yerepouni_news"
+	_ "megaCrawler/plugins/cfr"
 )
