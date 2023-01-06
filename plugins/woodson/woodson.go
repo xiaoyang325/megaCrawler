@@ -11,11 +11,6 @@ func init() {
 	w.SetStartingUrls([]string{"http://woodsoncenter.org/post-sitemap.xml"})
 
 	w.OnXML("//loc", func(element *colly.XMLElement, ctx *Crawler.Context) {
-		parsed, err := element.Request.URL.Parse("url Here")
-		if err != nil {
-			return
-		}
-		w.Visit(parsed.String(), Crawler.News)
 		w.Visit(element.Text, Crawler.News)
 	})
 
