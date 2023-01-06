@@ -37,7 +37,7 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Set ENV
         if: ${{ steps.regex-match.outputs.match != '' }}
-        run: echo "TARGET='${{ steps.regex-match.outputs.group1 }}'" >> $GITHUB_ENV
+        run: echo "TARGET=${{ steps.regex-match.outputs.group1 }}" >> $GITHUB_ENV
       - name: Install dependencies
         if: ${{ steps.regex-match.outputs.match != '' }}
         run: go get .
@@ -60,7 +60,11 @@ jobs:
             The run on ${{ steps.regex-match.outputs.group1 }} has finished.
             - You can view the run [here](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
             - Created by [test-action](https://github.com/foxwhite25/megaCrawler/blob/master/.github/workflows/test.yml).
-            # Result:
-            ```yaml
-            ${{ env.RESULT }}
-            ```
+            
+            <details>
+              <summary>Result</summary>
+            
+              ```yaml
+              ${{ env.RESULT }}
+              ```
+            </details>
