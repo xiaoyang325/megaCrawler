@@ -1,7 +1,6 @@
 name: test
-
-on: [ issue_comment ]
-
+on:
+  - issue_comment
 jobs:
   create_comment:
     runs-on: ubuntu-latest
@@ -9,44 +8,37 @@ jobs:
       pull-requests: write
     strategy:
       matrix:
-        go-version: [ '1.18' ]
-
+        go-version:
+          - "1.18"
     steps:
       - uses: actions/checkout@v2
-
       - uses: actions-ecosystem/action-regex-match@v2
         id: regex-match
         with:
           text: ${{ github.event.comment.body }}
-          regex: '^/test\s*(.*?)\s*$'
-
+          regex: ^/test\s*(.*?)\s*$
       - name: Setup Go
         uses: actions/setup-go@v3
         if: ${{ steps.regex-match.outputs.match != '' }}
         with:
           go-version: ${{ matrix.go-version }}
-
       - name: Set ENV
         if: ${{ steps.regex-match.outputs.match != '' }}
         run: echo "TARGET=${{ steps.regex-match.outputs.group1 }}" >> $GITHUB_ENV
-
       - name: Install dependencies
         if: ${{ steps.regex-match.outputs.match != '' }}
         run: go get .
-
       - name: Test with Go
         id: test
         if: ${{ steps.regex-match.outputs.match != '' }}
         run: echo "RESULT=$(go test)" >> $GITHUB_OUTPUT
-
       - name: Upload Go log
         uses: actions/upload-artifact@v3
         if: ${{ steps.regex-match.outputs.match != '' }}
         with:
           name: Go-log-${{ matrix.go-version }}
           path: ./log/debug.jsonl
-
       - uses: mshick/add-pr-comment@v2
         if: ${{ steps.regex-match.outputs.match != '' }}
         with:
-          message: ```\n${{ steps.test.outputs.RESULT }}\n```
+          message: \`\`\`\n${{ steps.test.outputs.RESULT }}\n\`\`\`
