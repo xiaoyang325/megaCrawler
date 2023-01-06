@@ -26,10 +26,9 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            目标为 ${{ steps.regex-match.outputs.group1 }} 的自动测试启动了.
+            目标为 ${{ steps.regex-match.outputs.group1 }} 的自动测试启动了。
             - 你可以在 [这里](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) 找到测试过程和结果。
             - 由 [test-action](https://github.com/foxwhite25/megaCrawler/blob/master/.github/workflows/test.yml) 创建。
-          reactions: '+1'
       - name: Setup Go
         uses: actions/setup-go@v3
         if: ${{ steps.regex-match.outputs.match != '' }}
@@ -62,6 +61,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v2
         with:
           comment-id: ${{ steps.create_comment.outputs.comment-id }}
+          reactions: rocket
           body: |         
             ## Edit: 本次运行已完成！
             你可以通过上述链接下载 Log 文件。

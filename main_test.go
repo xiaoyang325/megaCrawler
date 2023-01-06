@@ -29,15 +29,22 @@ func TestTester(t *testing.T) {
 			Name: "Report",
 		},
 	}
+
+	buf, err := os.Create("table.txt")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
 	Crawler.Test.WG.Add(1)
 	target := os.Getenv("TARGET")
 	if target == "" {
-		t.Error("please set TARGET")
+		_, _ = buf.WriteString("No target specified.")
 		return
 	}
 	c, ok := Crawler.WebMap[target]
 	if !ok {
-		t.Error("no such target")
+		_, _ = buf.WriteString("No such target.")
 		return
 	}
 
@@ -62,11 +69,7 @@ func TestTester(t *testing.T) {
 	go Crawler.StartEngine(c, true)
 	Crawler.Test.WG.Wait()
 	time.Sleep(time.Second * 5)
-	buf, err := os.Create("table.txt")
-	if err != nil {
-		t.Error(err)
-		return
-	}
+
 	table := tablewriter.NewWriter(buf)
 	table.SetHeader([]string{"Target", "Total", "Filled", "Success Rate"})
 	Crawler.Test.News.FillTable(table)
