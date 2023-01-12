@@ -197,8 +197,10 @@ func (w *WebsiteEngine) processUrl() (err error) {
 		go func() {
 			if !ctx.process() {
 				Sugar.Debugw("Empty Page", spread(*ctx)...)
-				response.Ctx.Put("ctx", newContext(urlData{Url: response.Request.URL, PageType: ctx.PageType}, w))
-				RetryRequest(response.Request, nil, w)
+				if Test == nil {
+					response.Ctx.Put("ctx", newContext(urlData{Url: response.Request.URL, PageType: ctx.PageType}, w))
+					RetryRequest(response.Request, nil, w)
+				}
 			} else {
 				_ = w.bar.Add(1)
 				w.WG.Done()
