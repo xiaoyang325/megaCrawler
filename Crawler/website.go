@@ -198,7 +198,8 @@ func (w *WebsiteEngine) processUrl() (err error) {
 			if !ctx.process() {
 				Sugar.Debugw("Empty Page", spread(*ctx)...)
 				if Test == nil {
-					response.Ctx.Put("ctx", newContext(urlData{Url: response.Request.URL, PageType: ctx.PageType}, w))
+					newCtx := newContext(urlData{Url: response.Request.URL, PageType: ctx.PageType}, w)
+					response.Ctx.Put("ctx", &newCtx)
 					RetryRequest(response.Request, nil, w)
 				}
 			} else {
@@ -219,7 +220,8 @@ func (w *WebsiteEngine) processUrl() (err error) {
 			}
 			ctx := colly.NewContext()
 
-			ctx.Put("ctx", newContext(k, w))
+			newCtx := newContext(k, w)
+			ctx.Put("ctx", &newCtx)
 			err := c.Request("GET", k.Url.String(), nil, ctx, nil)
 			if err != nil {
 				continue
