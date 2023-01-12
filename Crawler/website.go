@@ -197,7 +197,11 @@ func (w *WebsiteEngine) processUrl() (err error) {
 		go func() {
 			if !ctx.process() {
 				Sugar.Debugw("Empty Page", spread(*ctx)...)
-				RetryRequest(response.Request, nil, w)
+				if Test == nil {
+					newCtx := newContext(urlData{Url: response.Request.URL, PageType: ctx.PageType}, w)
+					response.Ctx.Put("ctx", &newCtx)
+					RetryRequest(response.Request, nil, w)
+				}
 			} else {
 				_ = w.bar.Add(1)
 				w.WG.Done()
@@ -216,22 +220,8 @@ func (w *WebsiteEngine) processUrl() (err error) {
 			}
 			ctx := colly.NewContext()
 
-			ctx.Put("ctx", &Context{
-				PageType:   k.PageType,
-				Authors:    []string{},
-				Image:      []string{},
-				Video:      []string{},
-				Audio:      []string{},
-				File:       []string{},
-				Link:       []string{},
-				Tags:       []string{},
-				Keywords:   []string{},
-				SubContext: []*Context{},
-				Url:        k.Url.String(),
-				Host:       k.Url.Host,
-				Website:    w.Id,
-				CrawlTime:  time.Time{},
-			})
+			newCtx := newContext(k, w)
+			ctx.Put("ctx", &newCtx)
 			err := c.Request("GET", k.Url.String(), nil, ctx, nil)
 			if err != nil {
 				continue
@@ -285,6 +275,25 @@ func (w *WebsiteEngine) processUrl() (err error) {
 		Test.Done = true
 	}
 	return
+}
+
+func newContext(k urlData, w *WebsiteEngine) Context {
+	return Context{
+		PageType:   k.PageType,
+		Authors:    []string{},
+		Image:      []string{},
+		Video:      []string{},
+		Audio:      []string{},
+		File:       []string{},
+		Link:       []string{},
+		Tags:       []string{},
+		Keywords:   []string{},
+		SubContext: []*Context{},
+		Url:        k.Url.String(),
+		Host:       k.Url.Host,
+		Website:    w.Id,
+		CrawlTime:  time.Time{},
+	}
 }
 
 func StartEngine(w *WebsiteEngine, test bool) {
