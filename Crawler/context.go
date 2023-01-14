@@ -186,7 +186,7 @@ func (ctx *Context) process() (success bool) {
 
 	if Test.Report.Count+Test.News.Count+Test.Expert.Count > 100 && !Test.Done {
 		Test.Done = true
-		Sugar.Info("Test limit reached")
+		Sugar.Info("Test finished, limit reached")
 		Test.WG.Done()
 		return false
 	}

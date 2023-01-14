@@ -56,16 +56,20 @@ func TestTester(t *testing.T) {
 		Crawler.Test = &Tester.Tester{
 			WG: &sync.WaitGroup{},
 			News: Tester.Status{
-				Name: "News",
+				Target: target,
+				Name:   "News",
 			},
 			Index: Tester.Status{
-				Name: "Index",
+				Target: target,
+				Name:   "Index",
 			},
 			Expert: Tester.Status{
-				Name: "Expert",
+				Target: target,
+				Name:   "Expert",
 			},
 			Report: Tester.Status{
-				Name: "Report",
+				Target: target,
+				Name:   "Report",
 			},
 		}
 
