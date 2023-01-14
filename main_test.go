@@ -21,7 +21,6 @@ func TestTester(t *testing.T) {
 		return
 	}
 
-	Crawler.Test.WG.Add(1)
 	target := os.Getenv("TARGET")
 	if target == "" {
 		_, _ = buf.WriteString("No target specified.\nFailed to run tests.\n")
@@ -72,6 +71,7 @@ func TestTester(t *testing.T) {
 				Name:   "Report",
 			},
 		}
+		Crawler.Test.WG.Add(1)
 
 		c, ok := Crawler.WebMap[target]
 		if !ok {
