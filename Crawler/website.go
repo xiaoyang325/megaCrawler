@@ -120,7 +120,7 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 	err := c.Limit(&colly.LimitRule{
 		RandomDelay: 5 * time.Second,
 		DomainGlob:  cc.domainGlob,
-		Parallelism: Threads,
+		Parallelism: cc.parallelLimit,
 	})
 
 	c.SetRequestTimeout(cc.timeout)
@@ -273,6 +273,7 @@ func (w *WebsiteEngine) processUrl() (err error) {
 	if Test != nil && !Test.Done {
 		Test.WG.Done()
 		Test.Done = true
+		Sugar.Infof("Test finished, all urls processed")
 	}
 	return
 }
@@ -345,7 +346,7 @@ func NewEngine(id string, baseUrl tld.URL) (we *WebsiteEngine) {
 		LastUpdate: time.Unix(0, 0),
 		UrlProcessor: CollectorConstructor{
 			domainGlob:    baseUrl.String(),
-			parallelLimit: 16,
+			parallelLimit: Threads,
 			timeout:       10 * time.Second,
 			htmlHandlers:  []CollyHTMLPair{},
 			xmlHandlers:   []XMLPair{},
