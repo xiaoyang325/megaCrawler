@@ -77,8 +77,6 @@ func TestTester(t *testing.T) {
 
 		table := tablewriter.NewWriter(buf)
 		table.SetHeader([]string{"Field", "Total", "Passed", "Coverage"})
-		table.SetAutoMergeCells(true)
-		table.SetRowLine(true)
 
 		Crawler.Test.News.FillTable(table)
 		Crawler.Test.Index.FillTable(table)
