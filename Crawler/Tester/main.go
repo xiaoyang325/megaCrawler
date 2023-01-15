@@ -8,7 +8,6 @@ import (
 )
 
 type Status struct {
-	Target      string
 	Name        string
 	Count       int64
 	FilledCount int64
@@ -35,7 +34,6 @@ func (s *Status) Add(delta int64) *Status {
 
 func (s *Status) FillTable(table *tablewriter.Table) {
 	table.Append([]string{
-		s.Target,
 		s.Name,
 		strconv.Itoa(int(s.Count)),
 		strconv.Itoa(int(s.FilledCount)),

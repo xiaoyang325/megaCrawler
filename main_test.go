@@ -46,29 +46,22 @@ func TestTester(t *testing.T) {
 
 	Crawler.Sugar = logger.Sugar()
 
-	table := tablewriter.NewWriter(buf)
-	table.SetHeader([]string{"Target", "Field", "Total", "Passed", "Coverage"})
-	table.SetAutoMergeCells(true)
-	table.SetRowLine(true)
-
 	for _, target := range targets {
+		_, _ = fmt.Fprintf(buf, "Testing %s:\n\n", target)
+
 		Crawler.Test = &Tester.Tester{
 			WG: &sync.WaitGroup{},
 			News: Tester.Status{
-				Target: target,
-				Name:   "News",
+				Name: "News",
 			},
 			Index: Tester.Status{
-				Target: target,
-				Name:   "Index",
+				Name: "Index",
 			},
 			Expert: Tester.Status{
-				Target: target,
-				Name:   "Expert",
+				Name: "Expert",
 			},
 			Report: Tester.Status{
-				Target: target,
-				Name:   "Report",
+				Name: "Report",
 			},
 		}
 		Crawler.Test.WG.Add(1)
@@ -82,11 +75,18 @@ func TestTester(t *testing.T) {
 		go Crawler.StartEngine(c, true)
 		Crawler.Test.WG.Wait()
 
+		table := tablewriter.NewWriter(buf)
+		table.SetHeader([]string{"Field", "Total", "Passed", "Coverage"})
+		table.SetAutoMergeCells(true)
+		table.SetRowLine(true)
+
 		Crawler.Test.News.FillTable(table)
 		Crawler.Test.Index.FillTable(table)
 		Crawler.Test.Expert.FillTable(table)
 		Crawler.Test.Report.FillTable(table)
-	}
 
-	table.Render()
+		table.Render()
+
+		_, _ = buf.WriteString("\n")
+	}
 }
