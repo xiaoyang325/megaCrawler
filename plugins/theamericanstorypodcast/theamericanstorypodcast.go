@@ -1,7 +1,6 @@
 package theamericanstorypodcast
 
 import (
-	_ "github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
 )
 

@@ -2,7 +2,6 @@ package usip
 
 import (
 	"github.com/gocolly/colly/v2"
-	_ "github.com/gocolly/colly/v2"
 	"megaCrawler/Crawler"
 )
 
