@@ -234,11 +234,15 @@ func (ctx *Context) process() (success bool) {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		}
-		Test.News.Add(1)
+		if Test != nil {
+			Test.News.Add(1)
+		}
 		if n.Title == "" || n.Content == "" {
 			return false
 		}
-		Test.News.AddFilled(1)
+		if Test != nil {
+			Test.News.AddFilled(1)
+		}
 		marshal, err = json.Marshal(n)
 		if !Kafka {
 			Sugar.Debugw("Got News Type", spread(n)...)
@@ -276,11 +280,15 @@ func (ctx *Context) process() (success bool) {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		}
-		Test.Report.Add(1)
+		if Test != nil {
+			Test.Report.Add(1)
+		}
 		if n.Title == "" || (n.Content == "" && len(n.File) == 0) {
 			return false
 		}
-		Test.Report.AddFilled(1)
+		if Test != nil {
+			Test.Report.AddFilled(1)
+		}
 		marshal, err = json.Marshal(n)
 		if !Kafka {
 			Sugar.Debugw("Got Report type", spread(n)...)
@@ -324,11 +332,15 @@ func (ctx *Context) process() (success bool) {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		}
-		Test.Expert.Add(1)
+		if Test != nil {
+			Test.Expert.Add(1)
+		}
 		if n.Name == "" {
 			return false
 		}
-		Test.Expert.AddFilled(1)
+		if Test != nil {
+			Test.Expert.AddFilled(1)
+		}
 		marshal, err = json.Marshal(n)
 		if !Kafka {
 			Sugar.Debugw("Got Expert type", spread(n)...)
