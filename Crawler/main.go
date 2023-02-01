@@ -28,6 +28,10 @@ var Threads int
 var Kafka bool
 var Proxy *url.URL
 var Test *Tester.Tester
+var Shard struct {
+	Total  int
+	Number int
+}
 
 // Manager Program structures.
 // Define Start and Stop methods.
@@ -58,6 +62,7 @@ func (c *Manager) run() error {
 	StartWebServer()
 
 	ticker := time.NewTicker(2 * time.Second)
+	StartAll()
 	for {
 		select {
 		case <-c.exit:
@@ -88,8 +93,14 @@ func Start() {
 	updateFlag := flag.Bool("update", false, "Update the program to the latest release version")
 	passwordFlag := flag.String("password", "", "The password for kafka server")
 	threadFlag := flag.Int("thread", 16, "Number of networking thread")
+	totalShardFlag := flag.Int("totalShard", 1, "Total number of shard")
+	shardFlag := flag.Int("shard", 0, "The shard number")
 
 	flag.Parse()
+
+	Shard.Total = *totalShardFlag
+	Shard.Number = *shardFlag
+
 	Debug = *debugFlag
 	Threads = *threadFlag
 

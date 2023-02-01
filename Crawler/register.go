@@ -2,6 +2,7 @@ package Crawler
 
 import (
 	"github.com/jpillora/go-tld"
+	"hash/fnv"
 	"megaCrawler/Crawler/config"
 	"sync"
 	"time"
@@ -12,6 +13,12 @@ var (
 	nextTime  = time.Now().Add(3 * time.Second)
 	timeMutex = sync.RWMutex{}
 )
+
+func hash(s string) uint32 {
+	h := fnv.New32a()
+	h.Write([]byte(s))
+	return h.Sum32()
+}
 
 // Register 注册插件控制器
 func Register(service string, name string, baseUrl string) *WebsiteEngine {
@@ -31,14 +38,25 @@ func Register(service string, name string, baseUrl string) *WebsiteEngine {
 	} else {
 		engine.Config = &c
 	}
-	go func() {
-		timeMutex.Lock()
-		engine.Scheduler.Every(168).Hour().StartAt(nextTime).Do(StartEngine, engine, false)
-		nextTime = nextTime.Add(1 * time.Minute)
-		engine.Scheduler.StartAsync()
-		timeMutex.Unlock()
-	}()
-
 	WebMap[service] = engine
+
 	return engine
+}
+
+func StartAll() {
+	for service, engine := range WebMap {
+		serviceHash := hash(service)
+		engine := engine
+		if serviceHash%uint32(Shard.Total) == uint32(Shard.Number) {
+			go func() {
+				timeMutex.Lock()
+				engine.Scheduler.Every(168).Hour().StartAt(nextTime).Do(StartEngine, engine, false)
+				nextTime = nextTime.Add(1 * time.Minute)
+				engine.Scheduler.StartAsync()
+				timeMutex.Unlock()
+			}()
+		} else {
+			delete(WebMap, service)
+		}
+	}
 }
