@@ -184,7 +184,7 @@ func (ctx *Context) process() (success bool) {
 	now := time.Now()
 	success = true
 
-	if Test.Report.Count+Test.News.Count+Test.Expert.Count > 100 && !Test.Done {
+	if Test != nil && Test.Report.Count+Test.News.Count+Test.Expert.Count > 100 && !Test.Done {
 		Test.Done = true
 		Sugar.Info("Test finished, limit reached")
 		Test.WG.Done()
