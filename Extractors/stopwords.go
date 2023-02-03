@@ -118,44 +118,44 @@ var viStopWord string
 //go:embed text/stopwords-zh.txt
 var zhStopWord string
 
-var stopWords = map[string]string{
-	"ar": arStopWord,
-	"be": beStopWord,
-	"bg": bgStopWord,
-	"da": daStopWord,
-	"de": deStopWord,
-	"el": elStopWord,
-	"en": enStopWord,
-	"es": esStopWord,
-	"et": etStopWord,
-	"fi": fiStopWord,
-	"fr": frStopWord,
-	"he": heStopWord,
-	"hi": hiStopWord,
-	"hr": hrStopWord,
-	"hu": huStopWord,
-	"id": idStopWord,
-	"it": itStopWord,
-	"ja": jaStopWord,
-	"ko": koStopWord,
-	"lt": ltStopWord,
-	"mk": mkStopWord,
-	"nb": nbStopWord,
-	"nl": nlStopWord,
-	"no": noStopWord,
-	"pl": plStopWord,
-	"pt": ptStopWord,
-	"ro": roStopWord,
-	"ru": ruStopWord,
-	"sl": slStopWord,
-	"sr": srStopWord,
-	"sv": svStopWord,
-	"sw": swStopWord,
-	"th": thStopWord,
-	"tr": trStopWord,
-	"uk": ukStopWord,
-	"vi": viStopWord,
-	"zh": zhStopWord,
+var stopWords = map[string][]string{
+	"ar": strings.Split(arStopWord, "\r\n"),
+	"be": strings.Split(beStopWord, "\r\n"),
+	"bg": strings.Split(bgStopWord, "\r\n"),
+	"da": strings.Split(daStopWord, "\r\n"),
+	"de": strings.Split(deStopWord, "\r\n"),
+	"el": strings.Split(elStopWord, "\r\n"),
+	"en": strings.Split(enStopWord, "\r\n"),
+	"es": strings.Split(esStopWord, "\r\n"),
+	"et": strings.Split(etStopWord, "\r\n"),
+	"fi": strings.Split(fiStopWord, "\r\n"),
+	"fr": strings.Split(frStopWord, "\r\n"),
+	"he": strings.Split(heStopWord, "\r\n"),
+	"hi": strings.Split(hiStopWord, "\r\n"),
+	"hr": strings.Split(hrStopWord, "\r\n"),
+	"hu": strings.Split(huStopWord, "\r\n"),
+	"id": strings.Split(idStopWord, "\r\n"),
+	"it": strings.Split(itStopWord, "\r\n"),
+	"ja": strings.Split(jaStopWord, "\r\n"),
+	"ko": strings.Split(koStopWord, "\r\n"),
+	"lt": strings.Split(ltStopWord, "\r\n"),
+	"mk": strings.Split(mkStopWord, "\r\n"),
+	"nb": strings.Split(nbStopWord, "\r\n"),
+	"nl": strings.Split(nlStopWord, "\r\n"),
+	"no": strings.Split(noStopWord, "\r\n"),
+	"pl": strings.Split(plStopWord, "\r\n"),
+	"pt": strings.Split(ptStopWord, "\r\n"),
+	"ro": strings.Split(roStopWord, "\r\n"),
+	"ru": strings.Split(ruStopWord, "\r\n"),
+	"sl": strings.Split(slStopWord, "\r\n"),
+	"sr": strings.Split(srStopWord, "\r\n"),
+	"sv": strings.Split(svStopWord, "\r\n"),
+	"sw": strings.Split(swStopWord, "\r\n"),
+	"th": strings.Split(thStopWord, "\r\n"),
+	"tr": strings.Split(trStopWord, "\r\n"),
+	"uk": strings.Split(ukStopWord, "\r\n"),
+	"vi": strings.Split(viStopWord, "\r\n"),
+	"zh": strings.Split(zhStopWord, "\r\n"),
 }
 
 var punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
@@ -169,7 +169,7 @@ type WordStats struct {
 
 func getWordCount(content string, language string) WordStats {
 	var wordStats WordStats
-	stopWords := strings.Split(stopWords[language], "\r\n")
+	stopWords := stopWords[language]
 	strippedContent := removePunctuationRegex.ReplaceAllString(content, "")
 	candidateWords := strings.Split(strippedContent, " ")
 
