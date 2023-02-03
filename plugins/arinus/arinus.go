@@ -71,7 +71,6 @@ func init() {
 		} else if ctx.PageType == Crawler.News {
 			ctx.Content = element.Text
 		}
-		element.ChildAttrs("a", "a")
 	})
 
 }
