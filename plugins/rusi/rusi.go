@@ -301,7 +301,9 @@ func init() {
 				for _, s := range obj.Result.Data.Article.Relationships.FieldAuthor {
 					ctx.Authors = append(ctx.Authors, s.FieldFirstNames+" "+s.Title)
 				}
-				ctx.Area = art.Relationships.FieldRegion[0].name
+				if len(art.Relationships.FieldRegion) > 0 {
+					ctx.Area = art.Relationships.FieldRegion[0].name
+				}
 				for _, topic := range art.Relationships.FieldTopics {
 					ctx.Tags = append(ctx.Tags, topic.Name)
 				}
