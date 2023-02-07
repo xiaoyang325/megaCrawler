@@ -45,22 +45,22 @@ func init() {
 
 	// 访问下一页 Index
 	w.OnHTML(`#Recent-publications > div > div > div > div:nth-child(2) > div > div > ul > li > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(ctx.Url+element.Attr("href"), Crawler.Index)
+		w.Visit(element.Attr("href"), Crawler.Index)
 	})
 
 	// 访问下一页 Index
 	w.OnHTML(`#Events > div > div > div > div > div > div > ul > li > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(ctx.Url+element.Attr("href"), Crawler.Index)
+		w.Visit(element.Attr("href"), Crawler.Index)
 	})
 
 	// 访问下一页 Index
 	w.OnHTML(`#Archive > div > div > div > div > div > div > ul > li > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(ctx.Url+element.Attr("href"), Crawler.Index)
+		w.Visit(element.Attr("href"), Crawler.Index)
 	})
 
 	// 访问下一页 Index
 	w.OnHTML(`#block-dgap-content > article > div > div > div > div > div > div > div > div > ul > li > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(ctx.Url+element.Attr("href"), Crawler.Index)
+		w.Visit(element.Attr("href"), Crawler.Index)
 	})
 
 	// 访问 Report 从 Index

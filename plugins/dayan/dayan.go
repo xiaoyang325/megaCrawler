@@ -27,7 +27,7 @@ func init() {
 
 	// 访问下一页 Index
 	w.OnHTML(`li[class="pager__item pager__item--next"] > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(ctx.Url+element.Attr("href"), Crawler.Index)
+		w.Visit(element.Attr("href"), Crawler.Index)
 	})
 
 	// 访问 Report 从 Index

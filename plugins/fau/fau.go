@@ -15,7 +15,7 @@ func init() {
 
 	// 访问下一页 Index
 	w.OnHTML(`.inline-nav > li:nth-last-child(1) > a.fau-pager__arrows`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(ctx.Url+element.Attr("href"), Crawler.Index)
+		w.Visit(element.Attr("href"), Crawler.Index)
 	})
 
 	// 访问 News 从 Index
