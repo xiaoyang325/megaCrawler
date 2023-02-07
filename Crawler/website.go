@@ -49,7 +49,10 @@ func (w *WebsiteEngine) Visit(url string, pageType PageType) {
 	if err != nil {
 		return
 	}
-	topLevel, _ := tld.Parse(u.String())
+	topLevel, err := tld.Parse(u.String())
+	if err != nil {
+		return
+	}
 	if topLevel.Domain != w.BaseUrl.Domain || topLevel.TLD != w.BaseUrl.TLD {
 		return
 	}

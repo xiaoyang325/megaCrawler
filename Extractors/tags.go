@@ -8,7 +8,7 @@ import (
 func getTags(dom *colly.HTMLElement) (tags []string) {
 	tags = append(tags, dom.ChildTexts("a[rel=\"tag\"]")...)
 	if len(tags) != 0 {
-		tags = append(tags, dom.ChildTexts("a[href*='/tag/'], a[href*='/tags/'], a[href*='/topic/'], a[href*='?keyword=']")...)
+		tags = append(tags, dom.ChildTexts("a[href*='/tag/'], a[href*='/tags/'], a[href*='/topic/'], a[href*='?keyword='], .entry-category > a")...)
 	}
 	return Crawler.Unique(tags)
 }
