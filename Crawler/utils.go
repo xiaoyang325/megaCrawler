@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -42,13 +44,6 @@ func mapToKeySlice[T any](m map[string]T) (slice []string) {
 		slice = append(slice, s)
 	}
 	return
-}
-
-func combineSlice[T any](bottom []T, top []T) []T {
-	for _, t := range top {
-		bottom = append(bottom, t)
-	}
-	return bottom
 }
 
 func successResponse(msg string) (b []byte, err error) {
@@ -114,6 +109,19 @@ func downloadFile(filepath string, url string) (err error) {
 	return nil
 }
 
+func GetNextIndexURL(currentUrl string, currentPageNum string, paramName string) string {
+	thisUrl, _ := url.Parse(currentUrl)
+	paramList := thisUrl.Query()
+
+	currentNum, _ := strconv.Atoi(currentPageNum)
+	currentNum++
+
+	paramList.Set(paramName, strconv.Itoa(currentNum))
+	thisUrl.RawQuery = paramList.Encode()
+
+	return thisUrl.String()
+}
+
 func spread(args interface{}) (k []interface{}) {
 	s := reflect.ValueOf(args)
 	st := s.Type()
@@ -125,4 +133,11 @@ func spread(args interface{}) (k []interface{}) {
 		k = append(k, iField.Interface())
 	}
 	return
+}
+
+func SplitDelimiters(s string, delimiters []string) (result []string) {
+	for _, delimiter := range delimiters {
+		s = strings.ReplaceAll(s, delimiter, ",")
+	}
+	return strings.Split(s, ",")
 }

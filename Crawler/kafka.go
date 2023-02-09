@@ -67,7 +67,7 @@ func getProducer() (newsChannel chan string, reportChannel chan string, expertCh
 	conf.Producer.RequiredAcks = sarama.WaitForAll
 	conf.Producer.Return.Successes = true
 	conf.Metadata.Full = true
-	conf.Version = sarama.V0_10_0_0
+	conf.Version = sarama.V3_2_3_0
 	conf.ClientID = "sasl_scram_client"
 	conf.Metadata.Full = true
 	conf.Net.SASL.Enable = true
