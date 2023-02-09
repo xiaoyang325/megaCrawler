@@ -2,6 +2,7 @@ package Extractors
 
 import (
 	_ "embed"
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"regexp"
 	"strings"
@@ -167,9 +168,12 @@ type WordStats struct {
 	StopWords     []string
 }
 
-func getWordCount(content string, language string) WordStats {
+func getWordCount(content string, language string) (WordStats, error) {
 	var wordStats WordStats
-	stopWords := stopWords[language]
+	stopWords, ok := stopWords[language]
+	if !ok {
+		return wordStats, fmt.Errorf("language %s not supported", language)
+	}
 	strippedContent := removePunctuationRegex.ReplaceAllString(content, "")
 	candidateWords := strings.Split(strippedContent, " ")
 
@@ -188,7 +192,7 @@ func getWordCount(content string, language string) WordStats {
 		wordStats.StopWords = append(wordStats.StopWords, word)
 	}
 	wordStats.StopWordCount = len(wordStats.StopWords)
-	return wordStats
+	return wordStats, nil
 }
 
 func isHighLinkDensity(content *goquery.Selection, stats WordStats) bool {

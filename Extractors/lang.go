@@ -2,12 +2,13 @@ package Extractors
 
 import (
 	"github.com/gocolly/colly/v2"
+	"megaCrawler/Crawler"
 	"regexp"
 )
 
 var ReLang, _ = regexp.Compile("^[A-Za-z]{2}$")
 
-func getMetaLang(dom colly.HTMLElement) string {
+func getMetaLang(dom *colly.HTMLElement) string {
 	attr := dom.Attr("lang")
 	if attr == "" {
 		selectors := []string{
@@ -28,4 +29,8 @@ func getMetaLang(dom colly.HTMLElement) string {
 		}
 	}
 	return ""
+}
+
+func Language(ctx *Crawler.Context, dom *colly.HTMLElement) {
+	ctx.Language = getMetaLang(dom)
 }

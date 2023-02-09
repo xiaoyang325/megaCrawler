@@ -24,7 +24,7 @@ func TestTopNodeExtractor(t *testing.T) {
 		return
 	}
 
-	node := CalculateBestNode(dom, "en")
+	node := CalculateBestNode(dom.Selection, "en")
 	node = postCleanup(node, "en")
 	if node == nil {
 		t.Error("node is nil")

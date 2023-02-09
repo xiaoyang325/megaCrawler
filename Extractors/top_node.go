@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func nodesToCheck(dom *goquery.Document) *goquery.Selection {
+func nodesToCheck(dom *goquery.Selection) *goquery.Selection {
 	return dom.Find("p,pre,td")
 }
 
@@ -60,7 +60,10 @@ func isBootable(node *goquery.Selection, language string) bool {
 		}
 
 		paraText := nodeText(selection)
-		wordStats := getWordCount(paraText, language)
+		wordStats, err := getWordCount(paraText, language)
+		if err != nil {
+			return
+		}
 		if wordStats.StopWordCount > MinimumStopWordCount {
 			isBootable = true
 		}
@@ -68,7 +71,7 @@ func isBootable(node *goquery.Selection, language string) bool {
 	return isBootable
 }
 
-func CalculateBestNode(dom *goquery.Document, language string) *goquery.Selection {
+func CalculateBestNode(dom *goquery.Selection, language string) *goquery.Selection {
 	startingBoost := 1.0
 	i := 0
 	var nodeWithText []*goquery.Selection
@@ -76,7 +79,10 @@ func CalculateBestNode(dom *goquery.Document, language string) *goquery.Selectio
 
 	nodesToCheck(dom).Each(func(i int, selection *goquery.Selection) {
 		textNode := nodeText(selection)
-		wordStats := getWordCount(textNode, language)
+		wordStats, err := getWordCount(textNode, language)
+		if err != nil {
+			return
+		}
 		highLinkDensity := isHighLinkDensity(selection, wordStats)
 		if wordStats.StopWordCount > 2 && !highLinkDensity {
 			nodeWithText = append(nodeWithText, selection)
@@ -109,7 +115,10 @@ func CalculateBestNode(dom *goquery.Document, language string) *goquery.Selectio
 		}
 
 		textNode := nodeText(node)
-		wordStats := getWordCount(textNode, language)
+		wordStats, err := getWordCount(textNode, language)
+		if err != nil {
+			return nil
+		}
 		upScore := boostScore + float64(wordStats.StopWordCount)
 
 		node.Parent().Each(func(i int, selection *goquery.Selection) {
@@ -200,7 +209,11 @@ func CalculateBestNode(dom *goquery.Document, language string) *goquery.Selectio
 func postCleanup(node *goquery.Selection, language string) *goquery.Selection {
 	//addSibling(node, "en")
 	node.Children().Each(func(i int, selection *goquery.Selection) {
-		if goquery.NodeName(selection) != "p" && isHighLinkDensity(selection, getWordCount(nodeText(selection), language)) {
+		wordCount, err := getWordCount(nodeText(selection), language)
+		if err != nil {
+			return
+		}
+		if goquery.NodeName(selection) != "p" && isHighLinkDensity(selection, wordCount) {
 			selection.Remove()
 		}
 	})
