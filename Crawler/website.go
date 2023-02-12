@@ -10,6 +10,7 @@ import (
 	"github.com/temoto/robotstxt"
 	"io/ioutil"
 	"math/rand"
+	"megaCrawler/Crawler/Tester"
 	"megaCrawler/Crawler/commands"
 	"megaCrawler/Crawler/config"
 	"net/http"
@@ -33,6 +34,7 @@ type WebsiteEngine struct {
 	ProgressBar  string
 	WG           *sync.WaitGroup
 	UrlData      chan urlData
+	Test         *Tester.Tester
 }
 
 type urlData struct {
@@ -82,7 +84,7 @@ func (w *WebsiteEngine) SetDomain(domain string) *WebsiteEngine {
 
 func (w *WebsiteEngine) OnHTML(selector string, callback func(element *colly.HTMLElement, ctx *Context)) *WebsiteEngine {
 	w.UrlProcessor.htmlHandlers = append(w.UrlProcessor.htmlHandlers, CollyHTMLPair{func(element *colly.HTMLElement) {
-		if Test != nil && Test.Done {
+		if w.Test != nil && w.Test.Done {
 			return
 		}
 		callback(element, element.Request.Ctx.GetAny("ctx").(*Context))
@@ -137,7 +139,7 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 
 	for _, xmlCallback := range cc.xmlHandlers {
 		c.OnXML(xmlCallback.selector, func(element *colly.XMLElement) {
-			if Test != nil && Test.Done {
+			if w.Test != nil && w.Test.Done {
 				return
 			}
 			xmlCallback.callback(element, element.Request.Ctx.GetAny("ctx").(*Context))
@@ -160,10 +162,15 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 }
 
 func RetryRequest(r *colly.Request, err error, w *WebsiteEngine) {
-	left := retryRequest(r, 10)
-	if Test != nil && Test.Done {
+	defer func() {
+		if r := recover(); r != nil {
+
+		}
+	}()
+	if w.Test != nil && w.Test.Done {
 		return
 	}
+	left := retryRequest(r, 10)
 
 	if left == 0 {
 		_ = w.bar.Add(1)
@@ -180,14 +187,46 @@ func RetryRequest(r *colly.Request, err error, w *WebsiteEngine) {
 }
 
 func (w *WebsiteEngine) processUrl() (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+
+		}
+	}()
+
 	c, err := w.getCollector()
 	if err != nil {
 		return
 	}
 	w.UrlData = make(chan urlData)
 
+	if w.Test != nil {
+		go func() {
+			defer func() {
+				if r := recover(); r != nil {
+
+				}
+			}()
+
+			for true {
+				time.Sleep(10)
+				if w.Test.Done {
+					for true {
+						w.WG.Done()
+					}
+				}
+			}
+		}()
+	}
+
 	c.OnScraped(func(response *colly.Response) {
-		if Test != nil && Test.Done {
+		defer func() {
+			if r := recover(); r != nil {
+
+			}
+		}()
+
+		if w.Test != nil && w.Test.Done {
+			w.WG.Done()
 			return
 		}
 		if strings.Contains(response.Ctx.Get("title"), "Internal server error") {
@@ -198,9 +237,15 @@ func (w *WebsiteEngine) processUrl() (err error) {
 		ctx := response.Ctx.GetAny("ctx").(*Context)
 		ctx.CrawlTime = time.Now()
 		go func() {
-			if !ctx.process() {
+			defer func() {
+				if r := recover(); r != nil {
+
+				}
+			}()
+
+			if !ctx.process(w.Test) {
 				Sugar.Debugw("Empty Page", spread(*ctx)...)
-				if Test == nil {
+				if w.Test == nil {
 					newCtx := newContext(urlData{Url: response.Request.URL, PageType: ctx.PageType}, w)
 					response.Ctx.Put("ctx", &newCtx)
 					RetryRequest(response.Request, nil, w)
@@ -215,7 +260,7 @@ func (w *WebsiteEngine) processUrl() (err error) {
 	go func() {
 		for true {
 			k := <-w.UrlData
-			if Test != nil && Test.Done {
+			if w.Test != nil && w.Test.Done {
 				return
 			}
 			if k.Url == nil {
@@ -229,6 +274,9 @@ func (w *WebsiteEngine) processUrl() (err error) {
 			if err != nil {
 				continue
 			}
+			if w.Test != nil && w.Test.Done {
+				return
+			}
 			w.WG.Add(1)
 			w.bar.ChangeMax64(w.bar.GetMax64() + 1)
 		}
@@ -239,12 +287,17 @@ func (w *WebsiteEngine) processUrl() (err error) {
 	}
 
 	if w.UrlProcessor.launchHandler != nil {
+		w.WG.Add(1)
+
 		go func() {
 			w.UrlProcessor.launchHandler()
+			defer func() {
+				if r := recover(); r != nil {
+
+				}
+			}()
 			w.WG.Done()
 		}()
-
-		w.WG.Add(1)
 	}
 
 	if w.UrlProcessor.robotTxt != "" {
@@ -273,10 +326,10 @@ func (w *WebsiteEngine) processUrl() (err error) {
 
 	time.Sleep(5 * time.Second)
 	w.WG.Wait()
-	if Test != nil && !Test.Done {
-		Test.WG.Done()
-		Test.Done = true
-		Sugar.Infof("Test finished, all urls processed")
+	if w.Test != nil && !w.Test.Done {
+		w.Test.WG.Done()
+		w.Test.Done = true
+		Sugar.Infof("w.Test finished, all urls processed")
 	}
 	return
 }
@@ -301,7 +354,7 @@ func newContext(k urlData, w *WebsiteEngine) Context {
 }
 
 func StartEngine(w *WebsiteEngine, test bool) {
-	if !test && Test != nil {
+	if !test && w.Test != nil {
 		return
 	}
 	if w.IsRunning {

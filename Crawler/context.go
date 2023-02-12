@@ -2,6 +2,7 @@ package Crawler
 
 import (
 	"encoding/json"
+	"megaCrawler/Crawler/Tester"
 	"strings"
 	"time"
 )
@@ -178,7 +179,7 @@ func (ctx *Context) CreateSubContext() (k *Context) {
 	return k
 }
 
-func (ctx *Context) process() (success bool) {
+func (ctx *Context) process(Test *Tester.Tester) (success bool) {
 	var err error
 	var marshal []byte
 	now := time.Now()
@@ -192,7 +193,7 @@ func (ctx *Context) process() (success bool) {
 	}
 
 	for _, context := range ctx.SubContext {
-		go context.process()
+		go context.process(Test)
 	}
 
 	switch ctx.PageType {

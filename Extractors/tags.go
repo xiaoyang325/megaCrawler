@@ -6,7 +6,7 @@ import (
 )
 
 func getTags(dom *colly.HTMLElement) (tags []string) {
-	tags = append(tags, dom.ChildTexts("a[rel=\"tag\"]")...)
+	tags = append(tags, dom.ChildTexts("a[rel=\"tag\"], li[itemprop=\"keywords\"] > a")...)
 	if len(tags) != 0 {
 		tags = append(tags, dom.ChildTexts("a[href*='/tag/'], a[href*='/tags/'], a[href*='/topic/'], a[href*='?keyword='], .entry-category > a")...)
 	}

@@ -12,6 +12,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 )
 
 func TestTester(t *testing.T) {
@@ -49,7 +50,12 @@ func TestTester(t *testing.T) {
 	for _, target := range targets {
 		_, _ = fmt.Fprintf(buf, "Testing %s:\n\n", target)
 
-		Crawler.Test = &Tester.Tester{
+		c, ok := Crawler.WebMap[target]
+		if !ok {
+			_, _ = fmt.Fprintf(buf, "No such target %s.\n\n", target)
+			continue
+		}
+		c.Test = &Tester.Tester{
 			WG: &sync.WaitGroup{},
 			News: Tester.Status{
 				Name: "News",
@@ -64,24 +70,25 @@ func TestTester(t *testing.T) {
 				Name: "Report",
 			},
 		}
-		Crawler.Test.WG.Add(1)
-
-		c, ok := Crawler.WebMap[target]
-		if !ok {
-			_, _ = fmt.Fprintf(buf, "No such target %s.\n\n", target)
-			continue
-		}
+		c.Test.WG.Add(1)
 
 		go Crawler.StartEngine(c, true)
-		Crawler.Test.WG.Wait()
+		go func() {
+			time.Sleep(2 * time.Minute)
+			if !c.Test.Done {
+				c.Test.WG.Done()
+				c.Test.Done = true
+			}
+		}()
+		c.Test.WG.Wait()
 
 		table := tablewriter.NewWriter(buf)
 		table.SetHeader([]string{"Field", "Total", "Passed", "Coverage"})
 
-		Crawler.Test.News.FillTable(table)
-		Crawler.Test.Index.FillTable(table)
-		Crawler.Test.Expert.FillTable(table)
-		Crawler.Test.Report.FillTable(table)
+		c.Test.News.FillTable(table)
+		c.Test.Index.FillTable(table)
+		c.Test.Expert.FillTable(table)
+		c.Test.Report.FillTable(table)
 
 		table.Render()
 
