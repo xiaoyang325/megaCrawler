@@ -1,4 +1,4 @@
-package dev
+package production
 
 import (
 	"github.com/PuerkitoBio/goquery"
