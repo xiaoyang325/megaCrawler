@@ -11,7 +11,6 @@ import (
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"log"
-	"megaCrawler/Crawler/Tester"
 	"megaCrawler/Crawler/commands"
 	"megaCrawler/Crawler/config"
 	"net/http"
@@ -27,7 +26,6 @@ var Debug bool
 var Threads int
 var Kafka bool
 var Proxy *url.URL
-var Test *Tester.Tester
 var Shard struct {
 	Total  int
 	Number int

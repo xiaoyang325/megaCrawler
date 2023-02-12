@@ -25,7 +25,7 @@ func init() {
 	engine.OnLaunch(func() {
 		baseUrl := "https://www.civicus.org/index.php?option=com_minitekwall&task=masonry.getContent&widget_id=11&page="
 		for i := 0; true; i++ {
-			if Crawler.Test != nil && Crawler.Test.Done {
+			if engine.Test != nil && engine.Test.Done {
 				return
 			}
 
@@ -36,6 +36,9 @@ func init() {
 			}
 
 			dom, err := goquery.NewDocumentFromReader(resp.Body)
+			if err != nil {
+				continue
+			}
 			urls := dom.Find(".mnwall-title > a")
 			if len(urls.Nodes) == 0 {
 				break
