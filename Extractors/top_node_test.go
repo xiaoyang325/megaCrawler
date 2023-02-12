@@ -8,7 +8,7 @@ import (
 )
 
 func TestTopNodeExtractor(t *testing.T) {
-	link := "https://www.valuewalk.com/qualivian-investment-partners-3q22-commentary-floor-decor/"
+	link := "https://www.osce.org/court-of-conciliation-and-arbitration/531383"
 
 	resp, err := http.Get(link)
 
@@ -30,7 +30,8 @@ func TestTopNodeExtractor(t *testing.T) {
 		t.Error("node is nil")
 		return
 	}
-	rg := regexp.MustCompile(`(\r\n?|\n){2,}`)
+	rg := regexp.MustCompile(`(\r\n?|\n| ){2,}`)
 	k := nodeText(node)
-	println(rg.ReplaceAllString(k, "$1"))
+	k = rg.ReplaceAllString(k, "$1")
+	t.Log(k)
 }

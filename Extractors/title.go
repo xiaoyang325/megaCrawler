@@ -106,8 +106,14 @@ func getTitle(dom *colly.HTMLElement) (title string) {
 func Titles(ctx *Crawler.Context, dom *colly.HTMLElement) {
 	title := getTitle(dom)
 	if ctx.PageType == Crawler.Expert {
+		if ctx.Name != "" {
+			return
+		}
 		ctx.Name = title
 	} else {
+		if ctx.Title != "" {
+			return
+		}
 		ctx.Title = title
 	}
 }
