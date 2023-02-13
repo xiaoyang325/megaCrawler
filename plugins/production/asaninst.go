@@ -91,7 +91,7 @@ func init() {
 		ctx.Name = strings.TrimSpace(element.ChildText("h3"))
 		// 去除其他信息以得到 Expert 的 Title
 		titleRaw := strings.Replace(element.Text, ctx.Name, "", 1)
-		titleRaw = strings.Replace(element.Text, element.ChildText("p"), "", 1)
+		titleRaw = strings.Replace(titleRaw, element.ChildText("p"), "", 1)
 		ctx.Title = strings.TrimSpace(titleRaw)
 	})
 }

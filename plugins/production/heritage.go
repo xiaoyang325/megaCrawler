@@ -63,7 +63,7 @@ func init() {
 
 	w.OnHTML(".expert-bio-card__photo", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		style := element.Attr("style")
-		reg, _ := regexp.Compile("https?://(www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z\\d()]{1,6}\\b([-a-zA-Z0-9@:%_+.~#?&/=]*)")
+		reg, _ := regexp.Compile(`https?://(www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z\\d()]{1,6}\\b([-a-zA-Z0-9@:%_+.~#?&/=]*)`)
 		ctx.Image = []string{reg.FindString(style)}
 	})
 
@@ -72,7 +72,7 @@ func init() {
 	})
 
 	w.OnHTML(".article-general-info", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		reg, _ := regexp.Compile("(\\w+ \\d+, \\d+)")
+		reg, _ := regexp.Compile(`(\w+ \d+, \d+)`)
 		match := reg.FindString(element.Text)
 		times, err := time.Parse("Jan 2, 2006", match)
 		if err != nil {

@@ -50,7 +50,11 @@ func StartAll() {
 		if serviceHash%uint32(Shard.Total) == uint32(Shard.Number) {
 			go func() {
 				timeMutex.Lock()
-				engine.Scheduler.Every(168).Hour().StartAt(nextTime).Do(StartEngine, engine, false)
+				_, err := engine.Scheduler.Every(168).Hour().StartAt(nextTime).Do(StartEngine, engine, false)
+				if err != nil {
+					Sugar.Error(err)
+					return
+				}
 				nextTime = nextTime.Add(1 * time.Minute)
 				engine.Scheduler.StartAsync()
 				timeMutex.Unlock()

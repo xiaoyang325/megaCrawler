@@ -106,7 +106,7 @@ func CalculateBestNode(dom *goquery.Selection, language string) *goquery.Selecti
 		if nodeCount > 15 {
 			if float64(nodeCount-i) <= bottomNegativeScore {
 				booster := bottomNegativeScore - float64(nodeCount-i)
-				boostScore := -math.Pow(booster, -2)
+				boostScore = -math.Pow(booster, -2)
 				negScore := math.Abs(boostScore) + negativeScore
 				if negScore > 40 {
 					boostScore = 5.0

@@ -33,14 +33,14 @@ func init() {
 	})
 
 	w.OnHTML(".like-count", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		reg, _ := regexp.Compile("\\d+")
+		reg, _ := regexp.Compile(`\d+`)
 		if val, err := strconv.Atoi(reg.FindString(element.Text)); err != nil {
 			ctx.LikeCount = val
 		}
 	})
 
 	w.OnHTML(".comment-count", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		reg, _ := regexp.Compile("\\d+")
+		reg, _ := regexp.Compile(`\d+`)
 		if val, err := strconv.Atoi(reg.FindString(element.Text)); err != nil {
 			ctx.LikeCount = val
 		}

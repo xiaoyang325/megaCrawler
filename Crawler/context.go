@@ -245,6 +245,10 @@ func (ctx *Context) process(Test *Tester.Tester) (success bool) {
 			Test.News.AddFilled(1)
 		}
 		marshal, err = json.Marshal(n)
+		if err != nil {
+			Sugar.Error(err)
+			return
+		}
 		if !Kafka {
 			Sugar.Debugw("Got News Type", spread(n)...)
 		} else {
@@ -291,6 +295,10 @@ func (ctx *Context) process(Test *Tester.Tester) (success bool) {
 			Test.Report.AddFilled(1)
 		}
 		marshal, err = json.Marshal(n)
+		if err != nil {
+			Sugar.Error(err)
+			return
+		}
 		if !Kafka {
 			Sugar.Debugw("Got Report type", spread(n)...)
 		} else {
@@ -343,15 +351,16 @@ func (ctx *Context) process(Test *Tester.Tester) (success bool) {
 			Test.Expert.AddFilled(1)
 		}
 		marshal, err = json.Marshal(n)
+		if err != nil {
+			Sugar.Error(err)
+			return
+		}
 		if !Kafka {
 			Sugar.Debugw("Got Expert type", spread(n)...)
 		} else {
 			expertChannel <- string(marshal)
 		}
 		return
-	}
-	if err != nil {
-		Sugar.Error(err.Error())
 	}
 	return false
 }

@@ -14,7 +14,7 @@ func init() {
 		thisUrl, _ := url.Parse(currentUrl)
 		path := thisUrl.Path
 
-		reg := regexp.MustCompile("page/(\\d+)")
+		reg := regexp.MustCompile(`page/(\d+)`)
 		rawStr := reg.FindStringSubmatch(path)
 		num, _ := strconv.Atoi(rawStr[1])
 		num++

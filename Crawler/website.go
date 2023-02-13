@@ -26,7 +26,6 @@ type WebsiteEngine struct {
 	IsRunning    bool
 	Disabled     bool
 	bar          *progressbar.ProgressBar
-	doneLaunch   bool
 	Scheduler    *gocron.Scheduler
 	LastUpdate   time.Time
 	UrlProcessor CollectorConstructor
@@ -164,7 +163,7 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 func RetryRequest(r *colly.Request, err error, w *WebsiteEngine) {
 	defer func() {
 		if r := recover(); r != nil {
-
+			Sugar.Debug(r)
 		}
 	}()
 	if w.Test != nil && w.Test.Done {
@@ -189,7 +188,7 @@ func RetryRequest(r *colly.Request, err error, w *WebsiteEngine) {
 func (w *WebsiteEngine) processUrl() (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-
+			Sugar.Debug(r)
 		}
 	}()
 
@@ -203,14 +202,14 @@ func (w *WebsiteEngine) processUrl() (err error) {
 		go func() {
 			defer func() {
 				if r := recover(); r != nil {
-
+					Sugar.Debug(r)
 				}
 			}()
 
-			for true {
-				time.Sleep(10)
+			for {
+				time.Sleep(10 * time.Microsecond)
 				if w.Test.Done {
-					for true {
+					for {
 						w.WG.Done()
 					}
 				}
@@ -221,7 +220,7 @@ func (w *WebsiteEngine) processUrl() (err error) {
 	c.OnScraped(func(response *colly.Response) {
 		defer func() {
 			if r := recover(); r != nil {
-
+				Sugar.Debug(r)
 			}
 		}()
 
@@ -239,7 +238,7 @@ func (w *WebsiteEngine) processUrl() (err error) {
 		go func() {
 			defer func() {
 				if r := recover(); r != nil {
-
+					Sugar.Debug(r)
 				}
 			}()
 
@@ -258,7 +257,7 @@ func (w *WebsiteEngine) processUrl() (err error) {
 	})
 
 	go func() {
-		for true {
+		for {
 			k := <-w.UrlData
 			if w.Test != nil && w.Test.Done {
 				return
@@ -293,7 +292,7 @@ func (w *WebsiteEngine) processUrl() (err error) {
 			w.UrlProcessor.launchHandler()
 			defer func() {
 				if r := recover(); r != nil {
-
+					Sugar.Debug(r)
 				}
 			}()
 			w.WG.Done()

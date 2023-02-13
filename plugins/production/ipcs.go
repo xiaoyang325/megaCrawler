@@ -84,21 +84,21 @@ func init() {
 	//reort .author .publish time . catagory
 	w.OnHTML("#main_wrapper > section > div > div.col-md-9 > div > span", func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		texts := strings.Split(element.Text, "·")
-		author_name := texts[0]
-		strings.Replace(author_name, "&nbsp;", "", 100)
-		strings.Replace(author_name, "&amp;", "", 100)
-		author_name = strings.TrimSpace(author_name)
-		ctx.Authors = append(ctx.Authors, author_name)
+		authorName := texts[0]
+		authorName = strings.Replace(authorName, "&nbsp;", "", 100)
+		authorName = strings.Replace(authorName, "&amp;", "", 100)
+		authorName = strings.TrimSpace(authorName)
+		ctx.Authors = append(ctx.Authors, authorName)
 
-		publish_time := texts[1]
-		strings.Replace(publish_time, "&nbsp;", "", 100)
-		publish_time = strings.TrimSpace(publish_time)
-		ctx.PublicationTime = publish_time
+		publishTime := texts[1]
+		publishTime = strings.Replace(publishTime, "&nbsp;", "", 100)
+		publishTime = strings.TrimSpace(publishTime)
+		ctx.PublicationTime = publishTime
 
-		category_text := texts[2]
-		strings.Replace(category_text, "&nbsp;", "", 100)
-		category_text = strings.TrimSpace(category_text)
-		ctx.CategoryText = category_text
+		categoryText := texts[2]
+		categoryText = strings.Replace(categoryText, "&nbsp;", "", 100)
+		categoryText = strings.TrimSpace(categoryText)
+		ctx.CategoryText = categoryText
 	})
 	//reort.content
 	w.OnHTML("#main_wrapper > section > div > div.col-md-9", func(element *colly.HTMLElement, ctx *Crawler.Context) {

@@ -249,7 +249,7 @@ func init() {
 	w.SetStartingUrls([]string{"https://www.rusi.org/sitemap/sitemap-index.xml"})
 
 	w.OnXML("//loc", func(element *colly.XMLElement, ctx *Crawler.Context) {
-		reg := regexp.MustCompile("rusi.org/([\\w-]+)/")
+		reg := regexp.MustCompile(`rusi.org/([\w-]+)/`)
 		if matches := reg.FindStringSubmatch(element.Text); len(matches) == 2 {
 			pageType, ok := PageTypeMap[matches[1]]
 			if !ok {

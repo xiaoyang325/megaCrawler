@@ -2,15 +2,11 @@ package Crawler
 
 import (
 	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
 	"net/url"
-	"os"
 	"reflect"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type errorResp struct {
@@ -39,13 +35,6 @@ func Contain[T comparable](slice []T, check T) bool {
 	return false
 }
 
-func mapToKeySlice[T any](m map[string]T) (slice []string) {
-	for s := range m {
-		slice = append(slice, s)
-	}
-	return
-}
-
 func successResponse(msg string) (b []byte, err error) {
 	errorJson := errorResp{
 		StatusCode: 200,
@@ -72,41 +61,8 @@ func errorResponse(w http.ResponseWriter, statusCode int, msg string) (err error
 	return nil
 }
 
-func shortDur(d time.Duration) string {
-	s := d.String()
-	if strings.HasSuffix(s, "m0s") {
-		s = s[:len(s)-2]
-	}
-	if strings.HasSuffix(s, "h0m") {
-		s = s[:len(s)-2]
-	}
-	return s
-}
-
 func StandardizeSpaces(s string) string {
 	return strings.Join(strings.Fields(s), " ")
-}
-
-func downloadFile(filepath string, url string) (err error) {
-	out, err := os.Create(filepath)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("bad status: %s", resp.Status)
-	}
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func GetNextIndexURL(currentUrl string, currentPageNum string, paramName string) string {

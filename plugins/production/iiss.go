@@ -49,7 +49,7 @@ type authorComponent struct {
 	} `json:"Items"`
 }
 
-var reactRegex = regexp.MustCompile("componentRenderQueue.push\\(function\\(\\) \\{ReactDOM.render\\(React.createElement\\(Components.(\\w+), (\\{.+})\\), document.getElementById")
+var reactRegex = regexp.MustCompile(`componentRenderQueue.push\(function\(\) \{ReactDOM.render\(React.createElement\(Components.(\w+), (\{.+})\), document.getElementById`)
 
 func getReactComponentData(dom *colly.HTMLElement) (component string, data string) {
 	match := reactRegex.FindStringSubmatch(dom.Text)

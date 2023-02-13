@@ -14,7 +14,7 @@ func init() {
 	w.SetStartingUrls([]string{"https://www.atlanticcouncil.org/sitemap_index.xml"})
 
 	w.OnXML("//loc", func(element *colly.XMLElement, ctx *Crawler.Context) {
-		reg := regexp.MustCompile("([a-zA-Z_-]+)\\d*.xml")
+		reg := regexp.MustCompile(`([a-zA-Z_-]+)\d*.xml`)
 		switch reg.FindStringSubmatch(ctx.Url)[1] {
 		case "sitemap_index":
 			w.Visit(element.Text, Crawler.Index)

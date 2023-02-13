@@ -50,7 +50,7 @@ func init() {
 	// 获取 Authors
 	w.OnHTML(`div.pb-4 > .toUpperCase:nth-child(2)`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
 		name := strings.Replace(element.Text, "by", "", 1)
-		name = strings.Replace(element.Text, "|", "", 1)
+		name = strings.Replace(name, "|", "", 1)
 		ctx.Authors = append(ctx.Authors, strings.TrimSpace(name))
 	})
 

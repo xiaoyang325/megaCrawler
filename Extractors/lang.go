@@ -22,7 +22,8 @@ func getMetaLang(dom *colly.HTMLElement) string {
 				break
 			}
 		}
-	} else {
+	}
+	if attr != "" {
 		value := attr[0:2]
 		if ReLang.MatchString(value) {
 			return value

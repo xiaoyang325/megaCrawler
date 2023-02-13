@@ -47,9 +47,7 @@ func init() {
 	})
 
 	w.OnHTML(".blog-sec", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		for _, imageLink := range element.ChildAttrs("img", "src") {
-			ctx.Image = append(ctx.Image, imageLink)
-		}
+		ctx.Image = append(ctx.Image, element.ChildAttrs("img", "src")...)
 	})
 
 	w.OnHTML("div.blog-right-text > span", func(element *colly.HTMLElement, ctx *Crawler.Context) {

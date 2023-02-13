@@ -18,5 +18,4 @@ func Get(id string) {
 	if website.IsRunning {
 		println(website.Bar)
 	}
-	return
 }

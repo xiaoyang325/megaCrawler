@@ -6,8 +6,8 @@ import (
 	"regexp"
 )
 
-var emailRegex = regexp.MustCompile("Email: ([.-_@\\w]+)")
-var telRegex = regexp.MustCompile("Tel: ([.\\w]+)")
+var emailRegex = regexp.MustCompile(`Email: ([.-_@\w]+)`)
+var telRegex = regexp.MustCompile(`Tel: ([.\w]+)`)
 
 func init() {
 	w := Crawler.Register("arinus", "亚洲研究所", "https://ari.nus.edu.sg/")

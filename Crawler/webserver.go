@@ -39,30 +39,48 @@ func startHandler(w http.ResponseWriter, r *http.Request) {
 		id, ok := mux.Vars(r)["id"]
 		if !ok {
 			err = errorResponse(w, 400, "Bad Request : Invalid argument, missing id")
+			if err != nil {
+				Sugar.Error(err)
+			}
 			return
 		}
 		if website, ok := WebMap[id]; ok {
 			if website.IsRunning {
 				err = errorResponse(w, 400, "Bad Request : Crawler is already running")
+				if err != nil {
+					Sugar.Error(err)
+				}
 				return
 			}
 			website.Scheduler.RunAll()
 			b, err = successResponse("Crawler should start soon")
 		} else {
 			err = errorResponse(w, 400, "Bad Request : Invalid argument, id does not exist")
+			if err != nil {
+				Sugar.Error(err)
+			}
 			return
 		}
 	default:
-		_ = errorResponse(w, 405, "Method not allowed")
+		err = errorResponse(w, 405, "Method not allowed")
+		if err != nil {
+			Sugar.Error(err)
+		}
 		return
 	}
 	if err != nil {
 		Sugar.Error("Failed to serialize response:" + err.Error())
-		_ = errorResponse(w, 500, "Failed to serialize response:"+err.Error())
+		err = errorResponse(w, 500, "Failed to serialize response:"+err.Error())
+		if err != nil {
+			Sugar.Error(err)
+		}
 		return
 	}
 	w.Header().Add("Content-Type", "application/json")
-	_, _ = w.Write(b)
+	_, err = w.Write(b)
+	if err != nil {
+		Sugar.Error(err)
+	}
 }
 
 func websiteHandler(w http.ResponseWriter, r *http.Request) {
@@ -74,26 +92,44 @@ func websiteHandler(w http.ResponseWriter, r *http.Request) {
 		id, ok := mux.Vars(r)["id"]
 		if !ok {
 			err = errorResponse(w, 400, "Bad Request : Invalid argument, missing id")
+			if err != nil {
+				Sugar.Error(err)
+			}
 			return
 		}
 		if website, ok := WebMap[id]; ok {
 			b, err = website.toJson()
+			if err != nil {
+				Sugar.Error(err)
+			}
 		} else {
 			err = errorResponse(w, 400, "Bad Request : Invalid argument, id does not exist")
+			if err != nil {
+				Sugar.Error(err)
+			}
 			return
 		}
 	case "POST":
-		_ = errorResponse(w, 405, "Method not allowed")
+		err = errorResponse(w, 405, "Method not allowed")
+		if err != nil {
+			Sugar.Error(err)
+		}
 		return
 	default:
-		_ = errorResponse(w, 405, "Method not allowed")
+		err = errorResponse(w, 405, "Method not allowed")
+		if err != nil {
+			Sugar.Error(err)
+		}
 		return
 	}
 	w.Header().Add("Content-Type", "application/json")
-	_, _ = w.Write(b)
+	_, err = w.Write(b)
 	if err != nil {
 		Sugar.Error("Failed to serialize response:" + err.Error())
-		_ = errorResponse(w, 500, "Internal Error : Failed to serialize response:"+err.Error())
+		err = errorResponse(w, 500, "Internal Error : Failed to serialize response:"+err.Error())
+		if err != nil {
+			Sugar.Error(err)
+		}
 		return
 	}
 	w.Header().Add("Content-Type", "application/json")

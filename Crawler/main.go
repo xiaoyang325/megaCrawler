@@ -61,13 +61,10 @@ func (c *Manager) run() error {
 
 	ticker := time.NewTicker(2 * time.Second)
 	StartAll()
-	for {
-		select {
-		case <-c.exit:
-			ticker.Stop()
-			return nil
-		}
+	for range c.exit {
+		ticker.Stop()
 	}
+	return nil
 }
 
 func (c *Manager) Stop(_ service.Service) error {
@@ -284,4 +281,7 @@ func Start() {
 	}()
 
 	err = s.Run()
+	if err != nil {
+		Sugar.Panic(err)
+	}
 }

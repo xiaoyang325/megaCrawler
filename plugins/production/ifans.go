@@ -12,7 +12,7 @@ import (
 
 // 这个函数用于从 onclick 函数调用中获取信息，拼接成 Report 的 URL，并返回
 func getURLFromFunctionCall(functionCall string, channelType string) string {
-	reg := regexp.MustCompile("fnCmdView\\('(\\d+)','(\\w+)'\\)")
+	reg := regexp.MustCompile(`fnCmdView\('(\d+)','(\w+)'\)`)
 	paramList := reg.FindStringSubmatch(functionCall)
 
 	for index, value := range paramList {

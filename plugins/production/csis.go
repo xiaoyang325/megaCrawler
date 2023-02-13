@@ -79,8 +79,8 @@ func init() {
 
 	// 正则匹配邮箱和电话号码
 	w.OnHTML("div.pane.pane--csis-contributor-contact-expert.pane--details > div.pane__content", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		emailRegex, _ := regexp.Compile("Email: ([.@\\w]+)")
-		telRegex, _ := regexp.Compile("Tel: ([.\\w]+)")
+		emailRegex, _ := regexp.Compile(`Email: ([.@\w]+)`)
+		telRegex, _ := regexp.Compile(`Tel: ([.\w]+)`)
 		emailMatch := emailRegex.FindStringSubmatch(element.Text)
 		telMatch := telRegex.FindStringSubmatch(element.Text)
 		if len(emailMatch) == 2 {

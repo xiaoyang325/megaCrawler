@@ -19,14 +19,3 @@ func GetMetaContent(dom *colly.HTMLElement, metaName string) string {
 	meta := dom.ChildAttr(metaName, "content")
 	return strings.TrimSpace(meta)
 }
-
-func ignoreError[T any](s T, err error) T {
-	return s
-}
-
-func unwrapError[T any](s T, err error) T {
-	if err != nil {
-		panic(err)
-	}
-	return s
-}

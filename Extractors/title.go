@@ -14,12 +14,12 @@ func splitTitle(title string, splitter string, hint string) string {
 	titlePieces := strings.Split(title, splitter)
 
 	if hint != "" {
-		filterRegex, _ := regexp.Compile("[^a-zA-Z\\d ]")
+		filterRegex, _ := regexp.Compile(`[^a-zA-Z\d ]`)
 		hint = strings.ToLower(filterRegex.ReplaceAllString(hint, ""))
 	}
 
 	for i, piece := range titlePieces {
-		filterRegex, _ := regexp.Compile("[^a-zA-Z\\d ]")
+		filterRegex, _ := regexp.Compile(`[^a-zA-Z\d ]`)
 		current := strings.TrimSpace(piece)
 		if hint != "" && strings.Contains(hint, strings.ToLower(filterRegex.ReplaceAllString(current, ""))) {
 			largeTextIndex = i

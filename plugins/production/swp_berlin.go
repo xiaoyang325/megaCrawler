@@ -64,7 +64,7 @@ func init() {
 
 	// 获取 PublicationTime //
 	w.OnHTML(`.news-header > div > time, .publication-page > div > span.small-text`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		reg := regexp.MustCompile("[\\d./]+")
+		reg := regexp.MustCompile(`[\d./]+`)
 		ctx.PublicationTime = reg.FindString(element.Text)
 	})
 

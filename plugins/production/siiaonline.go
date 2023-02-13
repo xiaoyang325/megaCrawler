@@ -21,7 +21,7 @@ func init() {
 		subCtx.Name = element.ChildText(".portfolio_title")
 		subCtx.Title = element.ChildText("span.project_category")
 
-		match := regexp.MustCompile("paoc-popup-cust-(\\d+)").FindStringSubmatch(
+		match := regexp.MustCompile(`paoc-popup-cust-(\d+)`).FindStringSubmatch(
 			element.Attr("class"),
 		)
 		if len(match) > 1 {

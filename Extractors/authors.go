@@ -9,9 +9,9 @@ import (
 	"strings"
 )
 
-var digits, _ = regexp.Compile("\\d")
-var byStatement, _ = regexp.Compile("[bB][yY][:\\s]|[fF]rom[:\\s]")
-var nameTokens, _ = regexp.Compile("[^\\w'\\-.]")
+var digits, _ = regexp.Compile(`\d`)
+var byStatement, _ = regexp.Compile(`[bB][yY][:\s]|[fF]rom[:\s]`)
+var nameTokens, _ = regexp.Compile(`[^\w'\-.]`)
 
 func containsDigits(d string) bool {
 	return digits.MatchString(d)

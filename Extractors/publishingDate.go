@@ -26,7 +26,7 @@ func MustParseTime(format string, text string) time.Time {
 }
 
 func getPublishingDate(dom *colly.HTMLElement) string {
-	var strictDateRegex, err = regexp.Compile("\\d+/\\d+/\\d+")
+	var strictDateRegex, err = regexp.Compile(`\d+/\d+/\d+`)
 	if err != nil {
 		Crawler.Sugar.Panic("Compile regex failed", err)
 		return ""

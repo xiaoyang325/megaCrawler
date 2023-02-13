@@ -7,10 +7,6 @@ import (
 
 type HTMLCallback func(element *colly.HTMLElement, ctx *Context)
 type XMLCallback func(element *colly.XMLElement, ctx *Context)
-type HTMLPair struct {
-	callback HTMLCallback
-	selector string
-}
 type CollyHTMLPair struct {
 	callback colly.HTMLCallback
 	selector string
