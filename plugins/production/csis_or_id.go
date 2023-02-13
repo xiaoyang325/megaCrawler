@@ -1,15 +1,16 @@
 package production
 
 import (
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
+	"megaCrawler/crawlers"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {
-	w := Crawler.Register("csis_or_id", "战略与国际研究中心", "https://csis.or.id/")
+	w := crawlers.Register("csis_or_id", "战略与国际研究中心", "https://csis.or.id/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://csis.or.id/projects/",
 		"https://csis.or.id/publications/books/",
 		"https://csis.or.id/publications/commentaries/",
@@ -20,32 +21,32 @@ func init() {
 	})
 
 	// 访问 Report 从 Index
-	w.OnHTML(`div.post-image > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Report)
+	w.OnHTML(`div.post-image > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Report)
 	})
 
 	// 获取 Title
-	w.OnHTML(`[class="page-title text-black text-left"] > h2`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`[class="page-title text-black text-left"] > h2`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 CategoryText
-	w.OnHTML(`[class="page-title text-black text-left"] > h5`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`[class="page-title text-black text-left"] > h5`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.CategoryText = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 Authors
-	w.OnHTML(`[class="page-title text-black text-left"] > .row > div > a > h4`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`[class="page-title text-black text-left"] > .row > div > a > h4`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
 	})
 
 	// 获取 Content
-	w.OnHTML(`.post-item .text-justify`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`.post-item .text-justify`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 File
-	w.OnHTML(`.btn-csis > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`.btn-csis > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.Attr("href"), ".pdf") {
 			ctx.File = append(ctx.File, element.Attr("href"))
 		}

@@ -1,35 +1,36 @@
 package production
 
 import (
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
-	"megaCrawler/Extractors"
+	"megaCrawler/crawlers"
+	"megaCrawler/extractors"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {
-	w := Crawler.Register("investigatemidwest", "中西部调查报道中心", "https://www.investigatemidwest.org/")
+	w := crawlers.Register("investigatemidwest", "中西部调查报道中心", "https://www.investigatemidwest.org/")
 
-	w.SetStartingUrls([]string{"https://investigatemidwest.org/post.xml"})
+	w.SetStartingURLs([]string{"https://investigatemidwest.org/post.xml"})
 
-	w.OnXML("//loc", func(element *colly.XMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Text, Crawler.News)
+	w.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Text, crawlers.News)
 	})
 
-	w.OnHTML("html", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		Extractors.Titles(ctx, element)
-		Extractors.PublishingDate(ctx, element)
+	w.OnHTML("html", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		extractors.Titles(ctx, element)
+		extractors.PublishingDate(ctx, element)
 	})
 
-	w.OnHTML(".subtitle", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".subtitle", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.SubTitle = element.Text
 	})
 
-	w.OnHTML(".entry-content", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		ctx.Content = Crawler.HTML2Text(strings.TrimSpace(element.Text))
+	w.OnHTML(".entry-content", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		ctx.Content = extractors.TrimText(element.DOM)
 	})
 
-	w.OnHTML(".post-category-link", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".post-category-link", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.CategoryText = strings.TrimSpace(element.Text)
 	})
 }

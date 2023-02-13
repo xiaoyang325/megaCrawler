@@ -1,18 +1,19 @@
 package errors
 
 import (
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
-	"megaCrawler/Extractors"
+	"megaCrawler/crawlers"
+	"megaCrawler/extractors"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {
-	engine := Crawler.Register("1052", "环境管理与评估研究所", "https://www.iema.net")
+	engine := crawlers.Register("1052", "环境管理与评估研究所", "https://www.iema.net")
 
-	engine.SetStartingUrls([]string{"https://www.iema.net/sitemap.xml"})
+	engine.SetStartingURLs([]string{"https://www.iema.net/sitemap.xml"})
 
-	extractorConfig := Extractors.Config{
+	extractorConfig := extractors.Config{
 		Author:       true,
 		Image:        true,
 		Language:     true,
@@ -25,9 +26,9 @@ func init() {
 
 	extractorConfig.Apply(engine)
 
-	engine.OnXML("//loc", func(element *colly.XMLElement, ctx *Crawler.Context) {
+	engine.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.Text, "sitemap") {
-			engine.Visit(element.Text, Crawler.Index)
+			engine.Visit(element.Text, crawlers.Index)
 			println("Index: " + element.Text)
 		}
 	})

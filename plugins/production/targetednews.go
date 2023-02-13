@@ -1,14 +1,15 @@
 package production
 
 import (
+	"megaCrawler/crawlers"
+
 	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
 )
 
 func init() {
-	w := Crawler.Register("targetednews", "Targeted News Service", "https://targetednews.com/")
+	w := crawlers.Register("targetednews", "Targeted News Service", "https://targetednews.com/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://targetednews.com/daily_news.php?page=6",
 		"https://targetednews.com/daily_news.php?page=10",
 		"https://targetednews.com/daily_news.php?page=7",
@@ -36,18 +37,18 @@ func init() {
 	})
 
 	// 访问 News 从 Index 通过 SubContext
-	w.OnHTML(`#content > div[id]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#content > div[id]`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		subContext := ctx.CreateSubContext()
-		subContext.PageType = Crawler.News
+		subContext.PageType = crawlers.News
 
 		subContext.Title = element.ChildText(`div.subtitle`)
 		subContext.Content = element.ChildText(`span:nth-last-child(1)`)
 	})
 
 	// 访问 News 从 Index 通过 SubContext
-	w.OnHTML(`div.sample_box`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`div.sample_box`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		subContext := ctx.CreateSubContext()
-		subContext.PageType = Crawler.News
+		subContext.PageType = crawlers.News
 
 		subContext.Title = element.ChildText(`h1`)
 		subContext.PublicationTime = element.ChildText(`.dateline:nth-child(3)`)

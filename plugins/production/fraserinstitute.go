@@ -1,16 +1,17 @@
 package production
 
 import (
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
-	"megaCrawler/Extractors"
+	"megaCrawler/crawlers"
+	"megaCrawler/extractors"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {
-	w := Crawler.Register("fraserinstitute", "菲沙研究所", "https://www.fraserinstitute.org/")
+	w := crawlers.Register("fraserinstitute", "菲沙研究所", "https://www.fraserinstitute.org/")
 
-	w.SetStartingUrls([]string{"https://www.fraserinstitute.org/studies/aboriginal-policy",
+	w.SetStartingURLs([]string{"https://www.fraserinstitute.org/studies/aboriginal-policy",
 		"https://www.fraserinstitute.org/studies/pensions-retirement",
 		"https://www.fraserinstitute.org/studies/competitiveness",
 		"https://www.fraserinstitute.org/studies/covid",
@@ -44,75 +45,75 @@ func init() {
 	)
 
 	// 尝试寻找下载pdf的按钮，并如果存在则将页面类型转换为报告
-	w.OnHTML("a.button", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("a.button", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.Attr("href"), ".pdf") {
 			ctx.File = append(ctx.File, element.Attr("href"))
-			ctx.PageType = Crawler.Report
+			ctx.PageType = crawlers.Report
 		}
 	})
 
-	w.OnHTML("html", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		Extractors.Authors(ctx, element)
-		Extractors.PublishingDate(ctx, element)
+	w.OnHTML("html", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		extractors.Authors(ctx, element)
+		extractors.PublishingDate(ctx, element)
 	})
 
 	// 从翻页器获取链接并访问
-	w.OnHTML("div.archive-links>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	w.OnHTML("div.archive-links>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 
 	// 从翻页器获取链接并访问
-	w.OnHTML("div.text-center>ul>li>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	w.OnHTML("div.text-center>ul>li>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 
 	// 从index访问新闻
-	w.OnHTML("span.field-content>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.News)
+	w.OnHTML("span.field-content>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.News)
 	})
 
 	// report.title
-	w.OnHTML("h1.page-header", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("h1.page-header", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = element.Text
 	})
 
 	// report .content
-	w.OnHTML("div.tab-content", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.tab-content", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = element.Text
 	})
 
 	// report .content
-	w.OnHTML("div.field-name-body", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.field-name-body", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = element.Text
 	})
 
 	// report.author
-	w.OnHTML("div.node-author-fullname>a, div.field-content-author-authors>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.node-author-fullname>a, div.field-content-author-authors>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, element.Text)
 	})
 
-	//内含Expert
-	w.OnHTML("div.node-author-fullname>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Expert)
+	// 内含Expert
+	w.OnHTML("div.node-author-fullname>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Expert)
 	})
 
 	// expert.Name
-	w.OnHTML("div.main-author-content > h2 > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.main-author-content > h2 > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Name = element.Text
 	})
 
 	// expert.title
-	w.OnHTML(" div.main-author-content > h3 > div > div > div", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(" div.main-author-content > h3 > div > div > div", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = element.Text
 	})
 
 	// expert.description
-	w.OnHTML(" div.main-author-content > div > div > div > div", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(" div.main-author-content > div > div > div > div", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = element.Text
 	})
 
 	// expert.link
-	w.OnHTML(" div.field-name-field-email > div > div > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(" div.field-name-field-email > div > div > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Link = append(ctx.Link, element.Attr("href"))
 	})
 }

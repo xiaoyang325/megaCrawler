@@ -1,16 +1,17 @@
 package production
 
 import (
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
+	"megaCrawler/crawlers"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {
-	w := Crawler.Register("prri", "公共宗教研究所",
+	w := crawlers.Register("prri", "公共宗教研究所",
 		"https://www.prri.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.prri.org/topic/abortion-reproductive-health/",
 		"https://www.prri.org/topic/climate-change-science/",
 		"https://www.prri.org/topic/economy/",
@@ -24,56 +25,56 @@ func init() {
 	})
 
 	// 从子频道入口中访问Index
-	w.OnHTML("div.researchLandingSearch__button>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	w.OnHTML("div.researchLandingSearch__button>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 
 	// 从Index中访问文章。
-	w.OnHTML("a.searchResult__title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Report)
+	w.OnHTML("a.searchResult__title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Report)
 	})
 
 	// 从翻页器获取下一页Index并访问。
-	w.OnHTML(".pagination>a[class=\"next page-numbers\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	w.OnHTML(".pagination>a[class=\"next page-numbers\"]", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 
 	// 从文章中获取Title并添加到ctx。
-	w.OnHTML("div.researchArticleHeading__title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.researchArticleHeading__title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = strings.TrimSpace(element.Text)
 	})
 
 	// 从文章中获取Author并添加到ctx。
-	w.OnHTML("div.researchArticleHeading__author>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.researchArticleHeading__author>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		name := strings.Split(element.Text, ",")[0]
 		ctx.Authors = append(ctx.Authors, strings.TrimSpace(name))
 	})
 
 	// 从文章中获取Author并添加到ctx。
-	w.OnHTML(".researchArticleHeading__author", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".researchArticleHeading__author", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		name := strings.Split(element.Text, ",")[0]
 		ctx.Authors = append(ctx.Authors, strings.TrimSpace(name))
 	})
 
-	w.OnHTML(".researchArticleHeading__date", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".researchArticleHeading__date", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = element.Text
 	})
 
-	w.OnHTML(".press__date", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".press__date", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = element.Text
 	})
 
-	w.OnHTML("meta[property=\"og:description\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("meta[property=\"og:description\"]", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Description = element.Attr("content")
 	})
 
 	// 从文章中获取Tag并添加到ctx。（Report）（News）
-	w.OnHTML(".researchArticleHeading__singleTag", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".researchArticleHeading__singleTag", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Tags = append(ctx.Tags, strings.TrimSpace(element.Text))
 	})
 
 	// 从文章中获取Content并添加到ctx。
-	w.OnHTML(".has-content-area", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".has-content-area", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = strings.TrimSpace(element.Text)
 	})
 }

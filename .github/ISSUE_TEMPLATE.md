@@ -8,7 +8,7 @@ assignees: ""
 
 <!-- Do not leave any section empty. -->
 
-# 网站 Url
+# 网站 URL
 <!--这个网站的URL 和 ID-->
 
 # 复现步骤

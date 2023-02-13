@@ -1,17 +1,18 @@
 package production
 
 import (
-	"github.com/PuerkitoBio/goquery"
-	"megaCrawler/Crawler"
-	"megaCrawler/Extractors"
+	"megaCrawler/crawlers"
+	"megaCrawler/extractors"
 	"net/http"
 	"strconv"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 func init() {
-	engine := Crawler.Register("1078", "世界公民参与联盟", "https://www.civicus.org")
+	engine := crawlers.Register("1078", "世界公民参与联盟", "https://www.civicus.org")
 
-	extractorConfig := Extractors.Config{
+	extractorConfig := extractors.Config{
 		Author:       true,
 		Image:        true,
 		Language:     true,
@@ -23,14 +24,14 @@ func init() {
 	}
 
 	engine.OnLaunch(func() {
-		baseUrl := "https://www.civicus.org/index.php?option=com_minitekwall&task=masonry.getContent&widget_id=11&page="
+		baseURL := "https://www.civicus.org/index.php?option=com_minitekwall&task=masonry.getContent&widget_id=11&page="
 		for i := 0; true; i++ {
 			if engine.Test != nil && engine.Test.Done {
 				return
 			}
 
-			pageUrl := baseUrl + strconv.Itoa(i)
-			resp, err := http.Get(pageUrl)
+			pageURL := baseURL + strconv.Itoa(i)
+			resp, err := http.Get(pageURL)
 			if err != nil {
 				continue
 			}
@@ -44,12 +45,17 @@ func init() {
 				break
 			}
 			urls.Each(func(i int, selection *goquery.Selection) {
-				pageUrl, ok := selection.Attr("href")
+				pageURL, ok := selection.Attr("href")
 				if !ok {
 					return
 				}
-				engine.Visit(pageUrl, Crawler.News)
+				engine.Visit(pageURL, crawlers.News)
 			})
+
+			err = resp.Body.Close()
+			if err != nil {
+				continue
+			}
 		}
 	})
 

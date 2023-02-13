@@ -2,10 +2,12 @@ package production
 
 import (
 	"encoding/json"
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
+	"megaCrawler/crawlers"
+	"megaCrawler/extractors"
 	"regexp"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 type PageData struct {
@@ -15,7 +17,7 @@ type PageData struct {
 		Data struct {
 			Article struct {
 				Typename string `json:"__typename"`
-				Id       string `json:"id"`
+				ID       string `json:"id"`
 				Path     struct {
 					Alias string `json:"alias"`
 				} `json:"path"`
@@ -39,7 +41,7 @@ type PageData struct {
 				FieldPublicationIssue    interface{} `json:"field_publication_issue"`
 				FieldPublicationVolume   interface{} `json:"field_publication_volume"`
 				FieldTandfPublic         bool        `json:"field_tandf_public"`
-				FieldTaylorAndFrancisUrl interface{} `json:"field_taylor_and_francis_url"`
+				FieldTaylorAndFrancisURL interface{} `json:"field_taylor_and_francis_url"`
 				Relationships            struct {
 					FieldMediaEnquiry interface{}   `json:"field_media_enquiry_"`
 					FieldSections     []interface{} `json:"field_sections"`
@@ -50,7 +52,7 @@ type PageData struct {
 						} `json:"path"`
 					} `json:"field_content_type"`
 					FieldAuthor []struct {
-						Id                string      `json:"id"`
+						ID                string      `json:"id"`
 						Title             string      `json:"title"`
 						FieldFirstNames   string      `json:"field_first_names"`
 						FieldEmailAddress interface{} `json:"field_email_address"`
@@ -64,25 +66,25 @@ type PageData struct {
 						} `json:"relationships"`
 					} `json:"field_author"`
 					FieldPdf []struct {
-						Id       string `json:"id"`
+						ID       string `json:"id"`
 						Filename string `json:"filename"`
 						Filesize int    `json:"filesize"`
 						Filemime string `json:"filemime"`
 						Fields   struct {
-							CdnUrl string `json:"cdn_url"`
+							CdnURL string `json:"cdn_url"`
 						} `json:"fields"`
 					} `json:"field_pdf"`
 					FieldRegion         []struct{ name string } `json:"field_region"`
 					FieldResearchGroups []interface{}           `json:"field_research_groups"`
 					FieldTopics         []struct {
-						Id   string `json:"id"`
+						ID   string `json:"id"`
 						Name string `json:"name"`
 						Path struct {
 							Alias string `json:"alias"`
 						} `json:"path"`
 					} `json:"field_topics"`
 					FieldRelatedProject []struct {
-						Id   string `json:"id"`
+						ID   string `json:"id"`
 						Name string `json:"name"`
 						Path struct {
 							Alias string `json:"alias"`
@@ -115,7 +117,7 @@ type PageData struct {
 			} `json:"article"`
 		} `json:"data"`
 		PageContext struct {
-			Id         string `json:"id"`
+			ID         string `json:"id"`
 			Title      string `json:"title"`
 			IsHomepage bool   `json:"isHomepage"`
 			Breadcrumb struct {
@@ -136,7 +138,7 @@ type NewsData struct {
 		Data struct {
 			Node struct {
 				Title                      string `json:"title"`
-				Id                         string `json:"id"`
+				ID                         string `json:"id"`
 				FieldPublishDate           string `json:"field_publish_date"`
 				MachineDate                string `json:"machineDate"`
 				FieldPrimaryTag            string `json:"field_primary_tag"`
@@ -144,7 +146,7 @@ type NewsData struct {
 				FieldExternalPubDescriptor string `json:"field_external_pub_descriptor"`
 				FieldOrganisation          struct {
 					Title string `json:"title"`
-					Uri   string `json:"uri"`
+					URI   string `json:"uri"`
 				} `json:"field_organisation"`
 				Relationships struct {
 					FieldSections    []interface{} `json:"field_sections"`
@@ -178,7 +180,7 @@ type NewsData struct {
 						} `json:"relationships"`
 					} `json:"field_external_publication"`
 					FieldAuthor []struct {
-						Id              string `json:"id"`
+						ID              string `json:"id"`
 						Title           string `json:"title"`
 						FieldFirstNames string `json:"field_first_names"`
 						FieldPosition   string `json:"field_position"`
@@ -200,7 +202,7 @@ type NewsData struct {
 						} `json:"path"`
 					} `json:"field_author"`
 					FieldRegion []struct {
-						Id   string `json:"id"`
+						ID   string `json:"id"`
 						Name string `json:"name"`
 						Path struct {
 							Alias string `json:"alias"`
@@ -208,7 +210,7 @@ type NewsData struct {
 					} `json:"field_region"`
 					FieldResearchGroups []interface{} `json:"field_research_groups"`
 					FieldTopics         []struct {
-						Id   string `json:"id"`
+						ID   string `json:"id"`
 						Name string `json:"name"`
 						Path struct {
 							Alias string `json:"alias"`
@@ -219,7 +221,7 @@ type NewsData struct {
 			} `json:"node"`
 		} `json:"data"`
 		PageContext struct {
-			Id         string `json:"id"`
+			ID         string `json:"id"`
 			Title      string `json:"title"`
 			IsHomepage bool   `json:"isHomepage"`
 			Breadcrumb struct {
@@ -234,68 +236,68 @@ type NewsData struct {
 	StaticQueryHashes []string `json:"staticQueryHashes"`
 }
 
-var PageTypeMap = map[string]Crawler.PageType{
-	"sitemap":              Crawler.Index,
-	"explore-our-research": Crawler.Report,
-	"people":               Crawler.Expert,
-	"news-and-comment":     Crawler.News,
-	"in-the-news":          Crawler.News,
-	"podcasts":             Crawler.News,
-	"publication":          Crawler.Report,
+var PageTypeMap = map[string]crawlers.PageType{
+	"sitemap":              crawlers.Index,
+	"explore-our-research": crawlers.Report,
+	"people":               crawlers.Expert,
+	"news-and-comment":     crawlers.News,
+	"in-the-news":          crawlers.News,
+	"podcasts":             crawlers.News,
+	"publication":          crawlers.Report,
 }
 
 func init() {
-	w := Crawler.Register("rusi", "皇家联合服务研究所", "https://rusi.org/")
-	w.SetStartingUrls([]string{"https://www.rusi.org/sitemap/sitemap-index.xml"})
+	w := crawlers.Register("rusi", "皇家联合服务研究所", "https://rusi.org/")
+	w.SetStartingURLs([]string{"https://www.rusi.org/sitemap/sitemap-index.xml"})
 
-	w.OnXML("//loc", func(element *colly.XMLElement, ctx *Crawler.Context) {
-		reg := regexp.MustCompile("rusi.org/([\\w-]+)/")
+	w.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
+		reg := regexp.MustCompile(`rusi.org/([\w-]+)/`)
 		if matches := reg.FindStringSubmatch(element.Text); len(matches) == 2 {
 			pageType, ok := PageTypeMap[matches[1]]
 			if !ok {
 				return
 			}
 			switch pageType {
-			case Crawler.Index:
+			case crawlers.Index:
 				w.Visit(element.Text, pageType)
-			case Crawler.Expert:
+			case crawlers.Expert:
 				w.Visit(element.Text, pageType)
-			default:
+			case crawlers.News, crawlers.Report:
 				url := strings.ReplaceAll(element.Text, "https://www.rusi.org/", "https://www.rusi.org/page-data/") + "/page-data.json"
 				w.Visit(url, pageType)
 			}
 		}
 	})
-	//获取人物姓名
-	w.OnHTML("[class^=\"ProfileTitleBlock-module--text\"] > h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	// 获取人物姓名
+	w.OnHTML("[class^=\"ProfileTitleBlock-module--text\"] > h1", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Name = element.Text
 	})
 
-	//获取人物头衔
-	w.OnHTML("[class^=\"ProfileTitleBlock-module--text\"] > samll", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	// 获取人物头衔
+	w.OnHTML("[class^=\"ProfileTitleBlock-module--text\"] > samll", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = element.Text
 	})
 
-	//获取人物领域
-	w.OnHTML("aside > ul > li > a > span", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	// 获取人物领域
+	w.OnHTML("aside > ul > li > a > span", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Area = element.Text
 	})
 
-	//获取人物描述
-	w.OnHTML("[class^=\"Section-module--content\"] > div > div > p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	// 获取人物描述
+	w.OnHTML("[class^=\"Section-module--content\"] > div > div > p", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Description = element.Text
 	})
 
-	w.OnResponse(func(response *colly.Response, ctx *Crawler.Context) {
-		if strings.Contains(ctx.Url, "page-data.json") {
+	w.OnResponse(func(response *colly.Response, ctx *crawlers.Context) {
+		if strings.Contains(ctx.URL, "page-data.json") {
 			var obj PageData
 			_ = json.Unmarshal(response.Body, &obj)
 			if obj.Result.Data.Article.Title != "" {
 				art := obj.Result.Data.Article
 				ctx.Title = art.Title
-				ctx.Content = Crawler.HTML2Text(art.Body.Value)
+				ctx.Content = extractors.HTML2Text(art.Body.Value)
 				if ctx.Content == "" {
-					ctx.Content = Crawler.HTML2Text(art.FieldAbstract.Value)
+					ctx.Content = extractors.HTML2Text(art.FieldAbstract.Value)
 				}
 				ctx.PublicationTime = art.Created
 				for _, s := range obj.Result.Data.Article.Relationships.FieldAuthor {
@@ -308,7 +310,7 @@ func init() {
 					ctx.Tags = append(ctx.Tags, topic.Name)
 				}
 				for _, pdf := range art.Relationships.FieldPdf {
-					ctx.File = append(ctx.File, pdf.Fields.CdnUrl)
+					ctx.File = append(ctx.File, pdf.Fields.CdnURL)
 				}
 				return
 			}
@@ -318,7 +320,7 @@ func init() {
 			if obj2.Result.Data.Node.Title != "" {
 				art := obj2.Result.Data.Node
 				ctx.Title = art.Title
-				ctx.Content = Crawler.HTML2Text(obj2.Result.Data.Node.FieldFocus)
+				ctx.Content = extractors.HTML2Text(obj2.Result.Data.Node.FieldFocus)
 				ctx.PublicationTime = art.FieldPublishDate
 				for _, s := range obj.Result.Data.Article.Relationships.FieldAuthor {
 					ctx.Authors = append(ctx.Authors, s.FieldFirstNames+" "+s.Title)

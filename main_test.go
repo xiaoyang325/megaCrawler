@@ -2,17 +2,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/olekukonko/tablewriter"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"gopkg.in/natefinch/lumberjack.v2"
-	"megaCrawler/Crawler"
-	"megaCrawler/Crawler/Tester"
+	"megaCrawler/crawlers"
+	"megaCrawler/crawlers/tester"
 	"os"
 	"strings"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/olekukonko/tablewriter"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 func TestTester(t *testing.T) {
@@ -45,34 +46,34 @@ func TestTester(t *testing.T) {
 
 	logger := zap.New(fileCore)
 
-	Crawler.Sugar = logger.Sugar()
+	crawlers.Sugar = logger.Sugar()
 
 	for _, target := range targets {
 		_, _ = fmt.Fprintf(buf, "Testing %s:\n\n", target)
 
-		c, ok := Crawler.WebMap[target]
+		c, ok := crawlers.WebMap[target]
 		if !ok {
 			_, _ = fmt.Fprintf(buf, "No such target %s.\n\n", target)
 			continue
 		}
-		c.Test = &Tester.Tester{
+		c.Test = &tester.Tester{
 			WG: &sync.WaitGroup{},
-			News: Tester.Status{
+			News: tester.Status{
 				Name: "News",
 			},
-			Index: Tester.Status{
+			Index: tester.Status{
 				Name: "Index",
 			},
-			Expert: Tester.Status{
+			Expert: tester.Status{
 				Name: "Expert",
 			},
-			Report: Tester.Status{
+			Report: tester.Status{
 				Name: "Report",
 			},
 		}
 		c.Test.WG.Add(1)
 
-		go Crawler.StartEngine(c, true)
+		go crawlers.StartEngine(c, true)
 		go func() {
 			time.Sleep(2 * time.Minute)
 			if !c.Test.Done {

@@ -1,16 +1,17 @@
 package production
 
 import (
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
+	"megaCrawler/crawlers"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {
-	w := Crawler.Register("quincyinst", "昆西负责任治国方略研究所",
+	w := crawlers.Register("quincyinst", "昆西负责任治国方略研究所",
 		"https://quincyinst.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://quincyinst.org/category/middle-east/",
 		"https://quincyinst.org/category/east-asia/",
 		"https://quincyinst.org/category/grand-strategy/",
@@ -23,77 +24,76 @@ func init() {
 	})
 
 	// 从Index中访问文章。
-	w.OnHTML(".link>.post__title>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".link>.post__title>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.Attr("href"), "/report/") {
-			w.Visit(element.Attr("href"), Crawler.Report)
+			w.Visit(element.Attr("href"), crawlers.Report)
 		} else {
-			w.Visit(element.Attr("href"), Crawler.News)
+			w.Visit(element.Attr("href"), crawlers.News)
 		}
-
 	})
 
 	// 从Index中访问文章。(/press/)
-	w.OnHTML("article>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("article>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.Attr("href"), "/press/") {
-			w.Visit(element.Attr("href"), Crawler.Report)
+			w.Visit(element.Attr("href"), crawlers.Report)
 		}
 	})
 
 	// 从Index中访问文章。(/events/)
-	w.OnHTML("section[class=\"events events__past\"]>.events-list>article>.card-body>.entry-title>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Report)
+	w.OnHTML("section[class=\"events events__past\"]>.events-list>article>.card-body>.entry-title>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Report)
 	})
 
 	// 从翻页器获取下一页Index并访问。
-	w.OnHTML("a[class=\"next page-numbers\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	w.OnHTML("a[class=\"next page-numbers\"]", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 
-	w.OnHTML("meta[property=\"og:title\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("meta[property=\"og:title\"]", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = strings.ReplaceAll(element.Attr("content"), " - Quincy Institute for Responsible Statecraft", "")
 	})
 
-	w.OnHTML("meta[property=\"article:published_time\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("meta[property=\"article:published_time\"]", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = element.Attr("content")
 	})
 
 	// 从文章中获取Author并添加到ctx。（Report）
-	w.OnHTML("header.post__header>div.post__header--container>div.post__author--container>div.post__author--info>div.post__author>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("header.post__header>div.post__header--container>div.post__author--container>div.post__author--info>div.post__author>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
 	})
 
 	// 从文章中获取Author并添加到ctx。（News）
-	w.OnHTML("header.post__header>div.post__header--container>div>div>div>div>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("header.post__header>div.post__header--container>div>div>div>div>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
 	})
 
 	// 从文章中获取Tag并添加到ctx。（Report）（News）
-	w.OnHTML("div.post__tag>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.post__tag>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Tags = append(ctx.Tags, strings.TrimSpace(element.Text))
 	})
 
 	// 从文章中获取Content并添加到ctx。（Report）
-	w.OnHTML(".report-body", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".report-body", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = strings.TrimSpace(element.Text)
 	})
 
 	// 从文章中获取Content并添加到ctx。（News）
-	w.OnHTML("article>section.post__content>div.post__content--article", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("article>section.post__content>div.post__content--article", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = strings.TrimSpace(element.Text)
 	})
 
 	// 从文章中获取Content并添加到ctx。（/press/）
-	w.OnHTML("div.press-release-content__container", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.press-release-content__container", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = strings.TrimSpace(element.Text)
 	})
 
 	// 从文章中获取Content并添加到ctx。（/event/）
-	w.OnHTML(".event-body>.event-description", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".event-body>.event-description", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = strings.TrimSpace(element.Text)
 	})
 
 	// 从文章中获取Location并添加到ctx。（/event/）
-	w.OnHTML(".event__location--copy", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".event__location--copy", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Location = strings.TrimSpace(element.Text)
 	})
 }

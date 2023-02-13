@@ -1,15 +1,16 @@
 package production
 
 import (
+	"megaCrawler/crawlers"
+
 	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
 )
 
 func init() {
-	w := Crawler.Register("carnegieendowment", "卡内基国际和平基金会",
+	w := crawlers.Register("carnegieendowment", "卡内基国际和平基金会",
 		"https://carnegieendowment.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.nupi.no/en/our-research/topics/defence-and-security/intelligence",
 		"https://www.nupi.no/en/our-research/topics/defence-and-security/cyber",
 		"https://www.nupi.no/en/our-research/topics/defence-and-security/nato",
@@ -59,93 +60,92 @@ func init() {
 		"https://www.nupi.no/en/our-research/research-centres/norwegian-centre-for-humanitarian-studies",
 	})
 	// 从翻页器获取链接并访问
-	w.OnHTML("a.page-link", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	w.OnHTML("a.page-link", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 
 	// 从index访问新闻
-	w.OnHTML("div.media-body>h5>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.News)
+	w.OnHTML("div.media-body>h5>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.News)
 	})
 	// 从index访问新闻
-	w.OnHTML("div.ezrichtext-field>p>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.News)
+	w.OnHTML("div.ezrichtext-field>p>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.News)
 	})
 	// 从index访问新闻
-	w.OnHTML("div.card-body>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.News)
+	w.OnHTML("div.card-body>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.News)
 	})
-	w.OnHTML("section.events > div > div > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.News)
+	w.OnHTML("section.events > div > div > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.News)
 	})
 	// report.title
-	w.OnHTML("body > div.container > div.row.main.content > div > div:nth-child(2) > div > h1 > font > font", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("body > div.container > div.row.main.content > div > div:nth-child(2) > div > h1 > font > font", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = element.Text
 	})
 	// report.title
-	w.OnHTML("div.content>div>div>h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.content>div>div>h1", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = element.Text
 	})
-	w.OnHTML("h1.pt-4", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("h1.pt-4", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = element.Text
 	})
 
 	// report .content
-	w.OnHTML("div.article-body", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.article-body", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = element.Text
 	})
-	//report.publish time
-	w.OnHTML("body > div.container > div.row.main.content > div > div:nth-child(2) > div > div > span > font > font", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	// report.publish time
+	w.OnHTML("body > div.container > div.row.main.content > div > div:nth-child(2) > div > div > span > font > font", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = element.Text
 	})
-	w.OnHTML("span.pub-date", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("span.pub-date", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = element.Text
 	})
-	w.OnHTML("div.fact>h4", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.fact>h4", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = element.Text
 	})
 	// report.description
-	w.OnHTML("div.eztext-field", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.eztext-field", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Description = element.Text
 	})
 
 	// report.author
-	w.OnHTML("section.person-section.py-3 > div > div > div > div > div.front > div > div > h5 > strong > a > font > font", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("section.person-section.py-3 > div > div > div > div > div.front > div > div > h5 > strong > a > font > font", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, element.Text)
 	})
-	w.OnHTML("div.byline>ul>li.list-inline-item>a.author", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.byline>ul>li.list-inline-item>a.author", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, element.Text)
 	})
-	w.OnHTML("a.author", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("a.author", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, element.Text)
 	})
 	// report .content
-	w.OnHTML("div.col-md-8", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.col-md-8", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = element.Text
 	})
 
-	//内含Expert
-	w.OnHTML("a.author", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Expert)
+	// 内含Expert
+	w.OnHTML("a.author", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Expert)
 	})
 	// expert.Name
-	w.OnHTML("h2.resume-name", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("h2.resume-name", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Name = element.Text
 	})
 	// expert.title
-	w.OnHTML("span.ezstring-field", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("span.ezstring-field", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = element.Text
 	})
 	// expert.description
-	w.OnHTML("div.text-start>div.ezrichtext-field", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.text-start>div.ezrichtext-field", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = element.Text
 	})
 	// expert.link
-	w.OnHTML("li.email>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("li.email>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Link = append(ctx.Link, element.Attr("href"))
 	})
-	w.OnHTML("li.phone", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("li.phone", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Link = append(ctx.Link, element.Attr("href"))
 	})
-
 }

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"megaCrawler/Crawler"
+	"megaCrawler/crawlers"
 )
 
 func main() {
-	Crawler.Start()
+	crawlers.Start()
 }
