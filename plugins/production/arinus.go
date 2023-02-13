@@ -12,7 +12,7 @@ var telRegex = regexp.MustCompile(`Tel: ([.\w]+)`)
 
 func init() {
 	w := crawlers.Register("arinus", "亚洲研究所", "https://ari.nus.edu.sg/")
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://ari.nus.edu.sg/about-ari/people/academic/",
 		"https://ari.nus.edu.sg/about-ari/people/administrative/",
 		"https://ari.nus.edu.sg/media/news/",

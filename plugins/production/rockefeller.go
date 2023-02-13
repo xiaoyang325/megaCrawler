@@ -8,7 +8,7 @@ import (
 
 func init() {
 	w := crawlers.Register("rockefeller", "洛克菲勒基金会", "https://www.rockefellerfoundation.org")
-	w.SetStartingUrls([]string{"https://www.rockefellerfoundation.org/commitment/food/",
+	w.SetStartingURLs([]string{"https://www.rockefellerfoundation.org/commitment/food/",
 		"https://www.rockefellerfoundation.org/commitment/health/",
 		"https://www.rockefellerfoundation.org/commitment/clean-energy/",
 		"https://www.rockefellerfoundation.org/commitment/economic-equity/",
@@ -78,11 +78,11 @@ func init() {
 
 	// Twitter
 	w.OnHTML("li.twitter > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.TwitterId = element.Text
+		ctx.TwitterID = element.Text
 	})
 
 	// LinkedIn
 	w.OnHTML("li.linkedin > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.TwitterId = element.Text
+		ctx.TwitterID = element.Text
 	})
 }

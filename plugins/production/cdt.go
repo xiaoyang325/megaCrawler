@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("cdt", "民主与技术中心", "https://cdt.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://cdt.org/area-of-focus/cybersecurity-standards/",
 		"https://cdt.org/area-of-focus/elections-democracy/",
 		"https://cdt.org/area-of-focus/equity-in-civic-tech/",
@@ -42,7 +42,7 @@ func init() {
 
 	// 添加 Author 到 ctx.Authors
 	w.OnHTML(".the-byline>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.Authors = append(ctx.Tags, element.Text)
+		ctx.Authors = append(ctx.Authors, element.Text)
 	})
 
 	// 添加 Content 到 ctx

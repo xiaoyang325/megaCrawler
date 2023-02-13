@@ -11,7 +11,7 @@ func init() {
 	w := crawlers.Register("blueoceanstrategy", "海洋战略研究所",
 		"https://www.blueoceanstrategy.com/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.blueoceanstrategy.com/blue-ocean-strategy-examples",
 		"https://www.blueoceanstrategy.com/teaching-materials/all-cases/",
 	})

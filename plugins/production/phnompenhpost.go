@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("phnompenhpost", "金边邮报", "https://www.phnompenhpost.com/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.phnompenhpost.com/post-depth",
 		"https://www.phnompenhpost.com/politics-0",
 		"https://www.phnompenhpost.com/kr-tribunal",

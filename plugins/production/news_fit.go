@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("news_fit", "佛罗里达理工学院", "https://news.fit.edu/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://news.fit.edu/sitemap_index.xml",
 	})
 

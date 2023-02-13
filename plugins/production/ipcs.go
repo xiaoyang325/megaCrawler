@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("ipcs", "和平与冲突研究所", "http://www.ipcs.org/")
 
-	w.SetStartingUrls([]string{"http://www.ipcs.org/commentaries.php", "http://www.ipcs.org/issue_briefs.php",
+	w.SetStartingURLs([]string{"http://www.ipcs.org/commentaries.php", "http://www.ipcs.org/issue_briefs.php",
 		"http://www.ipcs.org/special_reports.php", "http://www.ipcs.org/discussion_reports.php", "http://www.ipcs.org/expert_media.php", "http://www.ipcs.org/research_paper.php"})
 
 	w.OnResponse(func(response *colly.Response, ctx *crawlers.Context) {

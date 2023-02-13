@@ -9,7 +9,7 @@ import (
 func init() {
 	w := crawlers.Register("targetednews", "Targeted News Service", "https://targetednews.com/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://targetednews.com/daily_news.php?page=6",
 		"https://targetednews.com/daily_news.php?page=10",
 		"https://targetednews.com/daily_news.php?page=7",

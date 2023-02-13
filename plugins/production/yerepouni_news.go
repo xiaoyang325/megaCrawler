@@ -12,7 +12,7 @@ func init() {
 	w := crawlers.Register("yerepouni_news", "Yerepouni Daily News",
 		"https://www.yerepouni-news.com/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		`https://www.yerepouni-news.com/category/01-armenian-news/`,
 		`https://www.yerepouni-news.com/category/arm-articles/`,
 		`https://www.yerepouni-news.com/category/arm-interviews/`,
@@ -43,7 +43,7 @@ func init() {
 
 	// 访问 News & Report 从 Index
 	w.OnHTML(`.jeg_block_container article > .jeg_thumb > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		if strings.Contains(ctx.Url, "news/") {
+		if strings.Contains(ctx.URL, "news/") {
 			w.Visit(element.Attr("href"), crawlers.News)
 		} else {
 			w.Visit(element.Attr("href"), crawlers.Report)

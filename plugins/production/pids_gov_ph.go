@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("pids_gov_ph", "发展研究院", "https://pids.gov.ph/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://pids.gov.ph/research-agenda",
 		"https://pids.gov.ph/research",
 		"https://pids.gov.ph/publications/category/books",
@@ -86,8 +86,8 @@ func init() {
 
 	// 获取 File
 	w.OnHTML(`#modalDownload > #w2`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		file_url := "https://pids.gov.ph" + element.Attr("action")
-		ctx.File = append(ctx.File, file_url)
+		fileURL := "https://pids.gov.ph" + element.Attr("action")
+		ctx.File = append(ctx.File, fileURL)
 	})
 
 	// 获取 File

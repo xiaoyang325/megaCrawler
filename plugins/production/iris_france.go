@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("iris_france", "Institut de Relations Internationales et Stratégiques", "https://www.iris-france.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.iris-france.org/programmes/industrie-de-defense-et-de-securite/",
 		"https://www.iris-france.org/programmes/europe-et-strategie/",
 		"https://www.iris-france.org/programmes/humanitaire-et-developpement/",

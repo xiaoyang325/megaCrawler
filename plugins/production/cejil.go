@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("cejil", "国际法与司法中心", "https://cejil.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://cejil.org/en/press-releases/",
 		"https://cejil.org/en/publications/",
 		"https://cejil.org/en/blog/",
@@ -23,7 +23,7 @@ func init() {
 
 	// 访问 News & Report 从 Index
 	w.OnHTML(`.brd_btm > div.txt-rel > h3 > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		if strings.Contains(ctx.Url, "/press-releases/") {
+		if strings.Contains(ctx.URL, "/press-releases/") {
 			w.Visit(element.Attr("href"), crawlers.News)
 		} else {
 			w.Visit(element.Attr("href"), crawlers.Report)

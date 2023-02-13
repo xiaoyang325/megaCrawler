@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("lowyinstitute", "洛伊国际政策研究所", "https://www.lowyinstitute.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.lowyinstitute.org/publications?keys=&author=All&type=All&issues=195&related_issues=All",
 		"https://www.lowyinstitute.org/publications?keys=&author=All&type=All&issues=199&related_issues=All",
 		"https://www.lowyinstitute.org/publications?keys=&author=All&type=All&issues=195&related_issues=310",
@@ -97,7 +97,7 @@ func init() {
 
 	// 获取 File
 	w.OnHTML(`div[class="flex-col footer-actions"] > #download`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		file_url := "https://interactives.lowyinstitute.org" + element.Attr("href")
-		ctx.File = append(ctx.File, file_url)
+		fileURL := "https://interactives.lowyinstitute.org" + element.Attr("href")
+		ctx.File = append(ctx.File, fileURL)
 	})
 }

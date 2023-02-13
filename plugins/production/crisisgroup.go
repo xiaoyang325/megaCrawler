@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("crisisgroup", "国际危机组织", "https://www.crisisgroup.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.crisisgroup.org/latest-updates?page=0",
 		"https://www.crisisgroup.org/who-we-are/our-people",
 	})
@@ -22,7 +22,7 @@ func init() {
 		currentNum, _ := strconv.Atoi(strings.TrimSpace(numList[0]))
 		maxNum, _ := strconv.Atoi(strings.TrimSpace(numList[1]))
 		if currentNum <= maxNum {
-			w.Visit(crawlers.GetNextIndexURL(ctx.Url, strings.TrimSpace(numList[0]), "page"), crawlers.Index)
+			w.Visit(crawlers.GetNextIndexURL(ctx.URL, strings.TrimSpace(numList[0]), "page"), crawlers.Index)
 		}
 	})
 
@@ -86,10 +86,10 @@ func init() {
 		ctx.Title = strings.TrimSpace(element.Text)
 	})
 
-	// 获取 TwitterId //
+	// 获取 TwitterID //
 	w.OnHTML(`ul > li > a[title="Twitter"]`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		id := strings.Replace(element.Attr("href"), "https://twitter.com/", "", 1)
-		ctx.TwitterId = strings.TrimSpace(id)
+		ctx.TwitterID = strings.TrimSpace(id)
 	})
 
 	// 获取 Description //
@@ -108,9 +108,9 @@ func init() {
 		ctx.Location = strings.TrimSpace(element.Text)
 	})
 
-	// 获取 LinkedInId //
+	// 获取 LinkedInID //
 	w.OnHTML(`ul > li > a[title="Linkedin"]`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		address := strings.Replace(element.Attr("href"), "https://www.linkedin.com/in/", "", 1)
-		ctx.LinkedInId = strings.TrimSpace(address)
+		ctx.LinkedInID = strings.TrimSpace(address)
 	})
 }

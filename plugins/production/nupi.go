@@ -10,7 +10,7 @@ func init() {
 	w := crawlers.Register("carnegieendowment", "卡内基国际和平基金会",
 		"https://carnegieendowment.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.nupi.no/en/our-research/topics/defence-and-security/intelligence",
 		"https://www.nupi.no/en/our-research/topics/defence-and-security/cyber",
 		"https://www.nupi.no/en/our-research/topics/defence-and-security/nato",

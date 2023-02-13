@@ -2,7 +2,7 @@ package crawlers
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"math/rand"
 	"megaCrawler/crawlers/commands"
 	"megaCrawler/crawlers/config"
@@ -22,23 +22,23 @@ import (
 )
 
 type WebsiteEngine struct {
-	Id           string
-	BaseUrl      tld.URL
-	IsRunning    bool
-	Disabled     bool
-	bar          *progressbar.ProgressBar
-	Scheduler    *gocron.Scheduler
-	LastUpdate   time.Time
-	UrlProcessor CollectorConstructor
-	Config       *config.Config
-	ProgressBar  string
-	WG           *sync.WaitGroup
-	UrlData      chan urlData
-	Test         *tester.Tester
+	ID          string
+	BaseURL     tld.URL
+	IsRunning   bool
+	Disabled    bool
+	bar         *progressbar.ProgressBar
+	Scheduler   *gocron.Scheduler
+	LastUpdate  time.Time
+	Collector   CollectorConstructor
+	Config      *config.Config
+	ProgressBar string
+	WG          *sync.WaitGroup
+	URLChannel  chan urlData
+	Test        *tester.Tester
 }
 
 type urlData struct {
-	Url      *url.URL
+	URL      *url.URL
 	PageType PageType
 }
 
@@ -47,7 +47,7 @@ func (w *WebsiteEngine) Visit(url string, pageType PageType) {
 		return
 	}
 
-	u, err := w.BaseUrl.Parse(url)
+	u, err := w.BaseURL.Parse(url)
 	if err != nil {
 		return
 	}
@@ -55,35 +55,35 @@ func (w *WebsiteEngine) Visit(url string, pageType PageType) {
 	if err != nil {
 		return
 	}
-	if topLevel.Domain != w.BaseUrl.Domain || topLevel.TLD != w.BaseUrl.TLD {
+	if topLevel.Domain != w.BaseURL.Domain || topLevel.TLD != w.BaseURL.TLD {
 		return
 	}
 
-	w.UrlData <- urlData{Url: u, PageType: pageType}
+	w.URLChannel <- urlData{URL: u, PageType: pageType}
 }
 
-func (w *WebsiteEngine) SetStartingUrls(urls []string) *WebsiteEngine {
-	w.UrlProcessor.startingUrls = urls
+func (w *WebsiteEngine) SetStartingURLs(urls []string) *WebsiteEngine {
+	w.Collector.startingURLs = urls
 	return w
 }
 
 func (w *WebsiteEngine) FromRobotTxt(url string) *WebsiteEngine {
-	w.UrlProcessor.robotTxt = url
+	w.Collector.robotTxt = url
 	return w
 }
 
 func (w *WebsiteEngine) SetTimeout(timeout time.Duration) *WebsiteEngine {
-	w.UrlProcessor.timeout = timeout
+	w.Collector.timeout = timeout
 	return w
 }
 
 func (w *WebsiteEngine) SetDomain(domain string) *WebsiteEngine {
-	w.UrlProcessor.domainGlob = domain
+	w.Collector.domainGlob = domain
 	return w
 }
 
 func (w *WebsiteEngine) OnHTML(selector string, callback func(element *colly.HTMLElement, ctx *Context)) *WebsiteEngine {
-	w.UrlProcessor.htmlHandlers = append(w.UrlProcessor.htmlHandlers, CollyHTMLPair{func(element *colly.HTMLElement) {
+	w.Collector.htmlHandlers = append(w.Collector.htmlHandlers, CollyHTMLPair{func(element *colly.HTMLElement) {
 		if w.Test != nil && w.Test.Done {
 			return
 		}
@@ -93,22 +93,22 @@ func (w *WebsiteEngine) OnHTML(selector string, callback func(element *colly.HTM
 }
 
 func (w *WebsiteEngine) OnXML(selector string, callback func(element *colly.XMLElement, ctx *Context)) *WebsiteEngine {
-	w.UrlProcessor.xmlHandlers = append(w.UrlProcessor.xmlHandlers, XMLPair{callback, selector})
+	w.Collector.xmlHandlers = append(w.Collector.xmlHandlers, XMLPair{callback, selector})
 	return w
 }
 
 func (w *WebsiteEngine) OnResponse(callback func(response *colly.Response, ctx *Context)) *WebsiteEngine {
-	w.UrlProcessor.responseHandlers = append(w.UrlProcessor.responseHandlers, callback)
+	w.Collector.responseHandlers = append(w.Collector.responseHandlers, callback)
 	return w
 }
 
 func (w *WebsiteEngine) OnLaunch(callback func()) *WebsiteEngine {
-	w.UrlProcessor.launchHandler = callback
+	w.Collector.launchHandler = callback
 	return w
 }
 
 func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
-	cc := w.UrlProcessor
+	cc := w.Collector
 	c = colly.NewCollector(
 		colly.Async(true),
 	)
@@ -186,7 +186,7 @@ func RetryRequest(r *colly.Request, err error, w *WebsiteEngine) {
 	}
 }
 
-func (w *WebsiteEngine) processUrl() (err error) {
+func (w *WebsiteEngine) processURL() (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			Sugar.Debug(r)
@@ -197,7 +197,7 @@ func (w *WebsiteEngine) processUrl() (err error) {
 	if err != nil {
 		return
 	}
-	w.UrlData = make(chan urlData)
+	w.URLChannel = make(chan urlData)
 
 	if w.Test != nil {
 		go func() {
@@ -246,7 +246,7 @@ func (w *WebsiteEngine) processUrl() (err error) {
 			if !ctx.process(w.Test) {
 				Sugar.Debugw("Empty Page", spread(*ctx)...)
 				if w.Test == nil {
-					newCtx := newContext(urlData{Url: response.Request.URL, PageType: ctx.PageType}, w)
+					newCtx := newContext(urlData{URL: response.Request.URL, PageType: ctx.PageType}, w)
 					response.Ctx.Put("ctx", &newCtx)
 					RetryRequest(response.Request, nil, w)
 				}
@@ -259,18 +259,18 @@ func (w *WebsiteEngine) processUrl() (err error) {
 
 	go func() {
 		for {
-			k := <-w.UrlData
+			k := <-w.URLChannel
 			if w.Test != nil && w.Test.Done {
 				return
 			}
-			if k.Url == nil {
+			if k.URL == nil {
 				break
 			}
 			ctx := colly.NewContext()
 
 			newCtx := newContext(k, w)
 			ctx.Put("ctx", &newCtx)
-			err := c.Request("GET", k.Url.String(), nil, ctx, nil)
+			err := c.Request("GET", k.URL.String(), nil, ctx, nil)
 			if err != nil {
 				continue
 			}
@@ -282,15 +282,15 @@ func (w *WebsiteEngine) processUrl() (err error) {
 		}
 	}()
 
-	for _, startingUrl := range w.UrlProcessor.startingUrls {
-		w.Visit(startingUrl, Index)
+	for _, startingURL := range w.Collector.startingURLs {
+		w.Visit(startingURL, Index)
 	}
 
-	if w.UrlProcessor.launchHandler != nil {
+	if w.Collector.launchHandler != nil {
 		w.WG.Add(1)
 
 		go func() {
-			w.UrlProcessor.launchHandler()
+			w.Collector.launchHandler()
 			defer func() {
 				if r := recover(); r != nil {
 					Sugar.Debug(r)
@@ -300,8 +300,8 @@ func (w *WebsiteEngine) processUrl() (err error) {
 		}()
 	}
 
-	if w.UrlProcessor.robotTxt != "" {
-		resp, err := http.Get(w.UrlProcessor.robotTxt)
+	if w.Collector.robotTxt != "" {
+		resp, err := http.Get(w.Collector.robotTxt)
 		if err != nil {
 			return err
 		}
@@ -315,7 +315,7 @@ func (w *WebsiteEngine) processUrl() (err error) {
 		}
 		if len(robots.Sitemaps) > 0 {
 			for _, sitemap := range robots.Sitemaps {
-				u, err := w.BaseUrl.Parse(sitemap)
+				u, err := w.BaseURL.Parse(sitemap)
 				if err != nil {
 					continue
 				}
@@ -346,9 +346,9 @@ func newContext(k urlData, w *WebsiteEngine) Context {
 		Tags:       []string{},
 		Keywords:   []string{},
 		SubContext: []*Context{},
-		Url:        k.Url.String(),
-		Host:       k.Url.Host,
-		Website:    w.Id,
+		URL:        k.URL.String(),
+		Host:       k.URL.Host,
+		Website:    w.ID,
 		CrawlTime:  time.Time{},
 	}
 }
@@ -358,27 +358,27 @@ func StartEngine(w *WebsiteEngine, test bool) {
 		return
 	}
 	if w.IsRunning {
-		Sugar.Info("Already running id \"" + w.Id + "\"")
+		Sugar.Info("Already running id \"" + w.ID + "\"")
 		return
 	}
-	Sugar.Infow("Starting engine", "id", w.Id)
+	Sugar.Infow("Starting engine", "id", w.ID)
 	w.IsRunning = true
 	_ = w.bar.Set(0)
 	w.bar.ChangeMax(0)
 	w.bar.Reset()
-	err := w.processUrl()
+	err := w.processURL()
 	if err != nil {
-		Sugar.Errorw("Error when processing url", "id", w.Id, "err", err)
+		Sugar.Errorw("Error when processing url", "id", w.ID, "err", err)
 	}
 	w.IsRunning = false
-	Sugar.Info("Finished engine \"" + w.Id + "\"")
+	Sugar.Info("Finished engine \"" + w.ID + "\"")
 }
 
 func (w *WebsiteEngine) toStatus() (s commands.WebsiteStatus) {
 	_, next := w.Scheduler.NextRun()
 	return commands.WebsiteStatus{
-		Id:          w.Id,
-		BaseUrl:     w.BaseUrl.String(),
+		ID:          w.ID,
+		BaseURL:     w.BaseURL.String(),
 		IsRunning:   w.IsRunning,
 		NextIter:    next,
 		ProgressBar: w.ProgressBar,
@@ -388,20 +388,20 @@ func (w *WebsiteEngine) toStatus() (s commands.WebsiteStatus) {
 	}
 }
 
-func (w *WebsiteEngine) toJson() (b []byte, err error) {
+func (w *WebsiteEngine) toJSON() (b []byte, err error) {
 	k := w.toStatus()
 	b, err = json.Marshal(k)
 	return
 }
 
-func NewEngine(id string, baseUrl tld.URL) (we *WebsiteEngine) {
+func NewEngine(id string, baseURL tld.URL) (we *WebsiteEngine) {
 	we = &WebsiteEngine{
 		WG:         &sync.WaitGroup{},
-		Id:         id,
-		BaseUrl:    baseUrl,
+		ID:         id,
+		BaseURL:    baseURL,
 		LastUpdate: time.Unix(0, 0),
-		UrlProcessor: CollectorConstructor{
-			domainGlob:    baseUrl.String(),
+		Collector: CollectorConstructor{
+			domainGlob:    baseURL.String(),
 			parallelLimit: Threads,
 			timeout:       10 * time.Second,
 			htmlHandlers:  []CollyHTMLPair{},
@@ -410,7 +410,7 @@ func NewEngine(id string, baseUrl tld.URL) (we *WebsiteEngine) {
 		Scheduler: gocron.NewScheduler(time.Local),
 		bar: progressbar.NewOptions(
 			0,
-			progressbar.OptionSetWriter(ioutil.Discard),
+			progressbar.OptionSetWriter(io.Discard),
 			progressbar.OptionEnableColorCodes(true),
 			progressbar.OptionShowIts(),
 			progressbar.OptionShowCount(),

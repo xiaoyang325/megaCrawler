@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("sussex_ac", "萨塞克斯大学腐败问题研究所", "https://www.sussex.ac.uk/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.sussex.ac.uk/news/research",
 		"https://www.sussex.ac.uk/news/people",
 		"https://www.sussex.ac.uk/news/university",
@@ -62,11 +62,11 @@ func init() {
 		ctx.Tags = append(ctx.Tags, strings.TrimSpace(element.Text))
 	})
 
-	// 获取 TwitterId ***
+	// 获取 TwitterID ***
 	w.OnHTML(`[aria-label="Twitter profile"]`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		raw := element.Attr("href")
 		raw = strings.Replace(raw, "https://twitter.com/", "", 1)
-		ctx.TwitterId = strings.TrimSpace(raw)
+		ctx.TwitterID = strings.TrimSpace(raw)
 	})
 
 	// 获取 Name ***

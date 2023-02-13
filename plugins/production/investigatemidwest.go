@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("investigatemidwest", "中西部调查报道中心", "https://www.investigatemidwest.org/")
 
-	w.SetStartingUrls([]string{"https://investigatemidwest.org/post.xml"})
+	w.SetStartingURLs([]string{"https://investigatemidwest.org/post.xml"})
 
 	w.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
 		w.Visit(element.Text, crawlers.News)
@@ -27,7 +27,7 @@ func init() {
 	})
 
 	w.OnHTML(".entry-content", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.Content = crawlers.HTML2Text(strings.TrimSpace(element.Text))
+		ctx.Content = extractors.TrimText(element.DOM)
 	})
 
 	w.OnHTML(".post-category-link", func(element *colly.HTMLElement, ctx *crawlers.Context) {

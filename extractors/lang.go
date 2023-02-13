@@ -7,7 +7,7 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-var ReLang, _ = regexp.Compile("^[A-Za-z]{2}$")
+var ReLang = regexp.MustCompile("^[A-Za-z]{2}$")
 
 func getMetaLang(dom *colly.HTMLElement) string {
 	attr := dom.Attr("lang")

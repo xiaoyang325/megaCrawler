@@ -10,7 +10,7 @@ import (
 func init() {
 	engine := crawlers.Register("1087", "Associated Press-NORC Center for Public Affairs Research", "https://apnorc.org")
 
-	engine.SetStartingUrls([]string{"https://apnorc.org/post-sitemap.xml"})
+	engine.SetStartingURLs([]string{"https://apnorc.org/post-sitemap.xml"})
 
 	extractorConfig := extractors.Config{
 		Author:       true,

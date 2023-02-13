@@ -1,6 +1,6 @@
 module megaCrawler
 
-go 1.19
+go 1.20
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.0
@@ -14,6 +14,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.14
 	github.com/mouuff/go-rocket-update v1.5.3
 	github.com/olekukonko/tablewriter v0.0.5
+	github.com/pkg/errors v0.8.1
 	github.com/schollz/progressbar/v3 v3.8.6
 	github.com/temoto/robotstxt v1.1.1
 	github.com/xdg/scram v1.0.5

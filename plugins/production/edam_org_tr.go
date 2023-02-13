@@ -11,7 +11,7 @@ func init() {
 	w := crawlers.Register("edam_org_tr", "Center for Economics and Foreign Policy Studies",
 		"https://edam.org.tr/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://edam.org.tr/en/kategori/foreign-policy-security/",
 		"https://edam.org.tr/en/kategori/cyber-policy/",
 		"https://edam.org.tr/en/kategori/economics-globalization/",

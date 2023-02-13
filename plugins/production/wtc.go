@@ -9,7 +9,7 @@ import (
 
 func init() {
 	w := crawlers.Register("wtc", "World Trade Center", "https://wtc.com")
-	w.SetStartingUrls([]string{"https://www.wtc.com/wtc_sitemap.xml"})
+	w.SetStartingURLs([]string{"https://www.wtc.com/wtc_sitemap.xml"})
 
 	w.OnResponse(func(r *colly.Response, ctx *crawlers.Context) {
 		crawlers.Sugar.Infow("Response received", "url", r.Request.URL, "status", r.StatusCode, "DOM", string(r.Body))

@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("fraserinstitute", "菲沙研究所", "https://www.fraserinstitute.org/")
 
-	w.SetStartingUrls([]string{"https://www.fraserinstitute.org/studies/aboriginal-policy",
+	w.SetStartingURLs([]string{"https://www.fraserinstitute.org/studies/aboriginal-policy",
 		"https://www.fraserinstitute.org/studies/pensions-retirement",
 		"https://www.fraserinstitute.org/studies/competitiveness",
 		"https://www.fraserinstitute.org/studies/covid",

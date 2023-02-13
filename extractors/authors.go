@@ -10,9 +10,9 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-var digits, _ = regexp.Compile(`\d`)
-var byStatement, _ = regexp.Compile(`[bB][yY][:\s]|[fF]rom[:\s]`)
-var nameTokens, _ = regexp.Compile(`[^\w'\-.]`)
+var digits = regexp.MustCompile(`\d`)
+var byStatement = regexp.MustCompile(`[bB][yY][:\s]|[fF]rom[:\s]`)
+var nameTokens = regexp.MustCompile(`[^\w'\-.]`)
 
 func containsDigits(d string) bool {
 	return digits.MatchString(d)

@@ -9,14 +9,15 @@ import (
 
 func init() {
 	w := crawlers.Register("cpj", "国际新闻自由组织", "https://cpj.org/")
-	w.SetStartingUrls([]string{"https://cpj.org/sitemap.xml"})
+	w.SetStartingURLs([]string{"https://cpj.org/sitemap.xml"})
 
 	w.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
-		if strings.Contains(ctx.Url, "post-sitemap") {
+		switch {
+		case strings.Contains(ctx.URL, "post-sitemap"):
 			w.Visit(element.Text, crawlers.News)
-		} else if strings.Contains(ctx.Url, "people-sitemap") {
+		case strings.Contains(ctx.URL, "people-sitemap"):
 			w.Visit(element.Text, crawlers.Expert)
-		} else if strings.Contains(ctx.Url, "sitemap") {
+		case strings.Contains(ctx.URL, "sitemap"):
 			w.Visit(element.Text, crawlers.Index)
 		}
 	})

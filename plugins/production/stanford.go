@@ -11,7 +11,7 @@ func init() {
 	w := crawlers.Register("stanford", "斯坦福大学",
 		"https://stanford.edu/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://news.stanford.edu/section/science-technology/",
 		"https://news.stanford.edu/section/social-sciences/",
 		"https://news.stanford.edu/section/law-policy/a",

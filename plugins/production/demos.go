@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("demos", "Demos", "https://www.demos.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.demos.org/our-issues/democratic-reform",
 		"https://www.demos.org/our-issues/economic-justice",
 		"https://www.demos.org/what-we-do/policy-and-research",
@@ -93,7 +93,7 @@ func init() {
 
 	// 获取 File
 	w.OnHTML(`a[type="application/pdf"]`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		file_url := "https://www.demos.org/" + element.Attr("href")
-		ctx.File = append(ctx.File, file_url)
+		fileURL := "https://www.demos.org/" + element.Attr("href")
+		ctx.File = append(ctx.File, fileURL)
 	})
 }

@@ -12,7 +12,7 @@ import (
 func init() {
 	engine := crawlers.Register("1051", "经济事务学会", "https://iea.org.uk")
 
-	engine.SetStartingUrls([]string{"https://iea.org.uk/sitemap_index.xml"})
+	engine.SetStartingURLs([]string{"https://iea.org.uk/sitemap_index.xml"})
 
 	extractorConfig := extractors.Config{
 		Image:       true,
@@ -28,7 +28,7 @@ func init() {
 		if strings.Contains(element.Text, "post-sitemap") {
 			engine.Visit(element.Text, crawlers.Index)
 		}
-		if strings.Contains(ctx.Url, "post-sitemap") {
+		if strings.Contains(ctx.URL, "post-sitemap") {
 			engine.Visit(element.Text, crawlers.News)
 		}
 	})

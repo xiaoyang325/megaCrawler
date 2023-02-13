@@ -11,7 +11,7 @@ func init() {
 	w := crawlers.Register("carnegieendowment", "卡内基国际和平基金会",
 		"https://carnegieendowment.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://carnegieendowment.org/programs/africa",
 		"https://carnegieendowment.org/programs/americanstatecraft/",
 		"https://carnegieendowment.org/programs/asia/",
@@ -71,6 +71,6 @@ func init() {
 
 	// 添加 Tag 到 ctx
 	w.OnHTML(".show-tag", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.Tags = append(ctx.Authors, strings.TrimSpace(element.Text))
+		ctx.Tags = append(ctx.Tags, strings.TrimSpace(element.Text))
 	})
 }

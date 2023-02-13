@@ -11,7 +11,7 @@ import (
 
 func init() {
 	w := crawlers.Register("heritage", "美国传统基金会", "https://www.heritage.org/")
-	w.SetStartingUrls([]string{"https://www.heritage.org/sitemap.xml"})
+	w.SetStartingURLs([]string{"https://www.heritage.org/sitemap.xml"})
 
 	w.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.Text, "?page=") {
@@ -64,7 +64,7 @@ func init() {
 
 	w.OnHTML(".expert-bio-card__photo", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		style := element.Attr("style")
-		reg, _ := regexp.Compile(`https?://(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z\d()]{1,6}\b([-a-zA-Z0-9@:%_+.~#?&/=]*)`)
+		reg := regexp.MustCompile(`https?://(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z\d()]{1,6}\b([-a-zA-Z0-9@:%_+.~#?&/=]*)`)
 		ctx.Image = []string{reg.FindString(style)}
 	})
 
@@ -73,7 +73,7 @@ func init() {
 	})
 
 	w.OnHTML(".article-general-info", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		reg, _ := regexp.Compile(`(\w+ \d+, \d+)`)
+		reg := regexp.MustCompile(`(\w+ \d+, \d+)`)
 		match := reg.FindString(element.Text)
 		times, err := time.Parse("Jan 2, 2006", match)
 		if err != nil {

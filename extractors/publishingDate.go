@@ -1,10 +1,11 @@
 package extractors
 
 import (
-	"fmt"
 	"megaCrawler/crawlers"
 	"regexp"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/araddon/dateparse"
 	"github.com/gocolly/colly/v2"
@@ -13,7 +14,7 @@ import (
 func pareDateStr(date string) (time.Time, error) {
 	parseAny, err := dateparse.ParseAny(date)
 	if err != nil {
-		return time.Time{}, fmt.Errorf("cannot parse time: %s", err.Error())
+		return time.Time{}, errors.Errorf("cannot parse time: %s", err.Error())
 	}
 	return parseAny, nil
 }
@@ -27,11 +28,7 @@ func MustParseTime(format string, text string) time.Time {
 }
 
 func getPublishingDate(dom *colly.HTMLElement) string {
-	var strictDateRegex, err = regexp.Compile(`\d+/\d+/\d+`)
-	if err != nil {
-		crawlers.Sugar.Panic("Compile regex failed", err)
-		return ""
-	}
+	var strictDateRegex = regexp.MustCompile(`\d+/\d+/\d+`)
 
 	publishDateTags := []selectorContentPair{
 		{

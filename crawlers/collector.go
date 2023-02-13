@@ -20,7 +20,7 @@ type CollectorConstructor struct {
 	parallelLimit    int
 	domainGlob       string
 	timeout          time.Duration
-	startingUrls     []string
+	startingURLs     []string
 	robotTxt         string
 	htmlHandlers     []CollyHTMLPair
 	xmlHandlers      []XMLPair

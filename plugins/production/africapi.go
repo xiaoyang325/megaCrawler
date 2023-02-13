@@ -8,7 +8,7 @@ import (
 
 func init() {
 	w := crawlers.Register("africapi", "Africapi", "https://africapi.org")
-	w.SetStartingUrls([]string{"https://www.africapi.org/africa-reseach-notes"})
+	w.SetStartingURLs([]string{"https://www.africapi.org/africa-reseach-notes"})
 
 	w.OnHTML(".bg-size-cover > .column-content-inner > .gsc-image-content", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		subCtx := ctx.CreateSubContext()

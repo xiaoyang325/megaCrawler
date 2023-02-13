@@ -8,7 +8,7 @@ import (
 
 func init() {
 	w := crawlers.Register("chinadaily", "中国日报", "https://www.chinadaily.com.cn/")
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.chinadaily.com.cn/china/governmentandpolicy",
 		"https://www.chinadaily.com.cn/china/society",
 		"https://www.chinadaily.com.cn/china/scitech",

@@ -5,20 +5,20 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 )
 
-func getJson(url string, target interface{}) error {
+func getJSON(url string, target interface{}) error {
 	r, err := http.Get(url)
 	if err != nil {
 		return err
 	}
 	defer r.Body.Close()
 	if r.StatusCode != http.StatusOK {
-		bodyB, _ := ioutil.ReadAll(r.Body)
-		bodyStr := string(bytes.Replace(bodyB, []byte("\r"), []byte("\r\n"), -1))
+		bodyB, _ := io.ReadAll(r.Body)
+		bodyStr := string(bytes.ReplaceAll(bodyB, []byte("\r"), []byte("\r\n")))
 		return errors.New(bodyStr)
 	}
 	decoder := json.NewDecoder(r.Body)
@@ -27,8 +27,8 @@ func getJson(url string, target interface{}) error {
 }
 
 type WebsiteStatus struct {
-	Id          string    `json:"id"`
-	BaseUrl     string    `json:"baseUrl"`
+	ID          string    `json:"id"`
+	BaseURL     string    `json:"baseURL"`
 	IsRunning   bool      `json:"isRunning"`
 	NextIter    time.Time `json:"nextIter"`
 	ProgressBar string    `json:"progressBar"`
@@ -43,16 +43,16 @@ type ErrorResp struct {
 }
 
 func GetWebsite(id string) (s WebsiteStatus, err error) {
-	err = getJson("http://127.0.0.1:7171/website/"+id+"/", &s)
+	err = getJSON("http://127.0.0.1:7171/website/"+id+"/", &s)
 	return
 }
 
 func GetWebsites() (websites []WebsiteStatus, err error) {
-	err = getJson("http://127.0.0.1:7171/websites/", &websites)
+	err = getJSON("http://127.0.0.1:7171/websites/", &websites)
 	return
 }
 
 func StartWebsite(id string) (s ErrorResp, err error) {
-	err = getJson("http://127.0.0.1:7171/website/"+id+"/start/", &s)
+	err = getJSON("http://127.0.0.1:7171/website/"+id+"/start/", &s)
 	return
 }

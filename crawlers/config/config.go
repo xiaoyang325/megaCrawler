@@ -1,3 +1,4 @@
+// Package config enable and disable certain plugin on demand
 package config
 
 import (
@@ -10,7 +11,7 @@ import (
 )
 
 type Config struct {
-	Id       string    `json:"id"`
+	ID       string    `json:"id"`
 	LastIter time.Time `json:"lastIter"`
 	Disabled bool      `json:"disabled"`
 	Name     string    `json:"name"`

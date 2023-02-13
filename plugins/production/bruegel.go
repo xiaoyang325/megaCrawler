@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("bruegel", "布鲁盖尔研究所", "https://www.bruegel.org/")
 
-	w.SetStartingUrls([]string{"https://www.bruegel.org/topics/banking-and-capital-markets",
+	w.SetStartingURLs([]string{"https://www.bruegel.org/topics/banking-and-capital-markets",
 		"https://www.bruegel.org/topics/digital-economy-and-innovation",
 		"https://www.bruegel.org/topics/european-governance",
 		"https://www.bruegel.org/topics/global-economy-and-trade",

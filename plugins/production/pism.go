@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("pism", "国际事务研究所", "https://www.pism.pl/")
 
-	w.SetStartingUrls([]string{"https://www.pism.pl/publikacje",
+	w.SetStartingURLs([]string{"https://www.pism.pl/publikacje",
 		"https://www.pism.pl/konferencje",
 		"https://www.pism.pl/pism_w_mediach/media",
 		"https://www.pism.pl/projekty"})

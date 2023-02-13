@@ -11,7 +11,7 @@ import (
 func init() {
 	engine := crawlers.Register("1075", "斯德哥尔摩国际和平研究所", "https://www.sipri.org")
 
-	engine.SetStartingUrls([]string{"https://www.sipri.org/sitemap.xml"})
+	engine.SetStartingURLs([]string{"https://www.sipri.org/sitemap.xml"})
 
 	extractorConfig := extractors.Config{
 		Author:      true,

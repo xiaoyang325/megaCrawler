@@ -9,7 +9,7 @@ import (
 func init() {
 	w := crawlers.Register("project2049", "2049计划研究所", "https://project2049.net/")
 
-	w.SetStartingUrls([]string{"https://project2049.net/category/blog/",
+	w.SetStartingURLs([]string{"https://project2049.net/category/blog/",
 		"https://project2049.net/category/publications/policy-briefs/",
 		"https://project2049.net/category/publications/occasional-papers/",
 		"https://project2049.net/category/publications/in-the-news/",

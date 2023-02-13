@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("china_org_cn", "中国新闻办公室", "http://www.china.org.cn/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"http://www.china.org.cn/china/node_7075073.htm",
 		"http://www.china.org.cn/china/node_7075074.htm",
 		"http://www.china.org.cn/china/node_7075075.htm",

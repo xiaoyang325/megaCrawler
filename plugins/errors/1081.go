@@ -53,17 +53,17 @@ func init() {
 			//	Crawler.Sugar.Error(err)
 			//	continue
 			//}
-			//reader, err := goquery.NewDocumentFromReader(fz)
-			//if err != nil {
+			// reader, err := goquery.NewDocumentFromReader(fz)
+			// if err != nil {
 			//	Crawler.Sugar.Error(err)
 			//	return
 			//}
-			//reader.Find("//loc").Each(func(i int, selection *goquery.Selection) {
+			// reader.Find("//loc").Each(func(i int, selection *goquery.Selection) {
 			//	url := selection.Text()
 			//	if strings.Contains(url, "/news/") || strings.Contains(url, "/groups/") {
 			//		engine.Visit(selection.Text(), Crawler.News)
 			//	}
-			//})
+			// })
 		}
 	})
 

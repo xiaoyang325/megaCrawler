@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("grc", "海湾研究中心", "https://www.grc.net/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.grc.net/commentary-and-analysis",
 		"https://www.grc.net/country-updates",
 	})

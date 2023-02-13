@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("ait", "美国在台协会", "https://www.ait.org.tw/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.ait.org.tw/news/",
 		"https://www.ait.org.tw/category/speeches/",
 		"https://www.ait.org.tw/category/news/",
@@ -43,7 +43,7 @@ func init() {
 		meta := element.ChildText(".datemeta")
 		if meta == "" {
 			str := element.ChildText(`p[style="text-align: right;"]`)
-			reg, _ := regexp.Compile(`[A-Z]{2}-\d+`)
+			reg := regexp.MustCompile(`[A-Z]{2}-\d+`)
 			str = reg.ReplaceAllString(str, "")
 			ctx.PublicationTime = strings.TrimSpace(str)
 		} else {

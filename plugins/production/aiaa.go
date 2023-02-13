@@ -12,7 +12,7 @@ import (
 func init() {
 	w := crawlers.Register("aiaa", "美国航空航天学会", "https://www.aiaa.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.aiaa.org/news/industry-news/1",
 		"https://www.aiaa.org/news/press-releases/1",
 		"https://www.aiaa.org/news/aiaa-news/1",
@@ -24,16 +24,16 @@ func init() {
 
 	// 从翻页器获取下一页 Index 并访问
 	w.OnHTML(".pagination", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		now := ctx.Url
-		reg, _ := regexp.Compile(`/\d+$`)
-		num_str := string(reg.Find([]byte(now)))
+		now := ctx.URL
+		reg := regexp.MustCompile(`/\d+$`)
+		numStr := string(reg.Find([]byte(now)))
 		now = reg.ReplaceAllString(now, "")
-		num_str = strings.Replace(num_str, "/", "", 1)
-		num, _ := strconv.Atoi(num_str)
+		numStr = strings.Replace(numStr, "/", "", 1)
+		num, _ := strconv.Atoi(numStr)
 		num += 1
-		num_str = "/" + strconv.Itoa(num)
-		new_url := now + num_str
-		w.Visit(new_url, crawlers.Index)
+		numStr = "/" + strconv.Itoa(num)
+		newURL := now + numStr
+		w.Visit(newURL, crawlers.Index)
 	})
 
 	// 从 Index 访问 News

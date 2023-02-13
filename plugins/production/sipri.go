@@ -8,7 +8,7 @@ import (
 
 func init() {
 	w := crawlers.Register("sipri", "斯德哥尔摩国际和平研究所", "https://sipri.org/")
-	w.SetStartingUrls([]string{"https://sipri.org/news/past",
+	w.SetStartingURLs([]string{"https://sipri.org/news/past",
 		"https://sipri.org/publications/search",
 		"https://sipri.org/media/issue_experts"})
 

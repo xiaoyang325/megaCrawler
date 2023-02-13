@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("inpr", "台湾国策研究院", "http://inpr.org.tw/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"http://inpr.org.tw/m/412-1728-111.php",
 		"http://inpr.org.tw/m/412-1728-112.php",
 		"http://inpr.org.tw/m/412-1728-113.php",

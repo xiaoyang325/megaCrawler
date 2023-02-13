@@ -1,4 +1,4 @@
-// Package Crawler is the main implementation of web scraper
+// Package crawlers is the main implementation of web scraper
 package crawlers
 
 import (
@@ -195,9 +195,12 @@ func Start() {
 		errorMap := map[string]string{}
 
 		TestAndPrintWebsite := func(engine *WebsiteEngine) {
-			for _, startingUrl := range engine.UrlProcessor.startingUrls {
+			for _, startingURL := range engine.Collector.startingURLs {
 				n++
-				resp, err := http.Get(startingUrl)
+				resp, err := http.Get(startingURL)
+				if err != nil {
+					return
+				}
 				err = resp.Body.Close()
 				if err != nil {
 					return
@@ -209,8 +212,8 @@ func Start() {
 					reason = fmt.Sprintf("Status Code: %d", resp.StatusCode)
 				}
 				if reason != "" {
-					println("[Error] Website:", startingUrl, ",", reason)
-					errorMap[startingUrl] = reason
+					println("[Error] Website:", startingURL, ",", reason)
+					errorMap[startingURL] = reason
 				}
 				gp.Done()
 			}
@@ -218,7 +221,7 @@ func Start() {
 
 		for _, engine := range WebMap {
 			engine.Scheduler.Stop()
-			gp.Add(len(engine.UrlProcessor.startingUrls))
+			gp.Add(len(engine.Collector.startingURLs))
 			go TestAndPrintWebsite(engine)
 		}
 		gp.Wait()

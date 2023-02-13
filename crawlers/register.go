@@ -22,15 +22,15 @@ func hash(s string) uint32 {
 }
 
 // Register 注册插件控制器
-func Register(service string, name string, baseUrl string) *WebsiteEngine {
-	k, err := tld.Parse(baseUrl)
+func Register(service string, name string, baseURL string) *WebsiteEngine {
+	k, err := tld.Parse(baseURL)
 	if err != nil {
 		panic(err)
 	}
 	engine := NewEngine(service, *k)
 	if c, ok := config.Configs[service]; !ok {
 		engine.Config = &config.Config{
-			Id:       service,
+			ID:       service,
 			LastIter: time.Time{},
 			Disabled: false,
 			Name:     name,

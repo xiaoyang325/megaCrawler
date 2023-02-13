@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("cgai", "全球事务研究所", "https://www.cgai.ca/")
 
-	w.SetStartingUrls([]string{"https://www.cgai.ca/defence_innovation",
+	w.SetStartingURLs([]string{"https://www.cgai.ca/defence_innovation",
 		"https://www.cgai.ca/defence_policy",
 		"https://www.cgai.ca/defence_resources",
 		"https://www.cgai.ca/defence_operations",

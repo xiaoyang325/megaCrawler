@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("bihr", "British Institute of Human Rights", "https://www.bihr.org.uk/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.bihr.org.uk/the-human-rights-act-the-icescr",
 		"https://www.bihr.org.uk/covid-19-vaccine-and-human-rights",
 		"https://www.bihr.org.uk/the-mental-health-act-reform-and-human-rights",

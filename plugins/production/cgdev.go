@@ -9,7 +9,7 @@ import (
 
 func init() {
 	w := crawlers.Register("cgdev", "全球发展中心", "https://www.cgdev.org/")
-	w.SetStartingUrls([]string{"https://www.cgdev.org/section/experts", "https://www.cgdev.org/section/publications"})
+	w.SetStartingURLs([]string{"https://www.cgdev.org/section/experts", "https://www.cgdev.org/section/publications"})
 
 	// 访问专家
 	w.OnHTML(" div.view-content > div > div > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {

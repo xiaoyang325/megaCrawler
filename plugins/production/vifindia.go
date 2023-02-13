@@ -22,7 +22,7 @@ func init() {
 	w := crawlers.Register("vifindia",
 		"维韦卡南达国际基金会", "https://www.vifindia.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.vifindia.org/articles/terrorism",
 		"https://www.vifindia.org/articles/JammuAndKashmir",
 		"https://www.vifindia.org/articles/LeftwingExtremism",
@@ -84,7 +84,7 @@ func init() {
 	// 从所有的Index中访问文章（除了/question-for-expert）。
 	w.OnHTML(".article_title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		// 将从带有/article路径访问的标记为News
-		if strings.Contains(ctx.Url, "/article") {
+		if strings.Contains(ctx.URL, "/article") {
 			w.Visit(element.Attr("href"), crawlers.News)
 		} else { // 其他标记为Report
 			w.Visit(element.Attr("href"), crawlers.Report)
@@ -94,8 +94,8 @@ func init() {
 	// 从/question-for-expert中访问文章。
 	w.OnHTML("a[class=\"article_title expert_title\"]", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		// 拼接为URL并访问。
-		question_url := "https://www.vifindia.org/" + element.Attr("href")
-		w.Visit(question_url, crawlers.Report)
+		questionURL := "https://www.vifindia.org/" + element.Attr("href")
+		w.Visit(questionURL, crawlers.Report)
 	})
 
 	// 从文章中添加标题（Title）到ctx。
@@ -123,9 +123,9 @@ func init() {
 	// 从/question-for-expert文章中添加作者（Authors）到ctx。
 	w.OnHTML("div[class=\"content clear-block\"]>.wrap > :nth-child(2)", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		// 去除掉名字前面的 "Replied by "。
-		out_name := strings.Replace(element.Text, "Replied by ", "", 1)
+		outName := strings.Replace(element.Text, "Replied by ", "", 1)
 		// 从“名字, 职务”中获取名字。
-		ctx.Authors = append(ctx.Authors, cutOutName(out_name))
+		ctx.Authors = append(ctx.Authors, cutOutName(outName))
 	})
 
 	// 从文章中添加正文（Content）到ctx。
@@ -141,8 +141,8 @@ func init() {
 	// 添加标签（Tags）到ctx（仅带/article路径的News文章含有）
 	w.OnHTML(".keywords_tags", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		// 获取所有tag子元素的文本组成的[]string。
-		tags_list := element.ChildTexts("li > a")
-		ctx.Tags = tags_list
+		tagsList := element.ChildTexts("li > a")
+		ctx.Tags = tagsList
 	})
 
 	// 从文章中添加观看数（ViewCount）和评论数（CommentCount）到ctx。

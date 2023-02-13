@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("dayan", "摩西·达扬中东和非洲研究中心", "https://dayan.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://dayan.org/subject/archives",
 		"https://dayan.org/journal/tel-aviv-notes-contemporary-middle-east-analysis",
 		"https://dayan.org/he/journal/328",
@@ -68,7 +68,7 @@ func init() {
 
 	// 获取 File
 	w.OnHTML(`[class="file file--mime-application-pdf file--application-pdf"] > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		file_url := "https://dayan.org" + element.Attr("href")
-		ctx.File = append(ctx.File, file_url)
+		fileURL := "https://dayan.org" + element.Attr("href")
+		ctx.File = append(ctx.File, fileURL)
 	})
 }

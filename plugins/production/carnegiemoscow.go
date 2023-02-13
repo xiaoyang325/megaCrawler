@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("carnegiemoscow", "卡内基莫斯科中心", "https://carnegiemoscow.org/")
 
-	w.SetStartingUrls([]string{"https://carnegiemoscow.org/programs/74",
+	w.SetStartingURLs([]string{"https://carnegiemoscow.org/programs/74",
 		"https://carnegiemoscow.org/programs/68",
 		"https://carnegiemoscow.org/programs/70",
 		"https://carnegiemoscow.org/programs/72",

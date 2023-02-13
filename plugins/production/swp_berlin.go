@@ -10,8 +10,8 @@ import (
 )
 
 // 将 URL 的路劲加上 "/en" 以进入英文页面
-func switchToEnglish(thisUrl *string) string {
-	urlStruct, _ := url.Parse(*thisUrl)
+func switchToEnglish(thisURL *string) string {
+	urlStruct, _ := url.Parse(*thisURL)
 	path := urlStruct.Path
 	path = "/en" + path
 	urlStruct.Path = path
@@ -22,18 +22,19 @@ func init() {
 	w := crawlers.Register("swp_berlin", "Stiftung Wissenschaft und Politik",
 		"https://www.swp-berlin.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.swp-berlin.org/sitemap.xml",
 	})
 
 	w.OnXML(`//loc`, func(element *colly.XMLElement, ctx *crawlers.Context) {
-		if strings.Contains(element.Text, "sitemap.xml") {
+		switch {
+		case strings.Contains(element.Text, "sitemap.xml"):
 			w.Visit(element.Text, crawlers.Index)
-		} else if strings.Contains(element.Text, "/wissenschaftler-in") {
+		case strings.Contains(element.Text, "/wissenschaftler-in"):
 			w.Visit(switchToEnglish(&element.Text), crawlers.Expert)
-		} else if strings.Contains(element.Text, "/presse") {
+		case strings.Contains(element.Text, "/presse"):
 			w.Visit(switchToEnglish(&element.Text), crawlers.News)
-		} else if strings.Contains(element.Text, "/publikation") {
+		case strings.Contains(element.Text, "/publikation"):
 			w.Visit(switchToEnglish(&element.Text), crawlers.Report)
 		}
 	})
@@ -87,16 +88,16 @@ func init() {
 	// 获取 File //
 	w.OnHTML(`body > header.publication-page > section > div > ul > li > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.Attr("href"), ".pdf") {
-			fileUrl := "https://www.swp-berlin.org" + element.Attr("href")
-			ctx.File = append(ctx.File, fileUrl)
+			fileURL := "https://www.swp-berlin.org" + element.Attr("href")
+			ctx.File = append(ctx.File, fileURL)
 		}
 	})
 
 	// 获取 File //
 	w.OnHTML(`div > ul.downloads__list > li > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.Attr("href"), ".pdf") {
-			fileUrl := "https://www.swp-berlin.org" + element.Attr("href")
-			ctx.File = append(ctx.File, fileUrl)
+			fileURL := "https://www.swp-berlin.org" + element.Attr("href")
+			ctx.File = append(ctx.File, fileURL)
 		}
 	})
 

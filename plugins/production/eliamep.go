@@ -8,7 +8,7 @@ import (
 
 func init() {
 	w := crawlers.Register("eliamep", "希腊欧洲与外交政策基金会", "https://www.eliamep.gr/en/")
-	w.SetStartingUrls([]string{"https://www.eliamep.gr/en/publications/",
+	w.SetStartingURLs([]string{"https://www.eliamep.gr/en/publications/",
 		"https://www.eliamep.gr/en/experts/"})
 
 	// index

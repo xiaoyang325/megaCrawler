@@ -11,7 +11,7 @@ func init() {
 	w := crawlers.Register("centerforsecuritypolicy", "安全政策中心",
 		"https://centerforsecuritypolicy.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://centerforsecuritypolicy.org/category/articles/",
 		"https://centerforsecuritypolicy.org/category/books-and-reports/",
 		"https://centerforsecuritypolicy.org/category/decision-briefs/",
@@ -28,7 +28,7 @@ func init() {
 	// 访问 News & Report 从 Index
 	w.OnHTML(`[class="article-title article-title-1"] > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		url := element.Attr("href")
-		if strings.Contains(ctx.Url, "/in-the-news/") || strings.Contains(ctx.Url, "/press-release/") {
+		if strings.Contains(ctx.URL, "/in-the-news/") || strings.Contains(ctx.URL, "/press-release/") {
 			w.Visit(url, crawlers.News)
 		} else {
 			w.Visit(url, crawlers.Report)
@@ -62,8 +62,8 @@ func init() {
 
 	// 获取 File
 	w.OnHTML(`.pf-content a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		fileUrl := element.Attr("href")
-		if strings.Contains(fileUrl, ".pdf") {
+		fileURL := element.Attr("href")
+		if strings.Contains(fileURL, ".pdf") {
 			ctx.File = append(ctx.File, element.Attr("href"))
 		}
 	})

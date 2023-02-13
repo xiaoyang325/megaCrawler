@@ -12,7 +12,7 @@ func init() {
 	w := crawlers.Register("cyber_fsi_stanford", "网络政策研究所",
 		"https://cyber.fsi.stanford.edu/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://cyber.fsi.stanford.edu/io",
 		"https://cyber.fsi.stanford.edu/people",
 	})
@@ -51,12 +51,12 @@ func init() {
 		ctx.Phone = strings.TrimSpace(element.Text)
 	})
 
-	// 获取 LinkedInId or TwitterId
+	// 获取 LinkedInID or TwitterID
 	w.OnHTML(`div.block-hero-content__links > div > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.Attr("href"), "linkedin.com") {
-			ctx.LinkedInId = strings.TrimSpace(element.Text)
+			ctx.LinkedInID = strings.TrimSpace(element.Text)
 		} else if strings.Contains(element.Attr("href"), "twitter.com") {
-			ctx.TwitterId = strings.TrimSpace(element.Text)
+			ctx.TwitterID = strings.TrimSpace(element.Text)
 		}
 	})
 

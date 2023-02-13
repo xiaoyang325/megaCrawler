@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("iidnet", "国际对话倡议", "https://iidnet.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://iidnet.org/press-releases-archive/",
 		"https://iidnet.org/resources-archive/",
 		"https://iidnet.org/news-archive/",

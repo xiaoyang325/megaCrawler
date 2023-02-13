@@ -9,7 +9,7 @@ import (
 
 func init() {
 	w := crawlers.Register("nids", "防卫研究所", "http://www.nids.mod.go.jp/index.html")
-	w.SetStartingUrls([]string{"http://www.nids.mod.go.jp/research/profile/index.html",
+	w.SetStartingURLs([]string{"http://www.nids.mod.go.jp/research/profile/index.html",
 		"http://www.nids.mod.go.jp/publication/index.html"})
 
 	// index

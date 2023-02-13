@@ -6,7 +6,7 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-func getMetaImgUrl(dom *colly.HTMLElement) string {
+func getMetaImgURL(dom *colly.HTMLElement) string {
 	topMetaImage := GetMetaContent(dom, "meta[property=\"og:image\"]")
 	if topMetaImage == "" {
 		topMetaImage = dom.ChildAttr("link[rel=\"img_src|image_src\"]", "href")
@@ -24,10 +24,10 @@ func getMetaImgUrl(dom *colly.HTMLElement) string {
 	}
 }
 
-func getImgUrls(dom *colly.HTMLElement) (images []string) {
+func getImgURLs(dom *colly.HTMLElement) (images []string) {
 	return dom.ChildAttrs("img", "src")
 }
 
 func Image(ctx *crawlers.Context, dom *colly.HTMLElement) {
-	ctx.Image = append([]string{getMetaImgUrl(dom)}, getImgUrls(dom)...)
+	ctx.Image = append([]string{getMetaImgURL(dom)}, getImgURLs(dom)...)
 }

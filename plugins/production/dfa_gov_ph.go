@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("dfa_gov_ph", "外交部外交服务研究所", "https://dfa.gov.ph/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://dfa.gov.ph/dfa-news/dfa-releasesupdate",
 		"https://dfa.gov.ph/dfa-news/statements-and-advisoriesupdate",
 		"https://dfa.gov.ph/dfa-news/news-from-our-foreign-service-postsupdate",

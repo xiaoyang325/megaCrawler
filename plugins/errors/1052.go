@@ -11,7 +11,7 @@ import (
 func init() {
 	engine := crawlers.Register("1052", "环境管理与评估研究所", "https://www.iema.net")
 
-	engine.SetStartingUrls([]string{"https://www.iema.net/sitemap.xml"})
+	engine.SetStartingURLs([]string{"https://www.iema.net/sitemap.xml"})
 
 	extractorConfig := extractors.Config{
 		Author:       true,

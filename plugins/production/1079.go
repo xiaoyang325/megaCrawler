@@ -10,7 +10,7 @@ import (
 func init() {
 	engine := crawlers.Register("1079", "孟加拉国企业研究所", "https://bei-bd.org")
 
-	engine.SetStartingUrls([]string{
+	engine.SetStartingURLs([]string{
 		"https://bei-bd.org/project-list/bei-outreach-program",
 		"https://bei-bd.org/project-list/current-projects",
 		"https://bei-bd.org/project-list/completed-projects",

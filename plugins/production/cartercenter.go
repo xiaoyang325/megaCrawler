@@ -11,7 +11,7 @@ func init() {
 	w := crawlers.Register("cartercenter", "卡特中心",
 		"https://www.cartercenter.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.cartercenter.org/peace/conflict_resolution/press-releases.html",
 		"https://www.cartercenter.org/peace/conflict_resolution/index.html",
 		"https://www.cartercenter.org/peace/conflict_resolution/press-releases.html",

@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("iai", "国际事务研究所", "https://www.iai.it/")
 
-	w.SetStartingUrls([]string{"https://www.iai.it/en/tema/africa",
+	w.SetStartingURLs([]string{"https://www.iai.it/en/tema/africa",
 		"https://www.iai.it/en/tema/399",
 		"https://www.iai.it/en/tema/13",
 		"https://www.iai.it/en/tema/9",

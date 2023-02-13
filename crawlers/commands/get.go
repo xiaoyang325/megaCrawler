@@ -11,8 +11,8 @@ func Get(id string) {
 		return
 	}
 	println("Website Name:", website.Name)
-	println("Website  id:", website.Id)
-	println("Website Url:", website.BaseUrl)
+	println("Website  id:", website.ID)
+	println("Website URL:", website.BaseURL)
 	println("Running?   :", website.IsRunning)
 	println("Next Run at:", website.NextIter.Format(time.RFC3339))
 	if website.IsRunning {

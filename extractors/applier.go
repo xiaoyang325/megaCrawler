@@ -1,4 +1,4 @@
-// Package Extractors Provide General Information Extractor for standard websites
+// Package extractors Provide General Information Extractor for standard websites
 package extractors
 
 import (

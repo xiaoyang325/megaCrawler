@@ -11,7 +11,7 @@ func init() {
 	w := crawlers.Register("ifri", "Institut français des relations internationales",
 		"https://www.ifri.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.ifri.org/fr/espace-media/communiques",
 		"https://www.ifri.org/fr/espace-media/dossiers-dactualite",
 		"https://www.ifri.org/fr/espace-media/lifri-medias",

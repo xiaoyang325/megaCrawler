@@ -11,7 +11,7 @@ func init() {
 	w := crawlers.Register("demandprogress", "Demand Progress",
 		"https://demandprogress.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://demandprogress.org/media/press-releases/",
 		"https://demandprogress.org/policy-work/",
 	})

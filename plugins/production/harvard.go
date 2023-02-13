@@ -9,7 +9,7 @@ import (
 func init() {
 	w := crawlers.Register("harvard", "哈佛大学政治研究所", "https://iop.harvard.edu/")
 
-	w.SetStartingUrls([]string{"https://iop.harvard.edu/fall-2022-harvard-youth-poll",
+	w.SetStartingURLs([]string{"https://iop.harvard.edu/fall-2022-harvard-youth-poll",
 		"https://iop.harvard.edu/conferences",
 		"https://iop.harvard.edu/youth-poll/spring-2022-harvard-youth-poll",
 		"https://iop.harvard.edu/youth-poll/fall-2021-harvard-youth-poll",

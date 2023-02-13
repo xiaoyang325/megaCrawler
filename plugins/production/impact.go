@@ -8,7 +8,7 @@ import (
 
 func init() {
 	w := crawlers.Register("impact", "影响新闻", "https://impactnews.uk/")
-	w.SetStartingUrls([]string{"https://impactnews.uk/news/"})
+	w.SetStartingURLs([]string{"https://impactnews.uk/news/"})
 
 	// index
 	w.OnHTML("div.alignleft > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {

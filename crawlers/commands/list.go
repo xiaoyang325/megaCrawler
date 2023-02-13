@@ -19,7 +19,7 @@ func List() {
 	for i, website := range websites {
 		if website.IsRunning {
 			table.Rich(
-				[]string{strconv.Itoa(i), website.Id, website.NextIter.Format(time.RFC3339), strconv.FormatBool(website.IsRunning)},
+				[]string{strconv.Itoa(i), website.ID, website.NextIter.Format(time.RFC3339), strconv.FormatBool(website.IsRunning)},
 				[]tablewriter.Colors{
 					{},
 					{},
@@ -30,7 +30,7 @@ func List() {
 			iter += website.IterPerSec
 		} else {
 			table.Rich(
-				[]string{strconv.Itoa(i), website.Id, website.NextIter.Format(time.RFC3339), strconv.FormatBool(website.IsRunning)},
+				[]string{strconv.Itoa(i), website.ID, website.NextIter.Format(time.RFC3339), strconv.FormatBool(website.IsRunning)},
 				[]tablewriter.Colors{
 					{},
 					{},

@@ -9,7 +9,7 @@ import (
 func init() {
 	w := crawlers.Register("commoncause", "Common Cause", "https://www.commoncause.org/")
 
-	w.SetStartingUrls([]string{"https://www.commoncause.org/democracy-wire/",
+	w.SetStartingURLs([]string{"https://www.commoncause.org/democracy-wire/",
 		"https://www.commoncause.org/our-work/voting-and-elections/",
 		"https://www.commoncause.org/our-work/gerrymandering-and-representation/",
 		"https://www.commoncause.org/our-work/ethics-and-accountability/",

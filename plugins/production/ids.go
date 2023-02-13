@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("ids", "发展研究所", "https://www.ids.ac.uk/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.ids.ac.uk/about/clusters-and-teams/",
 		"https://www.ids.ac.uk/events/",
 		"https://www.ids.ac.uk/news-and-opinion/",
@@ -55,9 +55,9 @@ func init() {
 
 	// 获取 PublicationTime (Type 2)
 	w.OnHTML(`p[class="c-basic-single-meta__item ts-heading-5"]`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		time_str := strings.Replace(element.Text, "Published on", "", 1)
-		time_str = strings.TrimSpace(time_str)
-		ctx.PublicationTime = strings.TrimSpace(time_str)
+		timeStr := strings.Replace(element.Text, "Published on", "", 1)
+		timeStr = strings.TrimSpace(timeStr)
+		ctx.PublicationTime = strings.TrimSpace(timeStr)
 	})
 
 	// 获取 CategoryText

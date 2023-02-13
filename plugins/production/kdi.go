@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("kdi", "发展研究会", "https://www.kdi.re.kr/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.kdi.re.kr/kdi_eng/topics/dep_strategy.jsp",
 		"https://www.kdi.re.kr/kdi_eng/topics/dep_policy.jsp",
 		"https://www.kdi.re.kr/kdi_eng/topics/office_studies.jsp",
@@ -21,11 +21,11 @@ func init() {
 
 	// 访问下一页 Index
 	w.OnHTML(`.list_pagination > span > a.on`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		page_num := strings.TrimSpace(element.Text)
-		num, _ := strconv.Atoi(page_num)
-		next_url := "https://www.kdi.re.kr/kdi_eng/issues/policy_information.jsp?pg="
-		next_url += strconv.Itoa(num+1) + "&pp="
-		w.Visit(next_url, crawlers.Index)
+		pageNum := strings.TrimSpace(element.Text)
+		num, _ := strconv.Atoi(pageNum)
+		nextURL := "https://www.kdi.re.kr/kdi_eng/issues/policy_information.jsp?pg="
+		nextURL += strconv.Itoa(num+1) + "&pp="
+		w.Visit(nextURL, crawlers.Index)
 	})
 
 	// 访问 Expert's Index
@@ -113,21 +113,21 @@ func init() {
 
 	// 获取 File
 	w.OnHTML(`#ui_contents > div > div.board_view_wrap > div.top_title > div > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		raw_str := element.Attr("onclick")
-		raw_str = strings.Replace(raw_str, "downloadvar(", "", 1)
-		raw_str = strings.Replace(raw_str, "download2(", "", 1)
-		raw_str = strings.Replace(raw_str, ");return false;", "", 1)
-		raw_str = strings.Replace(raw_str, "'", "", -1)
-		param_list := strings.Split(raw_str, ",")
-		for index, value := range param_list {
-			param_list[index] = strings.TrimSpace(value)
+		rawStr := element.Attr("onclick")
+		rawStr = strings.Replace(rawStr, "downloadvar(", "", 1)
+		rawStr = strings.Replace(rawStr, "download2(", "", 1)
+		rawStr = strings.Replace(rawStr, ");return false;", "", 1)
+		rawStr = strings.ReplaceAll(rawStr, "'", "")
+		paramList := strings.Split(rawStr, ",")
+		for index, value := range paramList {
+			paramList[index] = strings.TrimSpace(value)
 		}
-		param_1, param_2, param_3 := param_list[0], param_list[1], param_list[2]
+		param1, param2, param3 := paramList[0], paramList[1], paramList[2]
 
-		file_url := "https://www.kdi.re.kr/kdi_eng/common/report_download.jsp?list_no="
-		file_url += param_1 + "&member_pub=" + param_2 + "&type=" + param_3
-		file_url += "&cacheclear=81"
+		fileURL := "https://www.kdi.re.kr/kdi_eng/common/report_download.jsp?list_no="
+		fileURL += param1 + "&member_pub=" + param2 + "&type=" + param3
+		fileURL += "&cacheclear=81"
 
-		ctx.File = append(ctx.File, file_url)
+		ctx.File = append(ctx.File, fileURL)
 	})
 }

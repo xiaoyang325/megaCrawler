@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("chathamhouse", "查塔姆研究所", "https://www.chathamhouse.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.chathamhouse.org/topics/defence-and-security",
 		"https://www.chathamhouse.org/topics/economics-and-trade",
 		"https://www.chathamhouse.org/topics/environment",
@@ -200,11 +200,11 @@ func init() {
 		ctx.Phone = strings.TrimSpace(element.Text)
 	})
 
-	// Expert 获取 TwitterId, Email, LinkedIn
+	// Expert 获取 TwitterID, Email, LinkedIn
 	w.OnHTML(`.person-bio__contact-item > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.Attr("href"), "https://twitter.com/") {
 			t := strings.ReplaceAll(element.Attr("href"), "https://twitter.com/", "")
-			ctx.TwitterId = strings.TrimSpace(t)
+			ctx.TwitterID = strings.TrimSpace(t)
 		}
 		if strings.Contains(element.Attr("href"), "mailto:") {
 			e := strings.ReplaceAll(element.Attr("href"), "mailto:", "")
@@ -212,7 +212,7 @@ func init() {
 		}
 		if strings.Contains(element.Attr("href"), "https://www.linkedin.com/in/") {
 			l := strings.ReplaceAll(element.Attr("href"), "https://www.linkedin.com/in/", "")
-			ctx.LinkedInId = l
+			ctx.LinkedInID = l
 		}
 	})
 }

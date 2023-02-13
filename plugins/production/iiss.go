@@ -3,8 +3,11 @@ package production
 import (
 	"encoding/json"
 	"megaCrawler/crawlers"
+	"megaCrawler/extractors"
 	"regexp"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
 
 	"github.com/gocolly/colly/v2"
 )
@@ -19,14 +22,14 @@ type introComponent struct {
 }
 
 type readingComponent struct {
-	Html      string `json:"Html"`
+	HTML      string `json:"html"`
 	ClassName string `json:"className"`
 }
 
 type navComponent struct {
 	Current struct {
 		Text string `json:"Text"`
-		Url  string `json:"Url"`
+		URL  string `json:"URL"`
 		Date string `json:"Date"`
 	} `json:"Current"`
 }
@@ -41,7 +44,7 @@ type authorComponent struct {
 		About     string `json:"About"`
 		AboutLink string `json:"AboutLink"`
 		Social    struct {
-			Url  interface{} `json:"Url"`
+			URL  interface{} `json:"URL"`
 			Name interface{} `json:"Name"`
 		} `json:"Social"`
 		Contact  interface{} `json:"Contact"`
@@ -50,7 +53,7 @@ type authorComponent struct {
 	} `json:"Items"`
 }
 
-var reactRegex = regexp.MustCompile(`componentRenderQueue.push\(function\(\) \{ReactDOM.render\(React.createElement\(Components.(\w+), (\{.+})\), document.getElementById`)
+var reactRegex = regexp.MustCompile(`componentRenderQueue.push\(function\(\) \{ReactDOM.render\(React.createElement\(Components.(\w+), (\{.+})\), document.getElementByID`)
 
 func getReactComponentData(dom *colly.HTMLElement) (component string, data string) {
 	match := reactRegex.FindStringSubmatch(dom.Text)
@@ -64,21 +67,22 @@ func init() {
 	w := crawlers.Register("iiss", "International Institute for Strategic Studies",
 		"https://www.iiss.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.iiss.org/sitemap.xml",
 	})
 
 	// 访问文章从 sitemap
 	w.OnXML(`//loc`, func(element *colly.XMLElement, ctx *crawlers.Context) {
-		if strings.Contains(element.Text, "/blogs/") {
+		switch {
+		case strings.Contains(element.Text, "/blogs/"):
 			w.Visit(element.Text, crawlers.Report)
-		} else if strings.Contains(element.Text, "/press/") {
+		case strings.Contains(element.Text, "/press/"):
 			w.Visit(element.Text, crawlers.News)
-		} else if strings.Contains(element.Text, "/publications/") {
+		case strings.Contains(element.Text, "/publications/"):
 			w.Visit(element.Text, crawlers.Report)
-		} else if strings.Contains(element.Text, "/events/") {
+		case strings.Contains(element.Text, "/events/"):
 			w.Visit(element.Text, crawlers.Report)
-		} else if strings.Contains(element.Text, "/people/") {
+		case strings.Contains(element.Text, "/people/"):
 			w.Visit(element.Text, crawlers.Expert)
 		}
 	})
@@ -104,8 +108,14 @@ func init() {
 				err := json.Unmarshal([]byte(data), &c)
 				if err != nil {
 					crawlers.Sugar.Error(err)
+					return
 				}
-				ctx.Description += crawlers.HTML2Text(c.Html) + "\n"
+				document, err := goquery.NewDocumentFromReader(strings.NewReader(c.HTML))
+				if err != nil {
+					crawlers.Sugar.Error(err)
+					return
+				}
+				ctx.Description += extractors.TrimText(document.Selection) + "\n"
 			}
 		case crawlers.Index, crawlers.News, crawlers.Report:
 			switch component {
@@ -123,15 +133,32 @@ func init() {
 				if err != nil {
 					crawlers.Sugar.Error(err)
 				}
-				ctx.Title = crawlers.HTML2Text(c.Title)
-				ctx.SubTitle = crawlers.HTML2Text(c.Intro)
+				document, err := goquery.NewDocumentFromReader(strings.NewReader(c.Title))
+				if err != nil {
+					crawlers.Sugar.Error(err)
+					return
+				}
+				ctx.Title = extractors.TrimText(document.Selection)
+
+				document, err = goquery.NewDocumentFromReader(strings.NewReader(c.Intro))
+				if err != nil {
+					crawlers.Sugar.Error(err)
+					return
+				}
+				ctx.SubTitle = extractors.TrimText(document.Selection)
+
 			case "Reading":
 				var c readingComponent
 				err := json.Unmarshal([]byte(data), &c)
 				if err != nil {
 					crawlers.Sugar.Error(err)
 				}
-				ctx.Content += crawlers.HTML2Text(c.Html) + "\n"
+				document, err := goquery.NewDocumentFromReader(strings.NewReader(c.HTML))
+				if err != nil {
+					crawlers.Sugar.Error(err)
+					return
+				}
+				ctx.Content += extractors.TrimText(document.Selection) + "\n"
 			case "AuthorInfo":
 				var c authorComponent
 				err := json.Unmarshal([]byte(data), &c)

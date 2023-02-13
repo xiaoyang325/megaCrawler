@@ -2,7 +2,7 @@ package production
 
 import (
 	"megaCrawler/crawlers"
-	"strings"
+	"megaCrawler/extractors"
 	"time"
 
 	"github.com/araddon/dateparse"
@@ -12,7 +12,7 @@ import (
 func init() {
 	w := crawlers.Register("moffitt", "莫菲特癌症中心", "https://moffitt.org/")
 
-	w.SetStartingUrls([]string{"https://moffitt.org/XMLsitemap"})
+	w.SetStartingURLs([]string{"https://moffitt.org/XMLsitemap"})
 
 	w.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
 		w.Visit(element.Text, crawlers.Index)
@@ -24,7 +24,7 @@ func init() {
 
 	w.OnHTML(".m-article__content", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PageType = crawlers.News
-		ctx.Content = crawlers.HTML2Text(strings.TrimSpace(element.Text))
+		ctx.Content = extractors.TrimText(element.DOM)
 	})
 
 	w.OnHTML("h3", func(element *colly.HTMLElement, ctx *crawlers.Context) {

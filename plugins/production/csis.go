@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("csis", "战略与国际研究中心", "https://www.csis.org/")
 
-	w.SetStartingUrls([]string{"https://www.csis.org/experts", "https://www.csis.org/analysis"})
+	w.SetStartingURLs([]string{"https://www.csis.org/experts", "https://www.csis.org/analysis"})
 
 	// 尝试寻找下载pdf的按钮，并如果存在则将页面类型转换为报告
 	w.OnHTML("a.button", func(element *colly.HTMLElement, ctx *crawlers.Context) {
@@ -80,8 +80,8 @@ func init() {
 
 	// 正则匹配邮箱和电话号码
 	w.OnHTML("div.pane.pane--csis-contributor-contact-expert.pane--details > div.pane__content", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		emailRegex, _ := regexp.Compile(`Email: ([.@\w]+)`)
-		telRegex, _ := regexp.Compile(`Tel: ([.\w]+)`)
+		emailRegex := regexp.MustCompile(`Email: ([.@\w]+)`)
+		telRegex := regexp.MustCompile(`Tel: ([.\w]+)`)
 		emailMatch := emailRegex.FindStringSubmatch(element.Text)
 		telMatch := telRegex.FindStringSubmatch(element.Text)
 		if len(emailMatch) == 2 {
@@ -93,10 +93,10 @@ func init() {
 	})
 
 	w.OnHTML(".nav__link--linkedin", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.LinkedInId = element.Attr("href")
+		ctx.LinkedInID = element.Attr("href")
 	})
 
 	w.OnHTML(".nav__link--twitter", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.TwitterId = element.Attr("href")
+		ctx.TwitterID = element.Attr("href")
 	})
 }

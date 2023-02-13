@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("dgap", "外交关系协会", "https://dgap.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://dgap.org/en/research/expertise/geo-economics/g7",
 		"https://dgap.org/en/research/expertise/geo-economics/resources-and-energy",
 		"https://dgap.org/en/research/expertise/geo-economics/trade",
@@ -166,8 +166,8 @@ func init() {
 
 	// 获取 File
 	w.OnHTML(`article div.layout--twocol-section div.no-offset-widescreen.is-2-widescreen.is-3-tablet.is-2-widescreen.column div.block.block-layout-builder.block-field-blocknodedgap-articlefield-pdf-download.block-field-block > div > div.field__item > article div.field.field--name-field-media-file.field--type-file.field--label-hidden.field__item > span > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		file_url := "https://dgap.org/" + element.Attr("href")
-		ctx.File = append(ctx.File, file_url)
+		fileURL := "https://dgap.org/" + element.Attr("href")
+		ctx.File = append(ctx.File, fileURL)
 	})
 
 	// 获取 Location
@@ -195,9 +195,9 @@ func init() {
 		ctx.Email = strings.TrimSpace(element.Text)
 	})
 
-	// 获取 TwitterId
+	// 获取 TwitterID
 	w.OnHTML(`#block-dgap-content > article > div.layout--twocol-section.layout--twocol-section--is-6\:is-3.layout div.is-offset-1-widescreen.is-3-widescreen.is-4-desktop.column div.field.field--name-field-twitter.field--type-link.field--label-inline > div.field__item > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.TwitterId = strings.TrimSpace(strings.Replace(element.Text, "@", "", 1))
+		ctx.TwitterID = strings.TrimSpace(strings.Replace(element.Text, "@", "", 1))
 	})
 
 	// 获取 Description

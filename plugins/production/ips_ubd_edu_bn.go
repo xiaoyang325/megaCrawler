@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("ips_ubd_edu_bn", "战略与政策研究中心", "https://ips.ubd.edu.bn/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://ips.ubd.edu.bn/category/news/",
 		"https://ips.ubd.edu.bn/category/seminar-series/",
 	})
@@ -22,7 +22,7 @@ func init() {
 
 	// 访问 News 和 Report 从 Index
 	w.OnHTML(`div > p.read-more-wrap > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		if strings.Contains(ctx.Url, "/seminar-series") {
+		if strings.Contains(ctx.URL, "/seminar-series") {
 			w.Visit(element.Attr("href"), crawlers.Report)
 		} else {
 			w.Visit(element.Attr("href"), crawlers.News)

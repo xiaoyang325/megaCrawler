@@ -8,7 +8,7 @@ import (
 
 func init() {
 	w := crawlers.Register("cepa", "欧洲政策分析中心", "https://cepa.org/")
-	w.SetStartingUrls([]string{"https://cepa.org/about-cepa/team/experts/", "https://cepa.org/insights-analysis/"})
+	w.SetStartingURLs([]string{"https://cepa.org/about-cepa/team/experts/", "https://cepa.org/insights-analysis/"})
 
 	// 访问专家
 	w.OnHTML(".btn.btn-primary.text-cta", func(element *colly.HTMLElement, ctx *crawlers.Context) {

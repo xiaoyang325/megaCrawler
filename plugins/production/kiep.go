@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("kiep", "对外经济政策研究所", "https://www.kiep.go.kr/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.kiep.go.kr/gallery.es?mid=a20301000000&bid=0007",
 		"https://www.kiep.go.kr/gallery.es?mid=a20303000000&bid=0001&cg_code=C01,C02,C03,C04,C13,C19",
 		"https://www.kiep.go.kr/gallery.es?mid=a20304000000&bid=0001&cg_code=C05,C06,C07,C09,C10,C11,C12",
@@ -121,14 +121,14 @@ func init() {
 
 	// 获取 File
 	w.OnHTML(`.file > .list .link > .btn_line`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		file_url := "https://www.kiep.go.kr" + element.Attr("href")
-		ctx.File = append(ctx.File, file_url)
+		fileURL := "https://www.kiep.go.kr" + element.Attr("href")
+		ctx.File = append(ctx.File, fileURL)
 	})
 
 	// 获取 File (Type 2)
 	w.OnHTML(`p[class="btns txt_left"] > a.btn1`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		file_url := "https://www.kiep.go.kr" + element.Attr("href")
-		ctx.File = append(ctx.File, file_url)
+		fileURL := "https://www.kiep.go.kr" + element.Attr("href")
+		ctx.File = append(ctx.File, fileURL)
 	})
 
 	// 获取 Location

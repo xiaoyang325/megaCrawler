@@ -12,7 +12,7 @@ func init() {
 	w := crawlers.Register("premiumtimesng", "Premium Official News",
 		"https://www.premiumtimesng.com/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.premiumtimesng.com/category/gender",
 		"https://www.premiumtimesng.com/category/news",
 		"https://www.premiumtimesng.com/category/foreign",

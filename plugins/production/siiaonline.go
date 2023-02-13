@@ -12,7 +12,7 @@ import (
 
 func init() {
 	w := crawlers.Register("siiaonline", "新加坡国际事务学院", "http://www.siiaonline.org/")
-	w.SetStartingUrls([]string{"http://www.siiaonline.org/our-people/",
+	w.SetStartingURLs([]string{"http://www.siiaonline.org/our-people/",
 		"http://www.siiaonline.org/reports-index/"})
 
 	// 人物信息

@@ -24,14 +24,14 @@ func init() {
 	}
 
 	engine.OnLaunch(func() {
-		baseUrl := "https://www.civicus.org/index.php?option=com_minitekwall&task=masonry.getContent&widget_id=11&page="
+		baseURL := "https://www.civicus.org/index.php?option=com_minitekwall&task=masonry.getContent&widget_id=11&page="
 		for i := 0; true; i++ {
 			if engine.Test != nil && engine.Test.Done {
 				return
 			}
 
-			pageUrl := baseUrl + strconv.Itoa(i)
-			resp, err := http.Get(pageUrl)
+			pageURL := baseURL + strconv.Itoa(i)
+			resp, err := http.Get(pageURL)
 			if err != nil {
 				continue
 			}
@@ -45,11 +45,11 @@ func init() {
 				break
 			}
 			urls.Each(func(i int, selection *goquery.Selection) {
-				pageUrl, ok := selection.Attr("href")
+				pageURL, ok := selection.Attr("href")
 				if !ok {
 					return
 				}
-				engine.Visit(pageUrl, crawlers.News)
+				engine.Visit(pageURL, crawlers.News)
 			})
 
 			err = resp.Body.Close()

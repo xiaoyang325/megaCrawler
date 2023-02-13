@@ -18,15 +18,15 @@ const (
 
 type Context struct {
 	PageType           PageType   `json:"page_type"`
-	Id                 string     `json:"id"`
+	ID                 string     `json:"id"`
 	Title              string     `json:"title"`
 	Name               string     `json:"name"`
 	SubTitle           string     `json:"sub_title"`
-	Url                string     `json:"url"`
+	URL                string     `json:"url"`
 	Host               string     `json:"host"`
 	Website            string     `json:"website"`
 	CategoryText       string     `json:"category_text"`
-	CategoryId         string     `json:"category_id"`
+	CategoryID         string     `json:"category_id"`
 	Location           string     `json:"location"`
 	CityISO            string     `json:"city_iso"`
 	Language           string     `json:"language"`
@@ -55,25 +55,25 @@ type Context struct {
 	Phone              string     `json:"phone"`
 	Email              string     `json:"email"`
 	Education          string     `json:"education"`
-	TwitterId          string     `json:"twitter_id"`
-	LinkedInId         string     `json:"linked_in_id"`
-	FacebookId         string     `json:"facebook_id"`
-	InstagramId        string     `json:"instagram_id"`
-	WikipediaId        string     `json:"wikipedia_id"`
+	TwitterID          string     `json:"twitter_id"`
+	LinkedInID         string     `json:"linked_in_id"`
+	FacebookID         string     `json:"facebook_id"`
+	InstagramID        string     `json:"instagram_id"`
+	WikipediaID        string     `json:"wikipedia_id"`
 	ExpertWebsite      string     `json:"expert_website"`
 	CrawlTime          time.Time  `json:"crawl_time"`
 	SubContext         []*Context `json:"subContext"`
 }
 
 type news struct {
-	Id              string    `json:"id"`
+	ID              string    `json:"id"`
 	Title           string    `json:"title"`
 	SubTitle        string    `json:"sub_title"`
-	Url             string    `json:"url"`
+	URL             string    `json:"url"`
 	Host            string    `json:"host"`
 	Website         string    `json:"website"`
 	CategoryText    string    `json:"category_text"`
-	CategoryId      string    `json:"category_id"`
+	CategoryID      string    `json:"category_id"`
 	Location        string    `json:"location"`
 	CityISO         string    `json:"city_iso_cd"`
 	Language        string    `json:"language"`
@@ -98,14 +98,14 @@ type news struct {
 	StoredTimestamp int64     `json:"stored_timestamp"`
 }
 type report struct {
-	Id              string    `json:"id"`
+	ID              string    `json:"id"`
 	Title           string    `json:"title"`
 	SubTitle        string    `json:"sub_title"`
-	Url             string    `json:"url"`
+	URL             string    `json:"url"`
 	Host            string    `json:"host"`
 	Website         string    `json:"website"`
 	CategoryText    string    `json:"category_text"`
-	CategoryId      string    `json:"category_id"`
+	CategoryID      string    `json:"category_id"`
 	CityISO         string    `json:"city_iso_cd"`
 	Language        string    `json:"language"`
 	Authors         []string  `json:"author_name"`
@@ -127,14 +127,14 @@ type report struct {
 	StoredTimestamp int64     `json:"stored_timestamp"`
 }
 type expert struct {
-	Id              string    `json:"id"`
+	ID              string    `json:"id"`
 	Title           string    `json:"title"`
 	Name            string    `json:"name"`
-	Url             string    `json:"url"`
+	URL             string    `json:"url"`
 	Host            string    `json:"host"`
 	Website         string    `json:"website"`
 	CategoryText    string    `json:"category_text"`
-	CategoryId      string    `json:"category_id"`
+	CategoryID      string    `json:"category_id"`
 	Location        string    `json:"location"`
 	CityISO         string    `json:"city_iso"`
 	Language        string    `json:"language"`
@@ -146,11 +146,11 @@ type expert struct {
 	Phone           string    `json:"phone"`
 	Email           string    `json:"email"`
 	Education       string    `json:"education"`
-	TwitterId       string    `json:"twitter_user_id"`
-	LinkedInId      string    `json:"linkedin_user_id"`
-	FacebookId      string    `json:"facebook_user_id"`
-	InstagramId     string    `json:"instagram_user_id"`
-	WikipediaId     string    `json:"wikipedia_url"`
+	TwitterID       string    `json:"twitter_user_id"`
+	LinkedInID      string    `json:"linkedin_user_id"`
+	FacebookID      string    `json:"facebook_user_id"`
+	InstagramID     string    `json:"instagram_user_id"`
+	WikipediaID     string    `json:"wikipedia_url"`
 	ExpertWebsite   string    `json:"expert_website"`
 	CrawlTime       time.Time `json:"crawl_time"`
 	CrawlTimestamp  int64     `json:"crawl_timestamp"`
@@ -170,48 +170,48 @@ func (ctx *Context) CreateSubContext() (k *Context) {
 		Tags:       []string{},
 		Keywords:   []string{},
 		SubContext: []*Context{},
-		Url:        ctx.Url,
+		URL:        ctx.URL,
 		Host:       ctx.Host,
-		Website:    ctx.Id,
+		Website:    ctx.ID,
 		CrawlTime:  time.Time{},
 	}
 	ctx.SubContext = append(ctx.SubContext, k)
 	return k
 }
 
-func (ctx *Context) process(Test *tester.Tester) (success bool) {
+func (ctx *Context) process(tester *tester.Tester) (success bool) {
 	var err error
 	var marshal []byte
 	now := time.Now()
 	success = true
 
-	if Test != nil && Test.Report.Count+Test.News.Count+Test.Expert.Count > 100 && !Test.Done {
-		Test.Done = true
-		Sugar.Info("Test finished, limit reached")
-		Test.WG.Done()
+	if tester != nil && tester.Report.Count+tester.News.Count+tester.Expert.Count > 100 && !tester.Done {
+		tester.Done = true
+		Sugar.Info("tester finished, limit reached")
+		tester.WG.Done()
 		return false
 	}
 
 	for _, context := range ctx.SubContext {
-		go context.process(Test)
+		go context.process(tester)
 	}
 
 	switch ctx.PageType {
 	case Index:
-		if Test != nil {
-			Test.Index.Add(1)
+		if tester != nil {
+			tester.Index.Add(1)
 		}
 		return
 	case News:
 		n := news{
-			Id:              ctx.Id,
+			ID:              ctx.ID,
 			Title:           strings.TrimSpace(ctx.Title),
 			SubTitle:        strings.TrimSpace(ctx.SubTitle),
-			Url:             ctx.Url,
+			URL:             ctx.URL,
 			Host:            ctx.Host,
 			Website:         ctx.Website,
 			CategoryText:    strings.TrimSpace(ctx.CategoryText),
-			CategoryId:      ctx.CategoryId,
+			CategoryID:      ctx.CategoryID,
 			Location:        ctx.Location,
 			CityISO:         ctx.CityISO,
 			Language:        ctx.Language,
@@ -235,14 +235,14 @@ func (ctx *Context) process(Test *tester.Tester) (success bool) {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		}
-		if Test != nil {
-			Test.News.Add(1)
+		if tester != nil {
+			tester.News.Add(1)
 		}
 		if n.Title == "" || n.Content == "" {
 			return false
 		}
-		if Test != nil {
-			Test.News.AddFilled(1)
+		if tester != nil {
+			tester.News.AddFilled(1)
 		}
 		marshal, err = json.Marshal(n)
 		if err != nil {
@@ -257,14 +257,14 @@ func (ctx *Context) process(Test *tester.Tester) (success bool) {
 		return
 	case Report:
 		n := report{
-			Id:              ctx.Id,
+			ID:              ctx.ID,
 			Title:           strings.TrimSpace(ctx.Title),
 			SubTitle:        strings.TrimSpace(ctx.SubTitle),
-			Url:             ctx.Url,
+			URL:             ctx.URL,
 			Host:            ctx.Host,
 			Website:         ctx.Website,
 			CategoryText:    ctx.CategoryText,
-			CategoryId:      ctx.CategoryId,
+			CategoryID:      ctx.CategoryID,
 			CityISO:         ctx.CityISO,
 			Language:        ctx.Language,
 			Authors:         Unique(ctx.Authors),
@@ -285,14 +285,14 @@ func (ctx *Context) process(Test *tester.Tester) (success bool) {
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		}
-		if Test != nil {
-			Test.Report.Add(1)
+		if tester != nil {
+			tester.Report.Add(1)
 		}
 		if n.Title == "" || (n.Content == "" && len(n.File) == 0) {
 			return false
 		}
-		if Test != nil {
-			Test.Report.AddFilled(1)
+		if tester != nil {
+			tester.Report.AddFilled(1)
 		}
 		marshal, err = json.Marshal(n)
 		if err != nil {
@@ -311,14 +311,14 @@ func (ctx *Context) process(Test *tester.Tester) (success bool) {
 			image = ctx.Image[0]
 		}
 		n := expert{
-			Id:              ctx.Id,
+			ID:              ctx.ID,
 			Title:           strings.TrimSpace(ctx.Title),
 			Name:            strings.TrimSpace(ctx.Name),
-			Url:             ctx.Url,
+			URL:             ctx.URL,
 			Host:            ctx.Host,
 			Website:         ctx.Website,
 			CategoryText:    strings.TrimSpace(ctx.CategoryText),
-			CategoryId:      ctx.CategoryId,
+			CategoryID:      ctx.CategoryID,
 			Location:        ctx.Location,
 			CityISO:         ctx.CityISO,
 			Language:        ctx.Language,
@@ -330,25 +330,25 @@ func (ctx *Context) process(Test *tester.Tester) (success bool) {
 			Phone:           ctx.Phone,
 			Email:           ctx.Email,
 			Education:       ctx.Education,
-			TwitterId:       ctx.TwitterId,
-			LinkedInId:      ctx.LinkedInId,
-			FacebookId:      ctx.FacebookId,
-			InstagramId:     ctx.InstagramId,
-			WikipediaId:     ctx.WikipediaId,
+			TwitterID:       ctx.TwitterID,
+			LinkedInID:      ctx.LinkedInID,
+			FacebookID:      ctx.FacebookID,
+			InstagramID:     ctx.InstagramID,
+			WikipediaID:     ctx.WikipediaID,
 			ExpertWebsite:   ctx.ExpertWebsite,
 			CrawlTime:       ctx.CrawlTime,
 			CrawlTimestamp:  ctx.CrawlTime.Unix(),
 			StoredTime:      now,
 			StoredTimestamp: now.Unix(),
 		}
-		if Test != nil {
-			Test.Expert.Add(1)
+		if tester != nil {
+			tester.Expert.Add(1)
 		}
 		if n.Name == "" {
 			return false
 		}
-		if Test != nil {
-			Test.Expert.AddFilled(1)
+		if tester != nil {
+			tester.Expert.AddFilled(1)
 		}
 		marshal, err = json.Marshal(n)
 		if err != nil {

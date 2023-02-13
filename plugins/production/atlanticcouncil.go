@@ -12,11 +12,11 @@ import (
 func init() {
 	w := crawlers.Register("atlanticcouncil", "大西洋理事會", "https://www.atlanticcouncil.org/")
 
-	w.SetStartingUrls([]string{"https://www.atlanticcouncil.org/sitemap_index.xml"})
+	w.SetStartingURLs([]string{"https://www.atlanticcouncil.org/sitemap_index.xml"})
 
 	w.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
 		reg := regexp.MustCompile(`([a-zA-Z_-]+)\d*.xml`)
-		switch reg.FindStringSubmatch(ctx.Url)[1] {
+		switch reg.FindStringSubmatch(ctx.URL)[1] {
 		case "sitemap_index":
 			w.Visit(element.Text, crawlers.Index)
 		case "post-sitemap":
@@ -35,7 +35,7 @@ func init() {
 			ctx.Content = strings.Join(element.ChildTexts("p"), "\n")
 			return
 		}
-		ctx.Content = crawlers.HTML2Text(strings.TrimSpace(element.Text))
+		ctx.Content = extractors.TrimText(element.DOM)
 	})
 
 	w.OnHTML(".gta-post-site-banner--title", func(element *colly.HTMLElement, ctx *crawlers.Context) {

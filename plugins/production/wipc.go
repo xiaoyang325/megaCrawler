@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("wipc", "Women's International Peace Center", "https://wipc.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://wipc.org/blog/latest-news/",
 		"https://wipc.org/blog/featured-stories/",
 		"https://wipc.org/resources/reports/",
@@ -44,7 +44,7 @@ func init() {
 
 	// 获取 Tags ***
 	w.OnHTML(`.tags-links > a[rel="tag"]`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		tag := strings.Replace(element.Text, "#", "", -1)
+		tag := strings.ReplaceAll(element.Text, "#", "")
 		ctx.Tags = append(ctx.Tags, strings.TrimSpace(tag))
 	})
 

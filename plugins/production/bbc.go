@@ -9,7 +9,7 @@ import (
 
 func init() {
 	w := crawlers.Register("bbc", "英国广播公司", "https://www.bbc.com/")
-	w.SetStartingUrls([]string{"https://www.bbc.com/sitemaps/https-index-com-news.xml"})
+	w.SetStartingURLs([]string{"https://www.bbc.com/sitemaps/https-index-com-news.xml"})
 
 	w.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.Text, "/sitemaps/") {

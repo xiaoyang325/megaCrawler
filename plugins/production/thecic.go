@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("thecic", "国际理事会", "https://thecic.org/")
 
-	w.SetStartingUrls([]string{"https://thecic.org/post-sitemap.xml"})
+	w.SetStartingURLs([]string{"https://thecic.org/post-sitemap.xml"})
 
 	w.OnHTML("html", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		extractors.Authors(ctx, element)

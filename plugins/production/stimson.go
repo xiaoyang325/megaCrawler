@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("stimson", "史汀森中心东亚项目", "https://www.stimson.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		`https://www.stimson.org/?ee_search_query=%7B%7D&s=`,
 		`https://www.stimson.org/about/people/stimson-staff/`,
 	})
@@ -45,12 +45,12 @@ func init() {
 		ctx.Name = strings.TrimSpace(element.Text)
 	})
 
-	// 获取 Expert's Email & TwitterId
+	// 获取 Expert's Email & TwitterID
 	w.OnHTML(`#main > div > section.elementor-section.elementor-top-section.elementor-element.elementor-section-boxed.elementor-section-height-default.elementor-section-height-default > div > div.elementor-column.elementor-col-50.elementor-top-column.elementor-element.elementor-element-f6cdff5 > div > div.elementor-element.elementor-element-cf76f7c.elementor-widget.elementor-widget-post-info > div > ul > li > a `, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.Attr("href"), "mailto:") {
 			ctx.Email = strings.TrimSpace(strings.Replace(element.Text, "mailto:", "", 1))
 		} else if strings.Contains(element.Attr("href"), "twitter.com") {
-			ctx.TwitterId = strings.TrimSpace(strings.Replace(element.Text, "https://twitter.com/", "", 1))
+			ctx.TwitterID = strings.TrimSpace(strings.Replace(element.Text, "https://twitter.com/", "", 1))
 		}
 	})
 

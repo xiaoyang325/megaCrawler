@@ -11,7 +11,7 @@ func init() {
 	w := crawlers.Register("reproductiverights", "生殖权利中心",
 		"https://reproductiverights.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://reproductiverights.org/?s=",
 		"https://reproductiverights.org/covid-19-resources/",
 	})
@@ -51,9 +51,9 @@ func init() {
 		subCtx := ctx.CreateSubContext()
 		subCtx.PageType = crawlers.Report
 
-		file_url := element.ChildAttr("em > a", "href")
-		if strings.Contains(file_url, ".pdf") {
-			subCtx.File = append(subCtx.File, file_url)
+		fileURL := element.ChildAttr("em > a", "href")
+		if strings.Contains(fileURL, ".pdf") {
+			subCtx.File = append(subCtx.File, fileURL)
 		}
 
 		subCtx.Title = element.ChildText("em > a")

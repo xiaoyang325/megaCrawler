@@ -1,4 +1,4 @@
-// Package piie Contains Cloudflare protection and may not scrape any data.
+// Package production contain plugins that are ready for production
 package production
 
 import (
@@ -11,8 +11,8 @@ import (
 
 // 从名字列表中分离出所有名字，并加入到[]string中返回。
 func cutOutNames(nameStr string) []string {
-	reg, _ := regexp.Compile("(?U)[(].*[)]")
-	outAnd, _ := regexp.Compile("and")
+	reg := regexp.MustCompile("(?U)[(].*[)]")
+	outAnd := regexp.MustCompile("and")
 
 	result := reg.ReplaceAllString(nameStr, "")
 	result2 := outAnd.ReplaceAllString(result, ",")
@@ -29,7 +29,7 @@ func init() {
 	w := crawlers.Register("pile",
 		"彼得森国际经济研究所", "https://www.piie.com")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.piie.com/research/organizations/association-southeast-asian-nations",
 		"https://www.piie.com/research/economic-issues/coronavirus",
 		"https://www.piie.com/research/economic-issues/economic-outlook",
@@ -149,14 +149,14 @@ func init() {
 
 	// 从翻页器中获取新的Index
 	w.OnHTML("a[title=\"Go to next page\"]", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		toUrl := strings.Split(ctx.Url, "?")[0] + element.Attr("href")
-		w.Visit(toUrl, crawlers.Index)
+		toURL := strings.Split(ctx.URL, "?")[0] + element.Attr("href")
+		w.Visit(toURL, crawlers.Index)
 	})
 
 	// 从Index中进入文章（情况一）
 	w.OnHTML(".view__row>article>.teaser__body>.teaser__title>span>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		toUrl := "https://www.piie.com/" + element.Attr("href")
-		if strings.Contains(toUrl, "/blogs/") || strings.Contains(toUrl, "/events/") {
+		toURL := "https://www.piie.com/" + element.Attr("href")
+		if strings.Contains(toURL, "/blogs/") || strings.Contains(toURL, "/events/") {
 			w.Visit(element.Attr("href"), crawlers.News)
 		} else {
 			w.Visit(element.Attr("href"), crawlers.Report)
@@ -168,8 +168,8 @@ func init() {
 		if strings.Contains(element.Attr("href"), "https:") {
 			// 对于网站外的链接，什么也不做。
 		} else {
-			toUrl := "https://www.piie.com/" + element.Attr("href")
-			if strings.Contains(toUrl, "/blogs/") || strings.Contains(toUrl, "/events/") {
+			toURL := "https://www.piie.com/" + element.Attr("href")
+			if strings.Contains(toURL, "/blogs/") || strings.Contains(toURL, "/events/") {
 				w.Visit(element.Attr("href"), crawlers.News)
 			} else {
 				w.Visit(element.Attr("href"), crawlers.Report)
@@ -224,14 +224,14 @@ func init() {
 
 	// 从文章中添加文件（File）到ctx。（/publications/）（/commentary/）
 	w.OnHTML(".download-button>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		fileUrl := "https://www.piie.com" + element.Attr("href")
-		ctx.File = append(ctx.File, fileUrl)
+		fileURL := "https://www.piie.com" + element.Attr("href")
+		ctx.File = append(ctx.File, fileURL)
 	})
 
 	// 从文章中添加文件（File）到ctx。（/events/）
 	w.OnHTML("a[type=\"application/pdf\"]", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		fileUrl := "https://www.piie.com" + element.Attr("href")
-		ctx.File = append(ctx.File, fileUrl)
+		fileURL := "https://www.piie.com" + element.Attr("href")
+		ctx.File = append(ctx.File, fileURL)
 	})
 
 	w.OnHTML("meta[property=\"og:description\"]", func(element *colly.HTMLElement, ctx *crawlers.Context) {

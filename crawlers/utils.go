@@ -36,19 +36,19 @@ func Contain[T comparable](slice []T, check T) bool {
 }
 
 func successResponse(msg string) (b []byte, err error) {
-	errorJson := errorResp{
+	errorJSON := errorResp{
 		StatusCode: 200,
 		Message:    msg,
 	}
-	return json.Marshal(errorJson)
+	return json.Marshal(errorJSON)
 }
 
 func errorResponse(w http.ResponseWriter, statusCode int, msg string) (err error) {
-	errorJson := errorResp{
+	errorJSON := errorResp{
 		StatusCode: statusCode,
 		Message:    msg,
 	}
-	b, err := json.Marshal(errorJson)
+	b, err := json.Marshal(errorJSON)
 	if err != nil {
 		return err
 	}
@@ -65,17 +65,17 @@ func StandardizeSpaces(s string) string {
 	return strings.Join(strings.Fields(s), " ")
 }
 
-func GetNextIndexURL(currentUrl string, currentPageNum string, paramName string) string {
-	thisUrl, _ := url.Parse(currentUrl)
-	paramList := thisUrl.Query()
+func GetNextIndexURL(currentURL string, currentPageNum string, paramName string) string {
+	thisURL, _ := url.Parse(currentURL)
+	paramList := thisURL.Query()
 
 	currentNum, _ := strconv.Atoi(currentPageNum)
 	currentNum++
 
 	paramList.Set(paramName, strconv.Itoa(currentNum))
-	thisUrl.RawQuery = paramList.Encode()
+	thisURL.RawQuery = paramList.Encode()
 
-	return thisUrl.String()
+	return thisURL.String()
 }
 
 func spread(args interface{}) (k []interface{}) {

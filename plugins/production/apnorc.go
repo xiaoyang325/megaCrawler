@@ -11,7 +11,7 @@ func init() {
 	w := crawlers.Register("apnorc", "Associated Press-NORC Center for Public Affairs Research",
 		"https://apnorc.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://apnorc.org/experts/",
 		"https://apnorc.org/topics/economics/",
 		"https://apnorc.org/topics/politics/",

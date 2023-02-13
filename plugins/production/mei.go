@@ -10,7 +10,7 @@ import (
 
 func init() {
 	w := crawlers.Register("mei", "中东研究所", "https://www.mei.edu/")
-	w.SetStartingUrls([]string{"https://www.mei.edu/policy-analysis", "https://www.mei.edu/experts"})
+	w.SetStartingURLs([]string{"https://www.mei.edu/policy-analysis", "https://www.mei.edu/experts"})
 
 	// index
 	w.OnHTML(".pager__item > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {

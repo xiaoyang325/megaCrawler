@@ -99,7 +99,7 @@ func websiteHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if website, ok := WebMap[id]; ok {
-			b, err = website.toJson()
+			b, err = website.toJSON()
 			if err != nil {
 				Sugar.Error(err)
 			}

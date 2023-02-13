@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("csis_or_id", "战略与国际研究中心", "https://csis.or.id/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://csis.or.id/projects/",
 		"https://csis.or.id/publications/books/",
 		"https://csis.or.id/publications/commentaries/",

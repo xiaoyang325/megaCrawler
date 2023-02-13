@@ -11,7 +11,7 @@ func init() {
 	w := crawlers.Register("humanrights_uconn", "国防部人权中心",
 		"https://uconn.edu/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://today.uconn.edu/archives/",
 		"https://humanrights.uconn.edu/leadership-staff/",
 		"https://humanrights.uconn.edu/about/our-people/faculty/",

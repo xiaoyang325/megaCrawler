@@ -8,7 +8,7 @@ import (
 
 func init() {
 	w := crawlers.Register("si", "史密斯研究所", "https://www.smithinst.co.uk/")
-	w.SetStartingUrls([]string{"https://www.smithinst.co.uk/insights/",
+	w.SetStartingURLs([]string{"https://www.smithinst.co.uk/insights/",
 		"https://www.smithinst.co.uk/the-team/"})
 
 	// index

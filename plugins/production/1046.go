@@ -10,7 +10,7 @@ import (
 func init() {
 	engine := crawlers.Register("1046", "激进派右翼分析中心", "https://www.radicalrightanalysis.com")
 
-	engine.SetStartingUrls([]string{"https://www.radicalrightanalysis.com/wp-sitemap-posts-post-1.xml"})
+	engine.SetStartingURLs([]string{"https://www.radicalrightanalysis.com/wp-sitemap-posts-post-1.xml"})
 
 	extractorConfig := extractors.Config{
 		Author:      true,

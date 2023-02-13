@@ -9,7 +9,7 @@ import (
 
 func init() {
 	w := crawlers.Register("horninstitute", "Horn Institute", "https://horninstitute.org")
-	w.SetStartingUrls([]string{"https://horninstitute.org/blogs/", "https://horninstitute.org/reports/", "https://horninstitute.org/papers/"})
+	w.SetStartingURLs([]string{"https://horninstitute.org/blogs/", "https://horninstitute.org/reports/", "https://horninstitute.org/papers/"})
 
 	w.OnHTML(".title_link > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		w.Visit(element.Attr("href"), crawlers.News)

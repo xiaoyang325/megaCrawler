@@ -2,9 +2,10 @@ package extractors
 
 import (
 	_ "embed"
-	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -173,7 +174,7 @@ func getWordCount(content string, language string) (WordStats, error) {
 	var wordStats WordStats
 	stopWords, ok := stopWords[language]
 	if !ok {
-		return wordStats, fmt.Errorf("language %s not supported", language)
+		return wordStats, errors.Errorf("language %s not supported", language)
 	}
 	strippedContent := removePunctuationRegex.ReplaceAllString(content, "")
 	candidateWords := strings.Split(strippedContent, " ")

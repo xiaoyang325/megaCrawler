@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("csdsafrica", "战略与国防研究中心", "https://csdsafrica.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://csdsafrica.org/close-protection-africa/",
 		"https://csdsafrica.org/our-insights/",
 	})
@@ -43,8 +43,8 @@ func init() {
 
 	// 获取 Authors
 	w.OnHTML(`#main > div.container_wrap.container_wrap_first.main_color.sidebar_right > div > main > article > div.entry-content-wrapper.clearfix.standard-content > div.entry-content > p[style="text-align: center;"] > strong`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		raw_str := strings.Replace(element.Text, "–", "", 1)
-		ctx.Authors = append(ctx.Authors, strings.TrimSpace(raw_str))
+		rawStr := strings.Replace(element.Text, "–", "", 1)
+		ctx.Authors = append(ctx.Authors, strings.TrimSpace(rawStr))
 	})
 
 	// 获取 CommentCount

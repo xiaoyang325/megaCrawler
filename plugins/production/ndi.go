@@ -10,7 +10,7 @@ import (
 
 func init() {
 	w := crawlers.Register("ndi", "国际民主研究所", "https://www.ndi.org/")
-	w.SetStartingUrls([]string{"https://www.ndi.org/sitemap.xml"})
+	w.SetStartingURLs([]string{"https://www.ndi.org/sitemap.xml"})
 
 	w.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
 		w.Visit(element.Text, crawlers.News)

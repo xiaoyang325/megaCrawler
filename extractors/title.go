@@ -15,12 +15,12 @@ func splitTitle(title string, splitter string, hint string) string {
 	titlePieces := strings.Split(title, splitter)
 
 	if hint != "" {
-		filterRegex, _ := regexp.Compile(`[^a-zA-Z\d ]`)
+		filterRegex := regexp.MustCompile(`[^a-zA-Z\d ]`)
 		hint = strings.ToLower(filterRegex.ReplaceAllString(hint, ""))
 	}
 
 	for i, piece := range titlePieces {
-		filterRegex, _ := regexp.Compile(`[^a-zA-Z\d ]`)
+		filterRegex := regexp.MustCompile(`[^a-zA-Z\d ]`)
 		current := strings.TrimSpace(piece)
 		if hint != "" && strings.Contains(hint, strings.ToLower(filterRegex.ReplaceAllString(current, ""))) {
 			largeTextIndex = i
@@ -43,11 +43,7 @@ func splitTitle(title string, splitter string, hint string) string {
 //	- h1, if properly detected, is the best (visible to users)
 //	- og:title and h1 can help improve the title extraction
 func getTitle(dom *colly.HTMLElement) (title string) {
-	var filterRegex, err = regexp.Compile("[^\u4e00-\u9fa5a-zA-Z\\d ]")
-	if err != nil {
-		crawlers.Sugar.Panic("Compile regex failed", err)
-		return
-	}
+	var filterRegex = regexp.MustCompile("[^\u4e00-\u9fa5a-zA-Z\\d ]")
 	title = dom.ChildText("title")
 	var useDelimiter bool
 	if len(title) == 0 {
@@ -77,15 +73,13 @@ func getTitle(dom *colly.HTMLElement) (title string) {
 	filterTitleH1 := strings.ToLower(filterRegex.ReplaceAllString(titleH1, ""))
 	filterTitleOG := strings.ToLower(filterRegex.ReplaceAllString(titleOG, ""))
 
-	if titleH1 == title {
+	switch {
+	case titleH1 == title:
 		useDelimiter = true
-	} else if filterTitleH1 == filterTitleOG && filterTitleH1 != "" {
+	case filterTitleH1 != "" && (filterTitleH1 == filterTitleOG) || (strings.Contains(filterTitleText, filterTitleH1) && filterTitleOG != "" && strings.Contains(filterTitleText, filterTitleOG) && len(filterTitleH1) > len(titleOG)):
 		title = titleH1
 		useDelimiter = true
-	} else if filterTitleH1 != "" && strings.Contains(filterTitleText, filterTitleH1) && filterTitleOG != "" && strings.Contains(filterTitleText, filterTitleOG) && len(filterTitleH1) > len(titleOG) {
-		title = titleH1
-		useDelimiter = true
-	} else if filterTitleOG != "" && strings.HasPrefix(filterTitleText, filterTitleOG) && filterTitleOG != filterTitleText {
+	case filterTitleOG != "" && strings.HasPrefix(filterTitleText, filterTitleOG) && filterTitleOG != filterTitleText:
 		title = titleOG
 		useDelimiter = true
 	}

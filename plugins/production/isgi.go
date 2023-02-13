@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("isgi", "国际法律研究所", "https://www.isgi.cnr.it/")
 
-	w.SetStartingUrls([]string{"https://www.isgi.cnr.it/altri-eventi/",
+	w.SetStartingURLs([]string{"https://www.isgi.cnr.it/altri-eventi/",
 		"https://www.isgi.cnr.it/progetti-conclusi-2/",
 		"https://www.isgi.cnr.it/pubblicazioni/italian-reports-on-international-humanitarian-law/",
 		"https://www.isgi.cnr.it/pubblicazioni/la-prassi-italiana-di-diritto-internazionale/",

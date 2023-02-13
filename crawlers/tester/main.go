@@ -1,3 +1,4 @@
+// Package tester provide a testing utils to visualize how a plugin is performing
 package tester
 
 import (

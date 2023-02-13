@@ -8,8 +8,8 @@ import (
 )
 
 // 由于不知道的原因，Tag 和 Authors 会被重复添加，这个函数用来阻止
-func strInSlice(name string, name_list *[]string) bool {
-	for _, value := range *name_list {
+func strInSlice(name string, nameList *[]string) bool {
+	for _, value := range *nameList {
 		if name == value {
 			return true
 		}

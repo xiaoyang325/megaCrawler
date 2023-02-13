@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("razumkov_org_ua", "拉祖姆科夫中心", "https://razumkov.org.ua/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://razumkov.org.ua/en/research-areas/economy",
 		"https://razumkov.org.ua/en/research-areas/security",
 		"https://razumkov.org.ua/en/research-areas/energy",

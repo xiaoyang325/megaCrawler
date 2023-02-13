@@ -11,7 +11,7 @@ func init() {
 	w := crawlers.Register("prri", "公共宗教研究所",
 		"https://www.prri.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.prri.org/topic/abortion-reproductive-health/",
 		"https://www.prri.org/topic/climate-change-science/",
 		"https://www.prri.org/topic/economy/",

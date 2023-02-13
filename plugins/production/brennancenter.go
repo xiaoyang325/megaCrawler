@@ -11,7 +11,7 @@ func init() {
 	w := crawlers.Register("brennancenter", "布伦南司法中心",
 		"https://www.brennancenter.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.brennancenter.org/issues/reform-money-politics/foreign-spending",
 		"https://www.brennancenter.org/issues/defend-our-elections/independent-state-legislature-theory",
 		"https://www.brennancenter.org/issues/strengthen-our-courts/scotus-federal-courts",
@@ -149,9 +149,9 @@ func init() {
 		ctx.Name = element.Text
 	})
 
-	// 获取 Expert 的 TwitterId
+	// 获取 Expert 的 TwitterID
 	w.OnHTML(".page-bio-header__twitter > span > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.TwitterId = strings.Replace(element.Attr("href"), "https://twitter.com/", "", 1)
+		ctx.TwitterID = strings.Replace(element.Attr("href"), "https://twitter.com/", "", 1)
 	})
 
 	// 获取 Expert 的 CategoryText

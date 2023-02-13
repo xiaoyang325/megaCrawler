@@ -9,7 +9,7 @@ import (
 
 func init() {
 	w := crawlers.Register("ips", "伊斯兰堡政策研究所", "https://www.ips.org.pk/")
-	w.SetStartingUrls([]string{"https://www.ips.org.pk/category/ips-events/",
+	w.SetStartingURLs([]string{"https://www.ips.org.pk/category/ips-events/",
 		"https://www.ips.org.pk/ips-lead/the-living-scripts/",
 		"https://www.ips.org.pk/category/research/pakistan-affairs/",
 		"https://www.ips.org.pk/category/research-themes/international-relations/",

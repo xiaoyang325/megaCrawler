@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("idea_int", "国际民主与选举援助研究所", "https://www.idea.int/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.idea.int/publications/catalogue",
 		"https://www.idea.int/news-media/news",
 		"https://www.idea.int/blog",
@@ -124,7 +124,7 @@ func init() {
 	// 获取 ViewCount
 	w.OnHTML(`.row .views [class="field-item even"]`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		var str = strings.TrimSpace(element.Text)
-		str = strings.Replace(str, ",", "", -1)
+		str = strings.ReplaceAll(str, ",", "")
 		num, _ := strconv.Atoi(str)
 		ctx.ViewCount = num
 	})

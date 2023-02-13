@@ -9,7 +9,7 @@ import (
 func init() {
 	w := crawlers.Register("usip", "美国和平研究所战略稳定与安全办公室", "https://www.usip.org/")
 
-	w.SetStartingUrls([]string{"https://www.usip.org/regions/asia/afghanistan",
+	w.SetStartingURLs([]string{"https://www.usip.org/regions/asia/afghanistan",
 		"https://www.usip.org/regions/americas/bolivia",
 		"https://www.usip.org/regions/asia/burma",
 		"https://www.usip.org/regions/africa/central-african-republic",
@@ -93,7 +93,7 @@ func init() {
 	})
 	// report .content
 	w.OnHTML("section.intro-wysiwyg", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.Content = ctx.Content + element.Text
+		ctx.Content += element.Text
 	})
 	w.OnHTML("section.wysiwyg", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = element.Text

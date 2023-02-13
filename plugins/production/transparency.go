@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("transparency", "透明国际", "https://www.transparency.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.transparency.org/en/news",
 		"https://www.transparency.org/en/blog",
 		"https://www.transparency.org/en/publications",

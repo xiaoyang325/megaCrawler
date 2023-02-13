@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("clingendael", "国际关系研究所", "https://www.clingendael.org/")
 
-	w.SetStartingUrls([]string{"https://www.clingendael.org/publications",
+	w.SetStartingURLs([]string{"https://www.clingendael.org/publications",
 		"https://www.clingendael.org/topic/security-and-justice",
 		"https://www.clingendael.org/topic/business-and-fragility",
 		"https://www.clingendael.org/topic/aid-architecture",

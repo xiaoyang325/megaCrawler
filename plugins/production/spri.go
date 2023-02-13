@@ -11,7 +11,7 @@ import (
 
 func init() {
 	w := crawlers.Register("spri", "安全政策改革研究所", "https://www.securityreform.org/")
-	w.SetStartingUrls([]string{"https://www.securityreform.org/news-and-analysis"})
+	w.SetStartingURLs([]string{"https://www.securityreform.org/news-and-analysis"})
 
 	w.OnHTML("html", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		extractors.Tags(ctx, element)
@@ -34,14 +34,14 @@ func init() {
 	})
 
 	w.OnHTML(".like-count", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		reg, _ := regexp.Compile(`\d+`)
+		reg := regexp.MustCompile(`\d+`)
 		if val, err := strconv.Atoi(reg.FindString(element.Text)); err != nil {
 			ctx.LikeCount = val
 		}
 	})
 
 	w.OnHTML(".comment-count", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		reg, _ := regexp.Compile(`\d+`)
+		reg := regexp.MustCompile(`\d+`)
 		if val, err := strconv.Atoi(reg.FindString(element.Text)); err != nil {
 			ctx.LikeCount = val
 		}

@@ -11,7 +11,7 @@ func init() {
 	w := crawlers.Register("quincyinst", "昆西负责任治国方略研究所",
 		"https://quincyinst.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://quincyinst.org/category/middle-east/",
 		"https://quincyinst.org/category/east-asia/",
 		"https://quincyinst.org/category/grand-strategy/",

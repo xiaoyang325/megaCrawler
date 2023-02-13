@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("rra", "激进派右翼分析中心", "https://www.radicalrightanalysis.com/")
 
-	w.SetStartingUrls([]string{"https://www.radicalrightanalysis.com/wp-sitemap-posts-post-1.xml"})
+	w.SetStartingURLs([]string{"https://www.radicalrightanalysis.com/wp-sitemap-posts-post-1.xml"})
 
 	w.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
 		w.Visit(element.Text, crawlers.News)

@@ -21,16 +21,16 @@ func getURLFromFunctionCall(functionCall string, channelType string) string {
 	}
 
 	param1, param2 := paramList[1], paramList[2]
-	fileUrl := "https://www.ifans.go.kr/knda/ifans/eng/act/"
-	fileUrl += channelType + ".do?sn=" + param1 + "&boardSe=" + param2
+	fileURL := "https://www.ifans.go.kr/knda/ifans/eng/act/"
+	fileURL += channelType + ".do?sn=" + param1 + "&boardSe=" + param2
 
-	return fileUrl
+	return fileURL
 }
 
 func init() {
 	w := crawlers.Register("ifans", "外交与国家安全研究所", "https://www.ifans.go.kr/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.ifans.go.kr/knda/ifans/eng/act/ActivityList.do?ctgrySe=02&pageIndex=1",
 		"https://www.ifans.go.kr/knda/ifans/eng/act/ActivityList.do?ctgrySe=15&pageIndex=1",
 		"https://www.ifans.go.kr/knda/ifans/eng/act/ActivityList.do?ctgrySe=03&pageIndex=1",
@@ -53,22 +53,22 @@ func init() {
 	// 访问下一页 Index
 	w.OnHTML(`#listForm > div.pagination > span.on`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		// 从当前 Index 的 URL 获取下一页 Index 的 URL
-		nextUrl := crawlers.GetNextIndexURL(ctx.Url, strings.TrimSpace(element.Text), "pageIndex")
-		w.Visit(nextUrl, crawlers.Index)
+		nextURL := crawlers.GetNextIndexURL(ctx.URL, strings.TrimSpace(element.Text), "pageIndex")
+		w.Visit(nextURL, crawlers.Index)
 	})
 
 	// 访问 Report 从 Index
 	w.OnHTML(`#listForm > ul.board_list > li > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		var reportUrl string
+		var reportURL string
 
 		// 从 a[onclick] 中的函数调用获取 Report 的 URL
-		if strings.Contains(ctx.Url, "ActivityList") {
-			reportUrl = getURLFromFunctionCall(element.Attr("onclick"), "ActivityView")
-		} else if strings.Contains(ctx.Url, "ActivityAreaList") {
-			reportUrl = getURLFromFunctionCall(element.Attr("onclick"), "ActivityAreaView")
+		if strings.Contains(ctx.URL, "ActivityList") {
+			reportURL = getURLFromFunctionCall(element.Attr("onclick"), "ActivityView")
+		} else if strings.Contains(ctx.URL, "ActivityAreaList") {
+			reportURL = getURLFromFunctionCall(element.Attr("onclick"), "ActivityAreaView")
 		}
 
-		w.Visit(reportUrl, crawlers.Report)
+		w.Visit(reportURL, crawlers.Report)
 	})
 
 	// 获取 Title
@@ -122,8 +122,8 @@ func init() {
 
 	// 获取 File
 	w.OnHTML(`#detailForm > div.editor.board_con.con_in > dl > dd > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		fileUrl := "https://www.ifans.go.kr" + element.Attr("href")
-		ctx.File = append(ctx.File, fileUrl)
+		fileURL := "https://www.ifans.go.kr" + element.Attr("href")
+		ctx.File = append(ctx.File, fileURL)
 	})
 
 	// 获取 Tags

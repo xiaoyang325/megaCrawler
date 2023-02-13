@@ -11,7 +11,7 @@ import (
 func init() {
 	w := crawlers.Register("usni", "海军研究所", "https://news.usni.org/")
 
-	w.SetStartingUrls([]string{"https://news.usni.org/",
+	w.SetStartingURLs([]string{"https://news.usni.org/",
 		"https://news.usni.org/category/documents",
 		"https://news.usni.org/topstories",
 		"https://news.usni.org/tag/coronavirus",

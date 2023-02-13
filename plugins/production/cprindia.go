@@ -10,19 +10,19 @@ import (
 func init() {
 	w := crawlers.Register("cprindia", "印度政策研究中心", "https://cprindia.org/")
 
-	w.SetStartingUrls([]string{"https://cprindia.org/sitemap_index.xml"})
+	w.SetStartingURLs([]string{"https://cprindia.org/sitemap_index.xml"})
 
 	w.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
-		if ctx.Url == "https://cprindia.org/post-sitemap.xml" {
+		if ctx.URL == "https://cprindia.org/post-sitemap.xml" {
 			w.Visit(element.Text, crawlers.News)
 		}
-		if ctx.Url == "https://cprindia.org/briefsreports-sitemap.xml" {
+		if ctx.URL == "https://cprindia.org/briefsreports-sitemap.xml" {
 			w.Visit(element.Text, crawlers.Report)
 		}
-		if ctx.Url == "https://cprindia.org/sitemap_index.xml" {
+		if ctx.URL == "https://cprindia.org/sitemap_index.xml" {
 			w.Visit(element.Text, crawlers.Index)
 		}
-		if ctx.Url == "https://cprindia.org/people-sitemap.xml" {
+		if ctx.URL == "https://cprindia.org/people-sitemap.xml" {
 			w.Visit(element.Text, crawlers.Expert)
 		}
 	})

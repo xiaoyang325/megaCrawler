@@ -12,7 +12,7 @@ import (
 func init() {
 	w := crawlers.Register("asaninst", "峨山政策研究院", "https://en.asaninst.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://en.asaninst.org/contents/issues/security/",
 		"https://en.asaninst.org/contents/issues/international-law/",
 		"https://en.asaninst.org/contents/issues/culture-and-society/",

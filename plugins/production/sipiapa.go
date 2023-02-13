@@ -9,7 +9,7 @@ import (
 func init() {
 	w := crawlers.Register("sipiapa", "美洲新闻协会", "https://www.sipiapa.org/")
 
-	w.SetStartingUrls([]string{"https://www.sipiapa.org/contenidos/noticias-impunidad.html",
+	w.SetStartingURLs([]string{"https://www.sipiapa.org/contenidos/noticias-impunidad.html",
 		"https://www.sipiapa.org/contenidos/leyes-libertad-de-prensa.html",
 		"https://www.sipiapa.org/contenidos/jurisprudencia-chapultepec.html",
 		"https://www.sipiapa.org/contenidos/informes.html",

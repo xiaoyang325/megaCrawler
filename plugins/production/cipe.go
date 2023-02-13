@@ -9,7 +9,7 @@ import (
 
 func init() {
 	w := crawlers.Register("cipe", "国际私营企业中心", "https://www.cipe.org/")
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.cipe.org/who-we-are/leadership/",
 		"https://www.cipe.org/who-we-are/board/",
 		"https://www.cipe.org/resources/",

@@ -8,7 +8,7 @@ import (
 func init() {
 	engine := crawlers.Register("1060", "Kidwai纪念肿瘤研究所", "https://kmio.karnataka.gov.in")
 
-	engine.SetStartingUrls([]string{})
+	engine.SetStartingURLs([]string{})
 
 	extractorConfig := extractors.Config{
 		Author:       true,

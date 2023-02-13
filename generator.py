@@ -14,7 +14,7 @@ import (
 func init() {
 	engine := Crawler.Register("%s", "%s", "%s")
 	
-	engine.SetStartingUrls([]string{})
+	engine.SetStartingURLs([]string{})
 	
 	extractorConfig := Extractors.Config{
 		Author:       true,

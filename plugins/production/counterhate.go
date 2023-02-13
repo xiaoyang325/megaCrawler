@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("counterhate", "打击数字仇恨中心", "https://counterhate.com/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://counterhate.com/topic/anti-muslim-hate/",
 		"https://counterhate.com/topic/antisemitism/",
 		"https://counterhate.com/topic/inside-the-metaverse/",

@@ -9,12 +9,12 @@ import (
 
 func init() {
 	w := crawlers.Register("tibetaction", "美国西藏行动委员会", "https://tibetaction.net/")
-	w.SetStartingUrls([]string{"https://tibetaction.net/wp-sitemap-posts-post-1.xml", "https://tibetaction.net/wp-sitemap-posts-profile-1.xml"})
+	w.SetStartingURLs([]string{"https://tibetaction.net/wp-sitemap-posts-post-1.xml", "https://tibetaction.net/wp-sitemap-posts-profile-1.xml"})
 
 	w.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
-		if strings.Contains(ctx.Url, "wp-sitemap-posts-post") {
+		if strings.Contains(ctx.URL, "wp-sitemap-posts-post") {
 			w.Visit(element.Text, crawlers.News)
-		} else if strings.Contains(ctx.Url, "wp-sitemap-posts-profile") {
+		} else if strings.Contains(ctx.URL, "wp-sitemap-posts-profile") {
 			w.Visit(element.Text, crawlers.Expert)
 		}
 	})

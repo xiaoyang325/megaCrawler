@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("epc", "欧洲国家政治经济中心", "https://epc.eu/")
 
-	w.SetStartingUrls([]string{"https://epc.eu/en/search?tag=6",
+	w.SetStartingURLs([]string{"https://epc.eu/en/search?tag=6",
 		"https://epc.eu/en/search?tag=368",
 		"https://epc.eu/en/search?tag=509",
 		"https://epc.eu/en/search?tag=559",

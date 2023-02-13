@@ -11,7 +11,7 @@ func init() {
 	w := crawlers.Register("summa_cejil", "国际法与司法中心 SUMMA频道",
 		"https://summa.cejil.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		`https://summa.cejil.org/es/library/?q=(order:desc,sort:metadata.fecha,types:!(%2758b2f3a35d59f31e1345b4ac%27,%2758b2f3a35d59f31e1345b471%27,%2758b2f3a35d59f31e1345b482%27,%2758b2f3a35d59f31e1345b479%27,%275a4d294c79f3f44b101e2816%27,%2759ee427f40f4a54920bd9b67%27,%2759ee461f40f4a54920bd9b87%27))`,
 	})
 
@@ -57,7 +57,7 @@ func init() {
 
 	// 获取 File
 	w.OnHTML(`a.file-download.btn.btn-outline-secondary`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		file_url := "https://summa.cejil.org" + element.Attr("href")
-		ctx.File = append(ctx.File, file_url)
+		fileURL := "https://summa.cejil.org" + element.Attr("href")
+		ctx.File = append(ctx.File, fileURL)
 	})
 }

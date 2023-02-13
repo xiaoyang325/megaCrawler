@@ -11,7 +11,7 @@ import (
 func init() {
 	engine := crawlers.Register("1077", "欧洲安全与合作组织", "https://www.osce.org")
 
-	engine.SetStartingUrls([]string{"https://www.osce.org/sitemap.xml"})
+	engine.SetStartingURLs([]string{"https://www.osce.org/sitemap.xml"})
 
 	extractorConfig := extractors.Config{
 		Author:       true,

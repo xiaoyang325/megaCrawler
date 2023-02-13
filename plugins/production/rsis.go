@@ -11,22 +11,22 @@ import (
 )
 
 func init() {
-	getNextIndexUrl := func(currentUrl string) string {
-		thisUrl, _ := url.Parse(currentUrl)
-		path := thisUrl.Path
+	getNextIndexURL := func(currentURL string) string {
+		thisURL, _ := url.Parse(currentURL)
+		path := thisURL.Path
 
 		reg := regexp.MustCompile(`page/(\d+)`)
 		rawStr := reg.FindStringSubmatch(path)
 		num, _ := strconv.Atoi(rawStr[1])
 		num++
-		newUrl := reg.ReplaceAllString(currentUrl, "page/"+strconv.Itoa(num))
+		newURL := reg.ReplaceAllString(currentURL, "page/"+strconv.Itoa(num))
 
-		return newUrl
+		return newURL
 	}
 
 	w := crawlers.Register("rsis", "拉惹勒南国际研究院", "https://www.rsis.edu.sg/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.rsis.edu.sg/research/cms/",
 		"https://www.rsis.edu.sg/research/nts-centre/",
 		"https://www.rsis.edu.sg/research/cens/",
@@ -44,11 +44,11 @@ func init() {
 
 	// 访问下一页 Index
 	w.OnHTML(`#main > div > div > div.content-view-container > div.col-2-3.print-expand.rsispub-listing-page-container.new-publication > article > section.publication-listing.clearfix > ul.pagination.list.clearfix > li.par-3.pagination-item.active`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		if !strings.Contains(ctx.Url, "page") {
+		if !strings.Contains(ctx.URL, "page") {
 			w.Visit(element.ChildAttr("a.link", "href"), crawlers.Index)
 		} else {
-			nextUrl := getNextIndexUrl(ctx.Url)
-			w.Visit(nextUrl, crawlers.Index)
+			nextURL := getNextIndexURL(ctx.URL)
+			w.Visit(nextURL, crawlers.Index)
 		}
 	})
 

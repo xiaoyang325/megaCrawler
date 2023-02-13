@@ -12,7 +12,7 @@ func init() {
 	w := crawlers.Register("aansi", "American-Armenian National Security Institute",
 		"https://aansi.org/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://aansi.org/tag/future/",
 		"https://aansi.org/tag/investment/",
 	})

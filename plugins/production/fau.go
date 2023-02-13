@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("fau", "皮尔斯堡大西洋大学", "https://www.fau.edu/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.fau.edu/hboi/newsroom/news/",
 	})
 
@@ -41,11 +41,11 @@ func init() {
 
 	// 获取 PublicationTime
 	w.OnHTML(`div.row.spacer--bottom--20 > span`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		raw_str := element.Text
-		raw_str = strings.Replace(raw_str, element.ChildText("a"), "", 1)
-		raw_str = strings.Replace(raw_str, "By", "", 1)
-		raw_str = strings.Replace(raw_str, "|", "", 1)
-		ctx.PublicationTime = strings.TrimSpace(raw_str)
+		rawStr := element.Text
+		rawStr = strings.Replace(rawStr, element.ChildText("a"), "", 1)
+		rawStr = strings.Replace(rawStr, "By", "", 1)
+		rawStr = strings.Replace(rawStr, "|", "", 1)
+		ctx.PublicationTime = strings.TrimSpace(rawStr)
 	})
 
 	// 获取 Authors

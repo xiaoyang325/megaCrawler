@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("kas", "康拉德·阿登纳基金会", "https://www.kas.de/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.kas.de/de/publikationen",
 	})
 
@@ -67,7 +67,7 @@ func init() {
 
 	// 获取 File
 	w.OnHTML(`div.c-aside-teaser.c-aside-teaser--links.c-aside-teaser--covermedia > div.c-aside-teaser__entry > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		fileUrl := "https://www.kas.de" + element.Attr("href")
-		ctx.File = append(ctx.File, fileUrl)
+		fileURL := "https://www.kas.de" + element.Attr("href")
+		ctx.File = append(ctx.File, fileURL)
 	})
 }

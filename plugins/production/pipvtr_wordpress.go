@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("pipvtr_wordpress", "安全与国际研究所", "https://pipvtr.wordpress.com/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://pipvtr.wordpress.com/sitemap.xml",
 	})
 

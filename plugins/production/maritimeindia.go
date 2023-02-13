@@ -9,7 +9,7 @@ import (
 func init() {
 	w := crawlers.Register("maritimeindia", "国家海事基金会", "https://maritimeindia.org/")
 
-	w.SetStartingUrls([]string{"https://maritimeindia.org/category/articles-nmf/",
+	w.SetStartingURLs([]string{"https://maritimeindia.org/category/articles-nmf/",
 		"https://maritimeindia.org/category/holistic-maritime-security-thematic/",
 		"https://maritimeindia.org/category/maritime_technology/",
 		"https://maritimeindia.org/category/blue-economy-climate-change/",

@@ -10,7 +10,7 @@ import (
 func init() {
 	w := crawlers.Register("dav_edu", "外交学院", "https://www.dav.edu.vn/")
 
-	w.SetStartingUrls([]string{
+	w.SetStartingURLs([]string{
 		"https://www.dav.edu.vn/su-kien-hoi-thao-toa-dam/?trang=1",
 		"https://www.dav.edu.vn/gioi-thieu-chung-nghien-cu/",
 		"https://www.dav.edu.vn/an-pham-nghien-cuu/?trang=1",
@@ -18,7 +18,7 @@ func init() {
 
 	// 访问下一页 Index
 	w.OnHTML(`[class="page-item active"] > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		indexURL := crawlers.GetNextIndexURL(ctx.Url, element.Text, "trang")
+		indexURL := crawlers.GetNextIndexURL(ctx.URL, element.Text, "trang")
 		w.Visit(indexURL, crawlers.Index)
 	})
 

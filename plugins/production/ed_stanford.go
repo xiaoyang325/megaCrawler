@@ -46,9 +46,9 @@ func partEd(w *crawlers.WebsiteEngine) {
 	// 获取 Authors
 	w.OnHTML(`div[class="field field-name-field-news-source field-type-text field-label-hidden"] div div`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		// "By Adam Hadhazy" -> "Adam had"
-		raw_string := strings.ReplaceAll(element.Text, "By", "")
-		raw_string = strings.TrimSpace(raw_string)
-		ctx.Authors = append(ctx.Authors, raw_string)
+		rawString := strings.ReplaceAll(element.Text, "By", "")
+		rawString = strings.TrimSpace(rawString)
+		ctx.Authors = append(ctx.Authors, rawString)
 	})
 
 	// 获取 Content
