@@ -1,13 +1,14 @@
 package production
 
 import (
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
+	"megaCrawler/crawlers"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {
-	w := Crawler.Register("dayan", "摩西·达扬中东和非洲研究中心", "https://dayan.org/")
+	w := crawlers.Register("dayan", "摩西·达扬中东和非洲研究中心", "https://dayan.org/")
 
 	w.SetStartingUrls([]string{
 		"https://dayan.org/subject/archives",
@@ -26,47 +27,47 @@ func init() {
 	})
 
 	// 访问下一页 Index
-	w.OnHTML(`li[class="pager__item pager__item--next"] > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	w.OnHTML(`li[class="pager__item pager__item--next"] > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 
 	// 访问 Report 从 Index
-	w.OnHTML(`.views-row a.title`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Report)
+	w.OnHTML(`.views-row a.title`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Report)
 	})
 
 	// 获取 Title
-	w.OnHTML(`h1.page-title`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`h1.page-title`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 Description
-	w.OnHTML(`.top-area > [class="field field--name-field-introduction field--type-string-long field--label-hidden field__item"]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`.top-area > [class="field field--name-field-introduction field--type-string-long field--label-hidden field__item"]`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Description = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 PublicationTime
-	w.OnHTML(`.field__item > time`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`.field__item > time`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 Authors
-	w.OnHTML(`.top-area .field__item > a[tuafontsizes="14"]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`.top-area .field__item > a[tuafontsizes="14"]`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
 	})
 
 	// 获取 Content
-	w.OnHTML(`[class="clearfix text-formatted field field--name-body field--type-text-with-summary field--label-hidden field__item"] `, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`[class="clearfix text-formatted field field--name-body field--type-text-with-summary field--label-hidden field__item"] `, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = strings.TrimSpace(element.ChildText("p"))
 	})
 
 	// 获取 Tags
-	w.OnHTML(`[class="field field--name-field-subject field--type-entity-reference field--label-hidden field__items"] a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`[class="field field--name-field-subject field--type-entity-reference field--label-hidden field__items"] a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Tags = append(ctx.Tags, strings.TrimSpace(element.Text))
 	})
 
 	// 获取 File
-	w.OnHTML(`[class="file file--mime-application-pdf file--application-pdf"] > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`[class="file file--mime-application-pdf file--application-pdf"] > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		file_url := "https://dayan.org" + element.Attr("href")
 		ctx.File = append(ctx.File, file_url)
 	})

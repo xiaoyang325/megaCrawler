@@ -1,17 +1,18 @@
 package production
 
 import (
+	"megaCrawler/crawlers"
+	"megaCrawler/extractors"
+
 	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
-	"megaCrawler/Extractors"
 )
 
 func init() {
-	engine := Crawler.Register("1087", "Associated Press-NORC Center for Public Affairs Research", "https://apnorc.org")
+	engine := crawlers.Register("1087", "Associated Press-NORC Center for Public Affairs Research", "https://apnorc.org")
 
 	engine.SetStartingUrls([]string{"https://apnorc.org/post-sitemap.xml"})
 
-	extractorConfig := Extractors.Config{
+	extractorConfig := extractors.Config{
 		Author:       true,
 		Image:        true,
 		Language:     true,
@@ -24,7 +25,7 @@ func init() {
 
 	extractorConfig.Apply(engine)
 
-	engine.OnXML("//loc", func(element *colly.XMLElement, ctx *Crawler.Context) {
-		engine.Visit(element.Text, Crawler.News)
+	engine.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
+		engine.Visit(element.Text, crawlers.News)
 	})
 }

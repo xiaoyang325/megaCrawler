@@ -1,12 +1,13 @@
 package production
 
 import (
+	"megaCrawler/crawlers"
+
 	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
 )
 
 func init() {
-	w := Crawler.Register("chinadaily", "中国日报", "https://www.chinadaily.com.cn/")
+	w := crawlers.Register("chinadaily", "中国日报", "https://www.chinadaily.com.cn/")
 	w.SetStartingUrls([]string{
 		"https://www.chinadaily.com.cn/china/governmentandpolicy",
 		"https://www.chinadaily.com.cn/china/society",
@@ -17,23 +18,23 @@ func init() {
 		"https://www.chinadaily.com.cn/world/africa",
 	})
 
-	//index
-	w.OnHTML(".next > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	// index
+	w.OnHTML(".next > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 
-	//访问新闻
-	w.OnHTML(".tw3_01_2_t > h4 > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.News)
+	// 访问新闻
+	w.OnHTML(".tw3_01_2_t > h4 > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.News)
 	})
 
-	//标题
-	w.OnHTML("h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	// 标题
+	w.OnHTML("h1", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = element.Text
 	})
 
-	//正文
-	w.OnHTML("#Content > p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	// 正文
+	w.OnHTML("#Content > p", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content += element.Text
 	})
 }

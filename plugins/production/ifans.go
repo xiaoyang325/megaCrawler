@@ -1,13 +1,14 @@
 package production
 
 import (
-	"github.com/araddon/dateparse"
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
+	"megaCrawler/crawlers"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/araddon/dateparse"
+	"github.com/gocolly/colly/v2"
 )
 
 // 这个函数用于从 onclick 函数调用中获取信息，拼接成 Report 的 URL，并返回
@@ -27,7 +28,7 @@ func getURLFromFunctionCall(functionCall string, channelType string) string {
 }
 
 func init() {
-	w := Crawler.Register("ifans", "外交与国家安全研究所", "https://www.ifans.go.kr/")
+	w := crawlers.Register("ifans", "外交与国家安全研究所", "https://www.ifans.go.kr/")
 
 	w.SetStartingUrls([]string{
 		"https://www.ifans.go.kr/knda/ifans/eng/act/ActivityList.do?ctgrySe=02&pageIndex=1",
@@ -50,14 +51,14 @@ func init() {
 	})
 
 	// 访问下一页 Index
-	w.OnHTML(`#listForm > div.pagination > span.on`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#listForm > div.pagination > span.on`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		// 从当前 Index 的 URL 获取下一页 Index 的 URL
-		nextUrl := Crawler.GetNextIndexURL(ctx.Url, strings.TrimSpace(element.Text), "pageIndex")
-		w.Visit(nextUrl, Crawler.Index)
+		nextUrl := crawlers.GetNextIndexURL(ctx.Url, strings.TrimSpace(element.Text), "pageIndex")
+		w.Visit(nextUrl, crawlers.Index)
 	})
 
 	// 访问 Report 从 Index
-	w.OnHTML(`#listForm > ul.board_list > li > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#listForm > ul.board_list > li > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		var reportUrl string
 
 		// 从 a[onclick] 中的函数调用获取 Report 的 URL
@@ -67,66 +68,66 @@ func init() {
 			reportUrl = getURLFromFunctionCall(element.Attr("onclick"), "ActivityAreaView")
 		}
 
-		w.Visit(reportUrl, Crawler.Report)
+		w.Visit(reportUrl, crawlers.Report)
 	})
 
 	// 获取 Title
-	w.OnHTML(`#content > div > div.sub_top_view.con_in > strong.tit`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#content > div > div.sub_top_view.con_in > strong.tit`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 Title
-	w.OnHTML(`#detailForm > div.editor.board_con_top.con_in > strong.tit`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#detailForm > div.editor.board_con_top.con_in > strong.tit`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 Description
-	w.OnHTML(`#detailForm > div.editor.board_con.con_in > span > span`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#detailForm > div.editor.board_con.con_in > span > span`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Description = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 Description
-	w.OnHTML(`#detailForm > div.board_con.con_in > span:nth-child(1)`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#detailForm > div.board_con.con_in > span:nth-child(1)`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Description = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 PublicationTime
-	w.OnHTML(`span.date > em`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`span.date > em`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = dateparse.MustParse(strings.TrimSpace(element.Text)).Format(time.RFC3339)
 	})
 
 	// 获取 CategoryText
-	w.OnHTML(`#content > div > div.sub_top_view.con_in > span.subj`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#content > div > div.sub_top_view.con_in > span.subj`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.CategoryText = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 Authors
-	w.OnHTML(`#content > div > div.sub_top_view.con_in > strong.write`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#content > div > div.sub_top_view.con_in > strong.write`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
 	})
 
 	// 获取 ViewCount
-	w.OnHTML(`#content > div > div.sub_top_view.con_in > span.look > em`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#content > div > div.sub_top_view.con_in > span.look > em`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		str := strings.TrimSpace(element.Text)
 		num, _ := strconv.Atoi(str)
 		ctx.ViewCount = num
 	})
 
 	// 获取 ViewCount
-	w.OnHTML(`#detailForm > div.editor.board_con_top.con_in > span.look > em`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#detailForm > div.editor.board_con_top.con_in > span.look > em`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		str := strings.TrimSpace(element.Text)
 		num, _ := strconv.Atoi(str)
 		ctx.ViewCount = num
 	})
 
 	// 获取 File
-	w.OnHTML(`#detailForm > div.editor.board_con.con_in > dl > dd > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#detailForm > div.editor.board_con.con_in > dl > dd > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		fileUrl := "https://www.ifans.go.kr" + element.Attr("href")
 		ctx.File = append(ctx.File, fileUrl)
 	})
 
 	// 获取 Tags
-	w.OnHTML(`#detailForm > div.editor.board_con.con_in > span.tag > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#detailForm > div.editor.board_con.con_in > span.tag > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		tagStr := strings.TrimSpace(element.Text)
 		// 删除 Tag 中的 "#"
 		tagStr = strings.Replace(tagStr, "#", "", 1)
@@ -134,11 +135,11 @@ func init() {
 	})
 
 	// 获取 Tags
-	w.OnHTML(`#detailForm > div.editor.board_con_top.con_in > span.subj`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#detailForm > div.editor.board_con_top.con_in > span.subj`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Tags = append(ctx.Tags, strings.TrimSpace(element.Text))
 	})
 
-	w.OnHTML(".board_con", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".board_con", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = element.Text
 	})
 }

@@ -1,12 +1,13 @@
 package production
 
 import (
+	"megaCrawler/crawlers"
+
 	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
 )
 
 func init() {
-	w := Crawler.Register("commoncause", "Common Cause", "https://www.commoncause.org/")
+	w := crawlers.Register("commoncause", "Common Cause", "https://www.commoncause.org/")
 
 	w.SetStartingUrls([]string{"https://www.commoncause.org/democracy-wire/",
 		"https://www.commoncause.org/our-work/voting-and-elections/",
@@ -21,36 +22,35 @@ func init() {
 		"https://www.commoncause.org/news-clips"})
 
 	// 从翻页器获取链接并访问
-	w.OnHTML("a.page-numbers", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	w.OnHTML("a.page-numbers", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 
 	// 从index访问新闻
-	w.OnHTML("a.full-link", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.News)
+	w.OnHTML("a.full-link", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.News)
 	})
 	// report.title
-	w.OnHTML("h1.page-title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("h1.page-title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = element.Text
 	})
-	//report.publish time
-	w.OnHTML("div.post-info", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	// report.publish time
+	w.OnHTML("div.post-info", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = element.Text
 	})
 	// report.author
-	w.OnHTML("span.name", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("span.name", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, element.Text)
 	})
 	// report.link
-	w.OnHTML("span.number", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("span.number", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Link = append(ctx.Link, element.Attr("href"))
 	})
-	w.OnHTML("li.contact>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("li.contact>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Link = append(ctx.Link, element.Attr("href"))
 	})
 	// report .content
-	w.OnHTML("main>div.content>.module", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("main>div.content>.module", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = element.Text
 	})
-
 }

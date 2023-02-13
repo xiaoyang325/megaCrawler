@@ -1,13 +1,14 @@
 package production
 
 import (
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
+	"megaCrawler/crawlers"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {
-	w := Crawler.Register("phnompenhpost", "金边邮报", "https://www.phnompenhpost.com/")
+	w := crawlers.Register("phnompenhpost", "金边邮报", "https://www.phnompenhpost.com/")
 
 	w.SetStartingUrls([]string{
 		"https://www.phnompenhpost.com/post-depth",
@@ -25,22 +26,22 @@ func init() {
 	})
 
 	// 访问下一页 Index
-	w.OnHTML(`ul[class="pager pager-load-more"] > li[class="pager-next first last"] > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	w.OnHTML(`ul[class="pager pager-load-more"] > li[class="pager-next first last"] > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 
 	// 访问 News 从 Index
-	w.OnHTML(`.view-content > .item-list li .article-image > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.News)
+	w.OnHTML(`.view-content > .item-list li .article-image > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.News)
 	})
 
 	// 获取 Title
-	w.OnHTML(`body > div.container > div > div.section.section-width-sidebar.single-article-header > h2`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`body > div.container > div > div.section.section-width-sidebar.single-article-header > h2`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 PublicationTime
-	w.OnHTML(`body > div.container > div > div.section.section-width-sidebar.single-article-header > div > p`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`body > div.container > div > div.section.section-width-sidebar.single-article-header > div > p`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		raw := element.Text
 		raw = strings.Replace(raw, element.ChildText("a"), "", 1)
 		raw = strings.Replace(raw, "|", "", 1)
@@ -48,12 +49,12 @@ func init() {
 	})
 
 	// 获取 Authors
-	w.OnHTML(`body > div.container > div > div.section.section-width-sidebar.single-article-header > div > p > a  > span`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`body > div.container > div > div.section.section-width-sidebar.single-article-header > div > p > a  > span`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
 	})
 
 	// 获取 Content
-	w.OnHTML(`div[itemprop="articleBody"]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`div[itemprop="articleBody"]`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = strings.TrimSpace(element.Text)
 	})
 }

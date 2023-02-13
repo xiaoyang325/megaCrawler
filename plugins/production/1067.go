@@ -1,18 +1,19 @@
 package production
 
 import (
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
-	"megaCrawler/Extractors"
+	"megaCrawler/crawlers"
+	"megaCrawler/extractors"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {
-	engine := Crawler.Register("1067", "布伦南司法中心", "https://www.brennancenter.org")
+	engine := crawlers.Register("1067", "布伦南司法中心", "https://www.brennancenter.org")
 
 	engine.SetStartingUrls([]string{"https://www.brennancenter.org/sitemap.xml"})
 
-	extractorConfig := Extractors.Config{
+	extractorConfig := extractors.Config{
 		Author:       true,
 		Image:        true,
 		Language:     true,
@@ -25,30 +26,30 @@ func init() {
 
 	extractorConfig.Apply(engine)
 
-	engine.OnXML("//loc", func(element *colly.XMLElement, ctx *Crawler.Context) {
+	engine.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.Text, "sitemap.xml") {
-			engine.Visit(element.Text, Crawler.Index)
+			engine.Visit(element.Text, crawlers.Index)
 		}
 		if strings.Contains(element.Text, "/about/staff/") {
-			engine.Visit(element.Text, Crawler.Expert)
+			engine.Visit(element.Text, crawlers.Expert)
 		}
 		if strings.Contains(element.Text, "/our-work/") {
-			engine.Visit(element.Text, Crawler.News)
+			engine.Visit(element.Text, crawlers.News)
 		}
 	})
 
-	engine.OnHTML(".page-info-header__author-title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	engine.OnHTML(".page-info-header__author-title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, element.Text)
 	})
 
-	engine.OnHTML(".page-bio-header__title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		if ctx.PageType == Crawler.Expert {
+	engine.OnHTML(".page-bio-header__title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		if ctx.PageType == crawlers.Expert {
 			ctx.Name = element.Text
 		}
 	})
 
-	engine.OnHTML(".page-bio-header__role", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		if ctx.PageType == Crawler.Expert {
+	engine.OnHTML(".page-bio-header__role", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		if ctx.PageType == crawlers.Expert {
 			ctx.Title = element.Text
 		}
 	})

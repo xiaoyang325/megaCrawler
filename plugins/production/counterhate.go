@@ -1,13 +1,14 @@
 package production
 
 import (
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
+	"megaCrawler/crawlers"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {
-	w := Crawler.Register("counterhate", "打击数字仇恨中心", "https://counterhate.com/")
+	w := crawlers.Register("counterhate", "打击数字仇恨中心", "https://counterhate.com/")
 
 	w.SetStartingUrls([]string{
 		"https://counterhate.com/topic/anti-muslim-hate/",
@@ -22,52 +23,52 @@ func init() {
 	})
 
 	// 从子频道入口访问 "View all research"
-	w.OnHTML(".topic-hub-research__intro>p>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	w.OnHTML(".topic-hub-research__intro>p>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 
 	// 从翻页器访问下一页 Index
-	w.OnHTML(".pagination__next>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	w.OnHTML(".pagination__next>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 
 	// 从 Index 访问报告
-	w.OnHTML(".research-post-single__view-link", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Report)
+	w.OnHTML(".research-post-single__view-link", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Report)
 	})
 
 	// 添加 Title 到ctx
-	w.OnHTML(".research-post__title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".research-post__title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = strings.TrimSpace(element.Text)
 	})
 
 	// 添加 SubTitle 到ctx
-	w.OnHTML(".research-post__subtitle", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".research-post__subtitle", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.SubTitle = strings.TrimSpace(element.Text)
 	})
 
 	// 添加 Tag 到 ctx.Tags
-	w.OnHTML(".topic-tag", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".topic-tag", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Tags = append(ctx.Tags, element.Text)
 	})
 
 	// 添加 Content 到 ctx
-	w.OnHTML("div[class=\"research-post__content flow\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div[class=\"research-post__content flow\"]", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = strings.TrimSpace(element.Text)
 	})
 
 	// 添加 File 到 ctx
-	w.OnHTML("a[class=\"button button--green\"]", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("a[class=\"button button--green\"]", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.File = append(ctx.File, element.Attr("href"))
 	})
 
 	// 添加 PublicationTime 到 ctx
-	w.OnHTML(".research-post__about > p > time", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".research-post__about > p > time", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = element.Text
 	})
 
 	// 添加 Description 到 ctx
-	w.OnHTML(".research-post__intro-text", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".research-post__intro-text", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Description = element.Text
 	})
 }

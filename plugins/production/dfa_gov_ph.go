@@ -1,13 +1,14 @@
 package production
 
 import (
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
+	"megaCrawler/crawlers"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {
-	w := Crawler.Register("dfa_gov_ph", "外交部外交服务研究所", "https://dfa.gov.ph/")
+	w := crawlers.Register("dfa_gov_ph", "外交部外交服务研究所", "https://dfa.gov.ph/")
 
 	w.SetStartingUrls([]string{
 		"https://dfa.gov.ph/dfa-news/dfa-releasesupdate",
@@ -29,27 +30,27 @@ func init() {
 	})
 
 	// 访问下一页 Index
-	w.OnHTML(`.pagination-next > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	w.OnHTML(`.pagination-next > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 
 	// 访问 News 从 Index
-	w.OnHTML(`tbody > tr > td > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.News)
+	w.OnHTML(`tbody > tr > td > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.News)
 	})
 
 	// 获取 Title
-	w.OnHTML(`.entry-title`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`.entry-title`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 SubTitle
-	w.OnHTML(`#content > div.post-box.clearfix > div.item-page > div.page-header > h2`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#content > div.post-box.clearfix > div.item-page > div.page-header > h2`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.SubTitle = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 Content
-	w.OnHTML(`#content > div.post-box.clearfix > div.item-page > div[itemprop="articleBody"]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#content > div.post-box.clearfix > div.item-page > div[itemprop="articleBody"]`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = strings.TrimSpace(element.Text)
 	})
 }

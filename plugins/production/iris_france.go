@@ -1,13 +1,14 @@
 package production
 
 import (
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
+	"megaCrawler/crawlers"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {
-	w := Crawler.Register("iris_france", "Institut de Relations Internationales et Stratégiques", "https://www.iris-france.org/")
+	w := crawlers.Register("iris_france", "Institut de Relations Internationales et Stratégiques", "https://www.iris-france.org/")
 
 	w.SetStartingUrls([]string{
 		"https://www.iris-france.org/programmes/industrie-de-defense-et-de-securite/",
@@ -29,57 +30,57 @@ func init() {
 	})
 
 	// 访问下一页 Index
-	w.OnHTML(`ul[class="page-pagination-list clearfix"] > li:nth-last-child(1) > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	w.OnHTML(`ul[class="page-pagination-list clearfix"] > li:nth-last-child(1) > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 
 	// 访问 Report 从 Index
-	w.OnHTML(`.block-content > div .title > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Report)
+	w.OnHTML(`.block-content > div .title > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Report)
 	})
 
 	// 获取 Title
-	w.OnHTML(`[class="block-content single-video-content"] > .single-title`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`[class="block-content single-video-content"] > .single-title`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 Title
-	w.OnHTML(`.content > .single-title`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`.content > .single-title`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 PublicationTime
-	w.OnHTML(`[class="block-content single-video-content"] > .article-date`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`[class="block-content single-video-content"] > .article-date`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 PublicationTime
-	w.OnHTML(`.content .date`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`.content .date`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 CategoryText
-	w.OnHTML(`[class="content row"] .intro-title`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`[class="content row"] .intro-title`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.CategoryText = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 Authors
-	w.OnHTML(`[class="block-content single-video-content"] > .article-author > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`[class="block-content single-video-content"] > .article-author > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
 	})
 
 	// 获取 Authors
-	w.OnHTML(`.block-content .content .author > span`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`.block-content .content .author > span`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, strings.TrimSpace(element.Text))
 	})
 
 	// 获取 Content
-	w.OnHTML(`[class="block-content single-video-content"]`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`[class="block-content single-video-content"]`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 Content
-	w.OnHTML(`.content`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`.content`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = strings.TrimSpace(element.Text)
 	})
 }

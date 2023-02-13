@@ -2,10 +2,11 @@ package production
 
 import (
 	"encoding/json"
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
+	"megaCrawler/crawlers"
 	"regexp"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 type PageData struct {
@@ -234,21 +235,21 @@ type NewsData struct {
 	StaticQueryHashes []string `json:"staticQueryHashes"`
 }
 
-var PageTypeMap = map[string]Crawler.PageType{
-	"sitemap":              Crawler.Index,
-	"explore-our-research": Crawler.Report,
-	"people":               Crawler.Expert,
-	"news-and-comment":     Crawler.News,
-	"in-the-news":          Crawler.News,
-	"podcasts":             Crawler.News,
-	"publication":          Crawler.Report,
+var PageTypeMap = map[string]crawlers.PageType{
+	"sitemap":              crawlers.Index,
+	"explore-our-research": crawlers.Report,
+	"people":               crawlers.Expert,
+	"news-and-comment":     crawlers.News,
+	"in-the-news":          crawlers.News,
+	"podcasts":             crawlers.News,
+	"publication":          crawlers.Report,
 }
 
 func init() {
-	w := Crawler.Register("rusi", "皇家联合服务研究所", "https://rusi.org/")
+	w := crawlers.Register("rusi", "皇家联合服务研究所", "https://rusi.org/")
 	w.SetStartingUrls([]string{"https://www.rusi.org/sitemap/sitemap-index.xml"})
 
-	w.OnXML("//loc", func(element *colly.XMLElement, ctx *Crawler.Context) {
+	w.OnXML("//loc", func(element *colly.XMLElement, ctx *crawlers.Context) {
 		reg := regexp.MustCompile(`rusi.org/([\w-]+)/`)
 		if matches := reg.FindStringSubmatch(element.Text); len(matches) == 2 {
 			pageType, ok := PageTypeMap[matches[1]]
@@ -256,46 +257,46 @@ func init() {
 				return
 			}
 			switch pageType {
-			case Crawler.Index:
+			case crawlers.Index:
 				w.Visit(element.Text, pageType)
-			case Crawler.Expert:
+			case crawlers.Expert:
 				w.Visit(element.Text, pageType)
-			default:
+			case crawlers.News, crawlers.Report:
 				url := strings.ReplaceAll(element.Text, "https://www.rusi.org/", "https://www.rusi.org/page-data/") + "/page-data.json"
 				w.Visit(url, pageType)
 			}
 		}
 	})
-	//获取人物姓名
-	w.OnHTML("[class^=\"ProfileTitleBlock-module--text\"] > h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	// 获取人物姓名
+	w.OnHTML("[class^=\"ProfileTitleBlock-module--text\"] > h1", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Name = element.Text
 	})
 
-	//获取人物头衔
-	w.OnHTML("[class^=\"ProfileTitleBlock-module--text\"] > samll", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	// 获取人物头衔
+	w.OnHTML("[class^=\"ProfileTitleBlock-module--text\"] > samll", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = element.Text
 	})
 
-	//获取人物领域
-	w.OnHTML("aside > ul > li > a > span", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	// 获取人物领域
+	w.OnHTML("aside > ul > li > a > span", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Area = element.Text
 	})
 
-	//获取人物描述
-	w.OnHTML("[class^=\"Section-module--content\"] > div > div > p", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	// 获取人物描述
+	w.OnHTML("[class^=\"Section-module--content\"] > div > div > p", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Description = element.Text
 	})
 
-	w.OnResponse(func(response *colly.Response, ctx *Crawler.Context) {
+	w.OnResponse(func(response *colly.Response, ctx *crawlers.Context) {
 		if strings.Contains(ctx.Url, "page-data.json") {
 			var obj PageData
 			_ = json.Unmarshal(response.Body, &obj)
 			if obj.Result.Data.Article.Title != "" {
 				art := obj.Result.Data.Article
 				ctx.Title = art.Title
-				ctx.Content = Crawler.HTML2Text(art.Body.Value)
+				ctx.Content = crawlers.HTML2Text(art.Body.Value)
 				if ctx.Content == "" {
-					ctx.Content = Crawler.HTML2Text(art.FieldAbstract.Value)
+					ctx.Content = crawlers.HTML2Text(art.FieldAbstract.Value)
 				}
 				ctx.PublicationTime = art.Created
 				for _, s := range obj.Result.Data.Article.Relationships.FieldAuthor {
@@ -318,7 +319,7 @@ func init() {
 			if obj2.Result.Data.Node.Title != "" {
 				art := obj2.Result.Data.Node
 				ctx.Title = art.Title
-				ctx.Content = Crawler.HTML2Text(obj2.Result.Data.Node.FieldFocus)
+				ctx.Content = crawlers.HTML2Text(obj2.Result.Data.Node.FieldFocus)
 				ctx.PublicationTime = art.FieldPublishDate
 				for _, s := range obj.Result.Data.Article.Relationships.FieldAuthor {
 					ctx.Authors = append(ctx.Authors, s.FieldFirstNames+" "+s.Title)

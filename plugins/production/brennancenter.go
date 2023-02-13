@@ -1,13 +1,14 @@
 package production
 
 import (
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
+	"megaCrawler/crawlers"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {
-	w := Crawler.Register("brennancenter", "布伦南司法中心",
+	w := crawlers.Register("brennancenter", "布伦南司法中心",
 		"https://www.brennancenter.org/")
 
 	w.SetStartingUrls([]string{
@@ -77,57 +78,57 @@ func init() {
 	})
 
 	// 从 Index 访问 Work & Resources 的 banner 的 Report
-	w.OnHTML(".half-banner__text .half-banner__title a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit("https://www.brennancenter.org"+element.Attr("href"), Crawler.Report)
+	w.OnHTML(".half-banner__text .half-banner__title a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit("https://www.brennancenter.org"+element.Attr("href"), crawlers.Report)
 	})
 
 	// 从 Index 访问 Work & Resources 的 Report
-	w.OnHTML(".collection-teaser__text .collection-teaser__title a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit("https://www.brennancenter.org"+element.Attr("href"), Crawler.Report)
+	w.OnHTML(".collection-teaser__text .collection-teaser__title a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit("https://www.brennancenter.org"+element.Attr("href"), crawlers.Report)
 	})
 
 	// 从 Index 访问 Work & Resources 的 Report
-	w.OnHTML(".link__title a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit("https://www.brennancenter.org"+element.Attr("href"), Crawler.Report)
+	w.OnHTML(".link__title a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit("https://www.brennancenter.org"+element.Attr("href"), crawlers.Report)
 	})
 
 	// 从 Index 访问 Work & Resources 的 Report
-	w.OnHTML(".teaser__title a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit("https://www.brennancenter.org"+element.Attr("href"), Crawler.Report)
+	w.OnHTML(".teaser__title a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit("https://www.brennancenter.org"+element.Attr("href"), crawlers.Report)
 	})
 
 	// 从 Index 访问 /news-analysis 的 Report
-	w.OnHTML(".search-result-link__title > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit("https://www.brennancenter.org"+element.Attr("href"), Crawler.Report)
+	w.OnHTML(".search-result-link__title > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit("https://www.brennancenter.org"+element.Attr("href"), crawlers.Report)
 	})
 
 	// 从 Index 访问 Experts
-	w.OnHTML(".expert__name > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit("https://www.brennancenter.org"+element.Attr("href"), Crawler.Expert)
+	w.OnHTML(".expert__name > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit("https://www.brennancenter.org"+element.Attr("href"), crawlers.Expert)
 	})
 
 	// 获取 Report 的 CategoryText
-	w.OnHTML(".page-info-header__tophat-area .page-info-header__tophat", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".page-info-header__tophat-area .page-info-header__tophat", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.CategoryText = element.Text
 	})
 
 	// 获取 Report 的 Title
-	w.OnHTML(".page-info-header__title span", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".page-info-header__title span", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = element.Text
 	})
 
 	// 获取 Report 的 Description
-	w.OnHTML(".page-info-header__description", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".page-info-header__description", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Description = element.Text
 	})
 
 	// 获取 Report 的 Authors
-	w.OnHTML(".page-info-header__author-title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".page-info-header__author-title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, element.Text)
 	})
 
 	// 获取 Report 的 Publication Time
-	w.OnHTML(".page-info-header__dates", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".page-info-header__dates", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.ChildText(":nth-child(2)"), "Published: ") {
 			time := strings.ReplaceAll(element.ChildText(":nth-child(2)"), "Published: ", "")
 			ctx.PublicationTime = strings.TrimSpace(time)
@@ -137,46 +138,46 @@ func init() {
 	})
 
 	// 获取 Report 的 Content
-	w.OnHTML(".page-body", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		if ctx.PageType == Crawler.Report {
+	w.OnHTML(".page-body", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		if ctx.PageType == crawlers.Report {
 			ctx.Content = element.ChildText("p, h2")
 		}
 	})
 
 	// 获取 Expert 的 Name
-	w.OnHTML(".page-bio-header__title", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".page-bio-header__title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Name = element.Text
 	})
 
 	// 获取 Expert 的 TwitterId
-	w.OnHTML(".page-bio-header__twitter > span > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".page-bio-header__twitter > span > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.TwitterId = strings.Replace(element.Attr("href"), "https://twitter.com/", "", 1)
 	})
 
 	// 获取 Expert 的 CategoryText
-	w.OnHTML(".page-bio-header__tophat", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".page-bio-header__tophat", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.CategoryText = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 Expert 的 Title
-	w.OnHTML(".page-bio-header__role", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".page-bio-header__role", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 Expert 的 Description
-	w.OnHTML(".page-body", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		if ctx.PageType == Crawler.Expert {
+	w.OnHTML(".page-body", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		if ctx.PageType == crawlers.Expert {
 			ctx.Description = strings.TrimSpace(element.ChildText("p, h2"))
 		}
 	})
 
 	// 获取 Expert 的 Email
-	w.OnHTML(".related-bio-group__contact-content :nth-child(2)", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".related-bio-group__contact-content :nth-child(2)", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Email = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 Expert 的 Phone
-	w.OnHTML(".related-bio-group__contact-content :nth-child(4)", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".related-bio-group__contact-content :nth-child(4)", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Phone = strings.TrimSpace(element.Text)
 	})
 }

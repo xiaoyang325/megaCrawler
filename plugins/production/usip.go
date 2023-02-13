@@ -1,12 +1,13 @@
 package production
 
 import (
+	"megaCrawler/crawlers"
+
 	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
 )
 
 func init() {
-	w := Crawler.Register("usip", "美国和平研究所战略稳定与安全办公室", "https://www.usip.org/")
+	w := crawlers.Register("usip", "美国和平研究所战略稳定与安全办公室", "https://www.usip.org/")
 
 	w.SetStartingUrls([]string{"https://www.usip.org/regions/asia/afghanistan",
 		"https://www.usip.org/regions/americas/bolivia",
@@ -62,60 +63,59 @@ func init() {
 		"https://www.usip.org/whyallthecoups"})
 
 	// 从翻页器获取链接并访问
-	w.OnHTML("li.pager__item>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	w.OnHTML("li.pager__item>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
-	w.OnHTML("section>a.btn.-link", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Index)
+	w.OnHTML("section>a.btn.-link", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 
 	// 从index访问新闻
-	w.OnHTML(".summary__heading>a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.News)
+	w.OnHTML(".summary__heading>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.News)
 	})
 	// report.title
-	w.OnHTML("main>header>div>div>h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("main>header>div>div>h1", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = element.Text
 	})
 
 	// report.author
-	w.OnHTML("body > div.dialog-off-canvas-main-canvas > main > header > div.container.row.-exact > div > p.meta", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("body > div.dialog-off-canvas-main-canvas > main > header > div.container.row.-exact > div > p.meta", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, element.Text)
 	})
-	w.OnHTML("body > div.dialog-off-canvas-main-canvas > main > section.container.row.-exact > article > header > p:nth-child(3)", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("body > div.dialog-off-canvas-main-canvas > main > section.container.row.-exact > article > header > p:nth-child(3)", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, element.Text)
 	})
 	//
-	//report.publish time
-	w.OnHTML("body > div.dialog-off-canvas-main-canvas > main > header > div.container.row.-exact > div > p.meta", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	// report.publish time
+	w.OnHTML("body > div.dialog-off-canvas-main-canvas > main > header > div.container.row.-exact > div > p.meta", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = element.Text
 	})
 	// report .content
-	w.OnHTML("section.intro-wysiwyg", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("section.intro-wysiwyg", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = ctx.Content + element.Text
 	})
-	w.OnHTML("section.wysiwyg", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("section.wysiwyg", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = element.Text
 	})
-	//内含Expert
-	w.OnHTML("body > div.dialog-off-canvas-main-canvas > main > header > div.container.row.-exact > div > p.meta > font > a", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.Expert)
+	// 内含Expert
+	w.OnHTML("body > div.dialog-off-canvas-main-canvas > main > header > div.container.row.-exact > div > p.meta > font > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.Expert)
 	})
 	// expert.Name
-	w.OnHTML("header.page__header>h1", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("header.page__header>h1", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Name = element.Text
 	})
 	// expert.title
-	w.OnHTML("header.page__header>p.meta", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("header.page__header>p.meta", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = element.Text
 	})
 	// expert.link
-	w.OnHTML("div.-with-separator>div", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("div.-with-separator>div", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Link = append(ctx.Link, element.Attr("href"))
 	})
 	// expert.description
-	w.OnHTML("section.wysiwyg", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML("section.wysiwyg", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = element.Text
 	})
-
 }

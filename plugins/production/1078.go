@@ -1,17 +1,18 @@
 package production
 
 import (
-	"github.com/PuerkitoBio/goquery"
-	"megaCrawler/Crawler"
-	"megaCrawler/Extractors"
+	"megaCrawler/crawlers"
+	"megaCrawler/extractors"
 	"net/http"
 	"strconv"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 func init() {
-	engine := Crawler.Register("1078", "世界公民参与联盟", "https://www.civicus.org")
+	engine := crawlers.Register("1078", "世界公民参与联盟", "https://www.civicus.org")
 
-	extractorConfig := Extractors.Config{
+	extractorConfig := extractors.Config{
 		Author:       true,
 		Image:        true,
 		Language:     true,
@@ -48,8 +49,13 @@ func init() {
 				if !ok {
 					return
 				}
-				engine.Visit(pageUrl, Crawler.News)
+				engine.Visit(pageUrl, crawlers.News)
 			})
+
+			err = resp.Body.Close()
+			if err != nil {
+				continue
+			}
 		}
 	})
 

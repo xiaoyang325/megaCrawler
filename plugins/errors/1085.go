@@ -1,16 +1,16 @@
 package errors
 
 import (
-	"megaCrawler/Crawler"
-	"megaCrawler/Extractors"
+	"megaCrawler/crawlers"
+	"megaCrawler/extractors"
 )
 
 func init() {
-	engine := Crawler.Register("1085", "American-Armenian National Security Institute", "https://aansi.org")
+	engine := crawlers.Register("1085", "American-Armenian National Security Institute", "https://aansi.org")
 
 	engine.SetStartingUrls([]string{})
 
-	extractorConfig := Extractors.Config{
+	extractorConfig := extractors.Config{
 		Author:       true,
 		Image:        true,
 		Language:     true,

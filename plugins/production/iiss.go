@@ -2,10 +2,11 @@ package production
 
 import (
 	"encoding/json"
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
+	"megaCrawler/crawlers"
 	"regexp"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 type introComponent struct {
@@ -60,7 +61,7 @@ func getReactComponentData(dom *colly.HTMLElement) (component string, data strin
 }
 
 func init() {
-	w := Crawler.Register("iiss", "International Institute for Strategic Studies",
+	w := crawlers.Register("iiss", "International Institute for Strategic Studies",
 		"https://www.iiss.org/")
 
 	w.SetStartingUrls([]string{
@@ -68,33 +69,33 @@ func init() {
 	})
 
 	// 访问文章从 sitemap
-	w.OnXML(`//loc`, func(element *colly.XMLElement, ctx *Crawler.Context) {
+	w.OnXML(`//loc`, func(element *colly.XMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.Text, "/blogs/") {
-			//w.Visit(element.Text, Crawler.Report)
+			w.Visit(element.Text, crawlers.Report)
 		} else if strings.Contains(element.Text, "/press/") {
-			//w.Visit(element.Text, Crawler.News)
+			w.Visit(element.Text, crawlers.News)
 		} else if strings.Contains(element.Text, "/publications/") {
-			//w.Visit(element.Text, Crawler.Report)
+			w.Visit(element.Text, crawlers.Report)
 		} else if strings.Contains(element.Text, "/events/") {
-			//w.Visit(element.Text, Crawler.Report)
+			w.Visit(element.Text, crawlers.Report)
 		} else if strings.Contains(element.Text, "/people/") {
-			w.Visit(element.Text, Crawler.Expert)
+			w.Visit(element.Text, crawlers.Expert)
 		}
 	})
 
-	w.OnHTML(".container--main script", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".container--main script", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		if !strings.HasPrefix(element.Text, "componentRenderQueue") {
 			return
 		}
 		component, data := getReactComponentData(element)
 		switch ctx.PageType {
-		case Crawler.Expert:
+		case crawlers.Expert:
 			switch component {
 			case "Intro":
 				var c introComponent
 				err := json.Unmarshal([]byte(data), &c)
 				if err != nil {
-					Crawler.Sugar.Error(err)
+					crawlers.Sugar.Error(err)
 				}
 				ctx.Name = c.Title
 				ctx.Title = c.Intro
@@ -102,17 +103,17 @@ func init() {
 				var c readingComponent
 				err := json.Unmarshal([]byte(data), &c)
 				if err != nil {
-					Crawler.Sugar.Error(err)
+					crawlers.Sugar.Error(err)
 				}
-				ctx.Description += Crawler.HTML2Text(c.Html) + "\n"
+				ctx.Description += crawlers.HTML2Text(c.Html) + "\n"
 			}
-		default:
+		case crawlers.Index, crawlers.News, crawlers.Report:
 			switch component {
 			case "ArticleNav":
 				var c navComponent
 				err := json.Unmarshal([]byte(data), &c)
 				if err != nil {
-					Crawler.Sugar.Error(err)
+					crawlers.Sugar.Error(err)
 				}
 				ctx.CategoryText = c.Current.Text
 				ctx.PublicationTime = c.Current.Date
@@ -120,22 +121,22 @@ func init() {
 				var c introComponent
 				err := json.Unmarshal([]byte(data), &c)
 				if err != nil {
-					Crawler.Sugar.Error(err)
+					crawlers.Sugar.Error(err)
 				}
-				ctx.Title = Crawler.HTML2Text(c.Title)
-				ctx.SubTitle = Crawler.HTML2Text(c.Intro)
+				ctx.Title = crawlers.HTML2Text(c.Title)
+				ctx.SubTitle = crawlers.HTML2Text(c.Intro)
 			case "Reading":
 				var c readingComponent
 				err := json.Unmarshal([]byte(data), &c)
 				if err != nil {
-					Crawler.Sugar.Error(err)
+					crawlers.Sugar.Error(err)
 				}
-				ctx.Content += Crawler.HTML2Text(c.Html) + "\n"
+				ctx.Content += crawlers.HTML2Text(c.Html) + "\n"
 			case "AuthorInfo":
 				var c authorComponent
 				err := json.Unmarshal([]byte(data), &c)
 				if err != nil {
-					Crawler.Sugar.Error(err)
+					crawlers.Sugar.Error(err)
 				}
 				for _, item := range c.Items {
 					ctx.Authors = append(ctx.Authors, item.Name)

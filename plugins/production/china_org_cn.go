@@ -1,14 +1,15 @@
 package production
 
 import (
-	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
+	"megaCrawler/crawlers"
 	"strconv"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {
-	w := Crawler.Register("china_org_cn", "中国新闻办公室", "http://www.china.org.cn/")
+	w := crawlers.Register("china_org_cn", "中国新闻办公室", "http://www.china.org.cn/")
 
 	w.SetStartingUrls([]string{
 		"http://www.china.org.cn/china/node_7075073.htm",
@@ -41,28 +42,28 @@ func init() {
 	})
 
 	// 访问下一页 Index
-	w.OnHTML(`.columns1 > #autopage > center`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`.columns1 > #autopage > center`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		// 仅在第一页访问所有其他 Index
 		if element.ChildText(`span`) == "1" {
 			urlList := element.ChildAttrs("a", "href")
 			for _, url := range urlList {
-				w.Visit(element.Attr(url), Crawler.Index)
+				w.Visit(element.Attr(url), crawlers.Index)
 			}
 		}
 	})
 
 	// 访问 News 从 Index
-	w.OnHTML(`.columns1 > ul > li > a`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		w.Visit(element.Attr("href"), Crawler.News)
+	w.OnHTML(`.columns1 > ul > li > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		w.Visit(element.Attr("href"), crawlers.News)
 	})
 
 	// 获取 Title
-	w.OnHTML(`.wrapper #title`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`.wrapper #title`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = strings.TrimSpace(element.Text)
 	})
 
 	// 获取 Authors & PublicationTime
-	w.OnHTML(`.wrapper #guild > dd`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`.wrapper #guild > dd`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		raw := strings.Replace(element.Text, ",", "*", 1)
 		outList := strings.Split(raw, "*")
 		var date string
@@ -76,21 +77,21 @@ func init() {
 	})
 
 	// 获取 CommentCount
-	w.OnHTML(`.wrapper #guild > dd > span font#pinglun`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`.wrapper #guild > dd > span font#pinglun`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		str := strings.TrimSpace(element.Text)
 		num, _ := strconv.Atoi(str)
 		ctx.CommentCount = num
 	})
 
 	// 获取 Content
-	w.OnHTML(`#container_txt`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`#container_txt`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = strings.TrimSpace(element.ChildText("p"))
 	})
 
 	// 获取 Expert 通过 SubContext 在 Index
-	w.OnHTML(`div.apDiv1 > div>  table > tbody > tr`, func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(`div.apDiv1 > div>  table > tbody > tr`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		subCtx := ctx.CreateSubContext()
-		subCtx.PageType = Crawler.Expert
+		subCtx.PageType = crawlers.Expert
 		subCtx.Name = element.ChildText("td > b")
 		subCtx.Description = element.ChildText(`td:nth-last-child(1)[valign="top"]`)
 	})

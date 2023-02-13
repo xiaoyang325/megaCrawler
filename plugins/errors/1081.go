@@ -1,47 +1,55 @@
 package errors
 
 import (
-	"github.com/temoto/robotstxt"
 	"io"
-	"megaCrawler/Crawler"
-	"megaCrawler/Extractors"
+	"megaCrawler/crawlers"
+	"megaCrawler/extractors"
 	"net/http"
+
+	"github.com/temoto/robotstxt"
 )
 
 func init() {
-	engine := Crawler.Register("1081", "American Bar Association Center for Global Programs", "https://www.americanbar.org")
+	engine := crawlers.Register("1081", "American Bar Association Center for Global Programs", "https://www.americanbar.org")
 
 	engine.OnLaunch(func() {
 		resp, err := http.Get("https://www.americanbar.org/robots.txt")
 		if err != nil {
-			Crawler.Sugar.Error(err)
+			crawlers.Sugar.Error(err)
 			return
 		}
 		robots, err := robotstxt.FromResponse(resp)
 		if err != nil {
-			Crawler.Sugar.Error(err)
+			crawlers.Sugar.Error(err)
 			return
 		}
 		err = resp.Body.Close()
 		if err != nil {
-			Crawler.Sugar.Error(err)
+			crawlers.Sugar.Error(err)
 			return
 		}
 		for _, sitemap := range robots.Sitemaps {
 			resp, err := http.Get(sitemap)
 			if err != nil {
-				Crawler.Sugar.Error(err)
+				crawlers.Sugar.Error(err)
 				continue
 			}
 			read, err := io.ReadAll(resp.Body)
 			if err != nil {
-				Crawler.Sugar.Error(err)
+				crawlers.Sugar.Error(err)
 				continue
 			}
-			Crawler.Sugar.Infof("%s", string(read))
 
-			//fz, err := gzip.NewReader(resp.Body)
-			//if err != nil {
+			err = resp.Body.Close()
+			if err != nil {
+				crawlers.Sugar.Error(err)
+				return
+			}
+
+			crawlers.Sugar.Infof("%s", string(read))
+
+			// fz, err := gzip.NewReader(resp.Body)
+			// if err != nil {
 			//	Crawler.Sugar.Error(err)
 			//	continue
 			//}
@@ -59,7 +67,7 @@ func init() {
 		}
 	})
 
-	extractorConfig := Extractors.Config{
+	extractorConfig := extractors.Config{
 		Author:       true,
 		Image:        true,
 		Language:     true,

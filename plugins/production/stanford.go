@@ -1,13 +1,14 @@
 package production
 
 import (
+	"megaCrawler/crawlers"
+	"megaCrawler/extractors"
+
 	"github.com/gocolly/colly/v2"
-	"megaCrawler/Crawler"
-	"megaCrawler/Extractors"
 )
 
 func init() {
-	w := Crawler.Register("stanford", "斯坦福大学",
+	w := crawlers.Register("stanford", "斯坦福大学",
 		"https://stanford.edu/")
 
 	w.SetStartingUrls([]string{
@@ -19,12 +20,12 @@ func init() {
 		"https://ed.stanford.edu/news-media",
 	})
 
-	w.OnHTML("html", func(element *colly.HTMLElement, ctx *Crawler.Context) {
-		Extractors.Titles(ctx, element)
-		Extractors.Tags(ctx, element)
+	w.OnHTML("html", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		extractors.Titles(ctx, element)
+		extractors.Tags(ctx, element)
 	})
 
-	w.OnHTML(".su-news-components", func(element *colly.HTMLElement, ctx *Crawler.Context) {
+	w.OnHTML(".su-news-components", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content = element.Text
 	})
 
