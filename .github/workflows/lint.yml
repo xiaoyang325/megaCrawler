@@ -28,6 +28,7 @@ jobs:
           git add --all
           git commit -m "ci(chore): Fix stylings"
           git push
+
       - name: Suggester
         if: ${{ github.event.pull_request }}
         uses: reviewdog/action-suggester@v1
