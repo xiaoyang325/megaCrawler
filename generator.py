@@ -7,16 +7,16 @@ r"""
 package dev
 
 import (
-	"megaCrawler/Crawler"
-	"megaCrawler/Extractors"
+	"megaCrawler/crawler"
+	"megaCrawler/extractors"
 )
 
 func init() {
-	engine := Crawler.Register("%s", "%s", "%s")
+	engine := crawler.Register("%s", "%s", "%s")
 	
 	engine.SetStartingURLs([]string{})
 	
-	extractorConfig := Extractors.Config{
+	extractorConfig := extractors.Config{
 		Author:       true,
 		Image:        true,
 		Language:     true,
