@@ -1,10 +1,9 @@
 package production
 
 import (
+	"github.com/gocolly/colly/v2"
 	"megaCrawler/crawlers"
 	"strings"
-
-	"github.com/gocolly/colly/v2"
 )
 
 func init() {
@@ -33,6 +32,7 @@ func init() {
 	// 获取 Title
 	w.OnHTML(`article > div.box-content > h1`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = strings.TrimSpace(element.Text)
+		ctx.
 	})
 
 	// 获取 PublicationTime
