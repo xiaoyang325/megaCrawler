@@ -31,5 +31,4 @@ func init() {
 	w.OnHTML(".tdb-title-text", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
 	})
-
 }

@@ -43,5 +43,4 @@ func init() {
 	w.OnHTML(".h1--author-name", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Name += element.Text
 	})
-
 }

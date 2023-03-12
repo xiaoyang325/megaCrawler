@@ -3,6 +3,8 @@ package production
 import (
 	"megaCrawler/crawlers"
 	"strings"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {

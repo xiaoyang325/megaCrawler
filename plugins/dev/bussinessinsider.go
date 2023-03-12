@@ -34,5 +34,4 @@ func init() {
 	w.OnHTML("div.wrapper.clearfix.article-content-wrapper > div.box-lhs-width.float-left > div > div.article_content.clearfix > div > article > div.mobile_padding > h1", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
 	})
-
 }

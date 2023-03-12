@@ -46,5 +46,4 @@ func init() {
 	w.OnHTML(".media-content>.headline", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = element.Text
 	})
-
 }

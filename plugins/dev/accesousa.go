@@ -31,5 +31,4 @@ func init() {
 	w.OnHTML(".story-body>.header>.h1", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
 	})
-
 }

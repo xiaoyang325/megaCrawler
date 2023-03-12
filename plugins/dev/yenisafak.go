@@ -23,10 +23,10 @@ func init() {
 		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 	w.OnHTML(".author-about-card-social-media>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.Link = append(ctx.Authors, element.Text)
+		ctx.Email = element.Text
 	})
 	w.OnHTML("#__layout > div > div.layout-content > div.detail-page.author-column-detail-page > div > div.author-about-card > div.author-about-card-container > div > div > div.author-about-card-content__author-info-content > div.author-about-card-social-media > div > a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.Link = append(ctx.Authors, element.Text)
+		ctx.Email = element.Text
 	})
 	w.OnHTML(".ys-link>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		w.Visit(element.Attr("href"), crawlers.News)
@@ -37,5 +37,4 @@ func init() {
 	w.OnHTML(".author-about-card-meta__title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
 	})
-
 }

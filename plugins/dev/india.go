@@ -31,5 +31,4 @@ func init() {
 	w.OnHTML("body > section.main-container.articledetails-page > div.container > div > div > div:nth-child(3)", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
 	})
-
 }

@@ -1,8 +1,9 @@
 package production
 
 import (
-	"github.com/gocolly/colly/v2"
 	"megaCrawler/crawlers"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func init() {

@@ -37,5 +37,4 @@ func init() {
 	w.OnHTML(".hbptHead>h1", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
 	})
-
 }

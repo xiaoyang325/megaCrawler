@@ -47,7 +47,7 @@ func init() {
 		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 	w.OnHTML("div.author-header>div.share-box", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.Link = append(ctx.Authors, element.Text)
+		ctx.Email = element.Text
 	})
 	w.OnHTML("div.author-header>div.name", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Name += element.Text
@@ -73,5 +73,4 @@ func init() {
 	w.OnHTML("h1.article-title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
 	})
-
 }

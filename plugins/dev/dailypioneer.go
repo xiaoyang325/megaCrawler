@@ -40,5 +40,4 @@ func init() {
 	w.OnHTML("h2[itemprop=\"headline\"]", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
 	})
-
 }

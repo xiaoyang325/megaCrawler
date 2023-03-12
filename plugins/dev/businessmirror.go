@@ -29,7 +29,7 @@ func init() {
 		w.Visit(element.Attr("href"), crawlers.Index)
 	})
 	w.OnHTML("div.cs-page__author-social > div > div", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.Link = append(ctx.Authors, element.Text)
+		ctx.Email = element.Text
 	})
 	w.OnHTML("h1.cs-page__title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Name += element.Text
@@ -43,5 +43,4 @@ func init() {
 	w.OnHTML(".cs-entry__title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
 	})
-
 }

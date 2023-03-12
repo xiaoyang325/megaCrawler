@@ -31,5 +31,4 @@ func init() {
 	w.OnHTML("div.swiper-slide-active>div.o-article>div.o-article__body>div>article>header>div>h1.c-article-title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
 	})
-
 }

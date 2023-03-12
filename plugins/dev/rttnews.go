@@ -43,5 +43,4 @@ func init() {
 	w.OnHTML("div.storyHeadline", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
 	})
-
 }

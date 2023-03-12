@@ -58,5 +58,4 @@ func init() {
 	w.OnHTML(".title_box", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
 	})
-
 }

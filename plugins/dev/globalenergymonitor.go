@@ -20,7 +20,7 @@ func init() {
 		}
 	})
 	w.OnHTML("ul.meta", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.File = append(ctx.Authors, element.Text)
+		ctx.File = append(ctx.File, element.Text)
 	})
 
 	w.OnHTML("ul.meta", func(element *colly.HTMLElement, ctx *crawlers.Context) {
@@ -44,5 +44,4 @@ func init() {
 	w.OnHTML("h1.page-header__title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
 	})
-
 }
