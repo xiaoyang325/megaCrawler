@@ -6,14 +6,15 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"megaCrawler/crawlers/commands"
-	"megaCrawler/crawlers/config"
 	"net/http"
 	"net/url"
 	"os"
 	"runtime"
 	"sync"
 	"time"
+
+	"megaCrawler/crawlers/commands"
+	"megaCrawler/crawlers/config"
 
 	"github.com/kardianos/service"
 	"github.com/mouuff/go-rocket-update/pkg/provider"

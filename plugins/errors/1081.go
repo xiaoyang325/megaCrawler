@@ -2,9 +2,10 @@ package errors
 
 import (
 	"io"
+	"net/http"
+
 	"megaCrawler/crawlers"
 	"megaCrawler/extractors"
-	"net/http"
 
 	"github.com/temoto/robotstxt"
 )

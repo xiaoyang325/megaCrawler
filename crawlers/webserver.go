@@ -2,10 +2,11 @@ package crawlers
 
 import (
 	"encoding/json"
-	"megaCrawler/crawlers/commands"
-	"megaCrawler/crawlers/config"
 	"net/http"
 	"sort"
+
+	"megaCrawler/crawlers/commands"
+	"megaCrawler/crawlers/config"
 
 	"github.com/gorilla/mux"
 )

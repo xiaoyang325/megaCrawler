@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"megaCrawler/crawlers"
-	"megaCrawler/crawlers/tester"
 	"os"
 	"strings"
 	"sync"
 	"testing"
 	"time"
+
+	"megaCrawler/crawlers"
+	"megaCrawler/crawlers/tester"
 
 	"github.com/olekukonko/tablewriter"
 	"go.uber.org/zap"

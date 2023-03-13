@@ -4,14 +4,15 @@ import (
 	"encoding/json"
 	"io"
 	"math/rand"
-	"megaCrawler/crawlers/commands"
-	"megaCrawler/crawlers/config"
-	"megaCrawler/crawlers/tester"
 	"net/http"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
+
+	"megaCrawler/crawlers/commands"
+	"megaCrawler/crawlers/config"
+	"megaCrawler/crawlers/tester"
 
 	"github.com/go-co-op/gocron"
 	"github.com/gocolly/colly/v2"

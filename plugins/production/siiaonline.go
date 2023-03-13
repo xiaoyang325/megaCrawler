@@ -1,10 +1,11 @@
 package production
 
 import (
-	"megaCrawler/crawlers"
 	"regexp"
 	"strings"
 	"time"
+
+	"megaCrawler/crawlers"
 
 	"github.com/araddon/dateparse"
 	"github.com/gocolly/colly/v2"

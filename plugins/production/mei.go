@@ -1,8 +1,9 @@
 package production
 
 import (
-	"megaCrawler/crawlers"
 	"time"
+
+	"megaCrawler/crawlers"
 
 	"github.com/araddon/dateparse"
 	"github.com/gocolly/colly/v2"

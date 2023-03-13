@@ -1,8 +1,9 @@
 package extractors
 
 import (
-	"megaCrawler/crawlers"
 	"regexp"
+
+	"megaCrawler/crawlers"
 
 	"github.com/gocolly/colly/v2"
 )

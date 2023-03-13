@@ -2,9 +2,10 @@
 package production
 
 import (
-	"megaCrawler/crawlers"
 	"regexp"
 	"strings"
+
+	"megaCrawler/crawlers"
 
 	"github.com/gocolly/colly/v2"
 )

@@ -3,9 +3,10 @@ package extractors
 import (
 	"fmt"
 	"math"
-	"megaCrawler/crawlers"
 	"strconv"
 	"strings"
+
+	"megaCrawler/crawlers"
 
 	"github.com/PuerkitoBio/goquery"
 )

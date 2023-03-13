@@ -2,9 +2,10 @@ package crawlers
 
 import (
 	"hash/fnv"
-	"megaCrawler/crawlers/config"
 	"sync"
 	"time"
+
+	"megaCrawler/crawlers/config"
 
 	"github.com/jpillora/go-tld"
 )

@@ -2,9 +2,10 @@ package extractors
 
 import (
 	"fmt"
-	"megaCrawler/crawlers"
 	"regexp"
 	"strings"
+
+	"megaCrawler/crawlers"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly/v2"

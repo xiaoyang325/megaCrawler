@@ -1,10 +1,11 @@
 package production
 
 import (
-	"megaCrawler/crawlers"
-	"megaCrawler/extractors"
 	"net/http"
 	"strconv"
+
+	"megaCrawler/crawlers"
+	"megaCrawler/extractors"
 
 	"github.com/PuerkitoBio/goquery"
 )

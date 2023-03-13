@@ -2,10 +2,11 @@ package production
 
 import (
 	"encoding/json"
-	"megaCrawler/crawlers"
-	"megaCrawler/extractors"
 	"regexp"
 	"strings"
+
+	"megaCrawler/crawlers"
+	"megaCrawler/extractors"
 
 	"github.com/gocolly/colly/v2"
 )

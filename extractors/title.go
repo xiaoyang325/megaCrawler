@@ -1,10 +1,11 @@
 package extractors
 
 import (
-	"megaCrawler/crawlers"
 	"regexp"
 	"sort"
 	"strings"
+
+	"megaCrawler/crawlers"
 
 	"github.com/gocolly/colly/v2"
 )

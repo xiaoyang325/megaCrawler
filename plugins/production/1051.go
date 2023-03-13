@@ -1,9 +1,10 @@
 package production
 
 import (
+	"strings"
+
 	"megaCrawler/crawlers"
 	"megaCrawler/extractors"
-	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly/v2"

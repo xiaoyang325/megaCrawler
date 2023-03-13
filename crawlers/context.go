@@ -2,9 +2,10 @@ package crawlers
 
 import (
 	"encoding/json"
-	"megaCrawler/crawlers/tester"
 	"strings"
 	"time"
+
+	"megaCrawler/crawlers/tester"
 )
 
 type PageType int8

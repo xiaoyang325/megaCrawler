@@ -1,9 +1,10 @@
 package extractors
 
 import (
-	"megaCrawler/crawlers"
 	"regexp"
 	"time"
+
+	"megaCrawler/crawlers"
 
 	"github.com/pkg/errors"
 

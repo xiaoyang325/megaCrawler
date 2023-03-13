@@ -1,8 +1,9 @@
 package extractors
 
 import (
-	"megaCrawler/crawlers"
 	"strings"
+
+	"megaCrawler/crawlers"
 
 	"github.com/PuerkitoBio/goquery"
 

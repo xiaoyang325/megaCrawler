@@ -1,10 +1,11 @@
 package production
 
 import (
-	"megaCrawler/crawlers"
-	"megaCrawler/extractors"
 	"regexp"
 	"strconv"
+
+	"megaCrawler/crawlers"
+	"megaCrawler/extractors"
 
 	"github.com/gocolly/colly/v2"
 )
