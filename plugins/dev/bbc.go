@@ -1,4 +1,4 @@
-package production
+package dev
 
 import (
 	"strings"
