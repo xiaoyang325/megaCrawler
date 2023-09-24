@@ -124,7 +124,7 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 	}
 
 	err := c.Limit(&colly.LimitRule{
-		RandomDelay: 5 * time.Second,
+		RandomDelay: 25 * time.Second,
 		DomainGlob:  cc.domainGlob,
 		Parallelism: cc.parallelLimit,
 	})
@@ -403,7 +403,7 @@ func NewEngine(id string, baseURL tld.URL) (we *WebsiteEngine) {
 		LastUpdate: time.Unix(0, 0),
 		Collector: CollectorConstructor{
 			domainGlob:    baseURL.String(),
-			parallelLimit: Threads,
+			parallelLimit: 1,
 			timeout:       10 * time.Second,
 			htmlHandlers:  []CollyHTMLPair{},
 			xmlHandlers:   []XMLPair{},
@@ -427,3 +427,17 @@ func NewEngine(id string, baseURL tld.URL) (we *WebsiteEngine) {
 	}
 	return
 }
+
+// 美国媒体：
+//1.Radio Free Asia：https://www.rfa.org/
+//2.Benar News：https://www.benarnews.org/
+//3.The Defense Post: https://www.thedefensepost.com
+//英国媒体：
+//1.Reuters：https://www.reuters.com/
+//美国智库：
+//1.USNI News：https://news.usni.org/
+//2.The Maritime Executive：https://maritime-executive.com/
+//3..Navy Recognition：https://navyrecognition.com/
+//日本媒体：
+//1.Kyodo：https://english.kyodonews.net/
+//2.The Yomiuri Shimbun：https://japannews.yomiuri.co.jp/
