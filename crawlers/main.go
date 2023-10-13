@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/gocolly/colly/v2"
+	"github.com/gocolly/colly/v2/proxy"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 
@@ -28,7 +30,7 @@ var Sugar *zap.SugaredLogger
 var Debug bool
 var Threads int
 var Kafka bool
-var Proxy *url.URL
+var Proxy colly.ProxyFunc
 var Shard struct {
 	Total  int
 	Number int
@@ -87,6 +89,7 @@ func Start() {
 	threadFlag := flag.Int("thread", 16, "Number of networking thread")
 	totalShardFlag := flag.Int("totalShard", 1, "Total number of shard")
 	shardFlag := flag.Int("shard", 0, "The shard number")
+	poolFlag := flag.String("proxy_pool", "", "Specify a proxy pool file path")
 
 	flag.Parse()
 
@@ -262,11 +265,27 @@ func Start() {
 		Kafka = true
 	}
 
-	if proxy := os.Getenv("HTTP_PROXY"); proxy != "" {
-		if parsedU, err := url.Parse(proxy); err == nil {
-			Proxy = parsedU
+	if *poolFlag != "" {
+		dat, err := os.ReadFile(*poolFlag)
+		if err != nil {
+			Sugar.Panicf("Cannot read proxy file: %s", *poolFlag)
+		}
+		rp, err := proxy.RoundRobinProxySwitcher(strings.Split(string(dat), "\n")...)
+
+		if err == nil {
+			Proxy = rp
 		} else {
-			Sugar.Panicf("Cannot parse proxy in HTTP_PROXY: %s", proxy)
+			Sugar.Panicf("Cannot parse proxy in proxy file: %s", *poolFlag)
+		}
+	} else {
+		if p := os.Getenv("HTTP_PROXY"); p != "" {
+			rp, err := proxy.RoundRobinProxySwitcher(p)
+
+			if err == nil {
+				Proxy = rp
+			} else {
+				Sugar.Panicf("Cannot parse proxy in HTTP_PROXY: %s", p)
+			}
 		}
 	}
 

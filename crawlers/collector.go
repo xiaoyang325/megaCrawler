@@ -17,7 +17,7 @@ type XMLPair struct {
 	selector string
 }
 type CollectorConstructor struct {
-	parallelLimit    int
+	parallelLimit    *int
 	domainGlob       string
 	timeout          time.Duration
 	startingURLs     []string

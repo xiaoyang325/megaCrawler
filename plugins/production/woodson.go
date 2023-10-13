@@ -1,6 +1,7 @@
 package production
 
 import (
+	"megaCrawler/extractors"
 	"strings"
 
 	"megaCrawler/crawlers"
@@ -16,21 +17,18 @@ func init() {
 		w.Visit(element.Text, crawlers.News)
 	})
 
-	w.OnHTML(".p-date", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime = element.Text
-	})
+	extractorConfig := extractors.Config{
+		Author:       true,
+		Image:        true,
+		Language:     true,
+		PublishDate:  true,
+		Tags:         true,
+		Text:         true,
+		Title:        true,
+		TextLanguage: "",
+	}
 
-	w.OnHTML("h1", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.Title = element.Text
-	})
-
-	w.OnHTML(".p-author", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.Authors = append(ctx.Authors, strings.TrimPrefix(element.Text, "Posted By "))
-	})
-
-	w.OnHTML(".et_pb_post_content ", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.Content = element.Text
-	})
+	extractorConfig.Apply(w)
 
 	w.OnHTML(".et_pb_post_content a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		if strings.Contains(element.Attr("href"), "pdf") {

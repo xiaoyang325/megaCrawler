@@ -2,12 +2,12 @@ package crawlers
 
 import (
 	"encoding/json"
+	"github.com/sourcegraph/conc/pool"
 	"io"
 	"math/rand"
 	"net/http"
 	"net/url"
 	"strings"
-	"sync"
 	"time"
 
 	"megaCrawler/crawlers/commands"
@@ -33,7 +33,7 @@ type WebsiteEngine struct {
 	Collector   CollectorConstructor
 	Config      *config.Config
 	ProgressBar string
-	WG          *sync.WaitGroup
+	Runner      *pool.Pool
 	URLChannel  chan urlData
 	Test        *tester.Tester
 }
@@ -59,7 +59,7 @@ func (w *WebsiteEngine) Visit(url string, pageType PageType) {
 	if topLevel.Domain != w.BaseURL.Domain || topLevel.TLD != w.BaseURL.TLD {
 		return
 	}
-
+	Sugar.Debug("Visiting " + url)
 	w.URLChannel <- urlData{URL: u, PageType: pageType}
 }
 
@@ -110,24 +110,20 @@ func (w *WebsiteEngine) OnLaunch(callback func()) *WebsiteEngine {
 
 func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 	cc := w.Collector
-	c = colly.NewCollector(
-		colly.Async(true),
-	)
+	c = colly.NewCollector()
 	extensions.RandomUserAgent(c)
 	extensions.Referer(c)
 
 	if Proxy != nil {
-		err := c.SetProxy(Proxy.String())
-		if err != nil {
-			return nil, err
-		}
+		c.SetProxyFunc(Proxy)
 	}
 
 	err := c.Limit(&colly.LimitRule{
 		RandomDelay: 25 * time.Second,
 		DomainGlob:  cc.domainGlob,
-		Parallelism: cc.parallelLimit,
 	})
+
+	w.Runner = pool.New().WithMaxGoroutines(*cc.parallelLimit)
 
 	c.SetRequestTimeout(cc.timeout)
 	if err != nil {
@@ -175,7 +171,6 @@ func RetryRequest(r *colly.Request, err error, w *WebsiteEngine) {
 
 	if left == 0 {
 		_ = w.bar.Add(1)
-		w.WG.Done()
 		if err != nil {
 			Sugar.Errorf("Max retries exceed for %s: %s", r.URL.String(), err.Error())
 		}
@@ -200,25 +195,6 @@ func (w *WebsiteEngine) processURL() (err error) {
 	}
 	w.URLChannel = make(chan urlData)
 
-	if w.Test != nil {
-		go func() {
-			defer func() {
-				if r := recover(); r != nil {
-					Sugar.Debug(r)
-				}
-			}()
-
-			for {
-				time.Sleep(10 * time.Microsecond)
-				if w.Test.Done {
-					for {
-						w.WG.Done()
-					}
-				}
-			}
-		}()
-	}
-
 	c.OnScraped(func(response *colly.Response) {
 		defer func() {
 			if r := recover(); r != nil {
@@ -227,9 +203,9 @@ func (w *WebsiteEngine) processURL() (err error) {
 		}()
 
 		if w.Test != nil && w.Test.Done {
-			w.WG.Done()
 			return
 		}
+
 		if strings.Contains(response.Ctx.Get("title"), "Internal server error") {
 			time.Sleep(10 * time.Second)
 			_ = response.Request.Retry()
@@ -237,25 +213,18 @@ func (w *WebsiteEngine) processURL() (err error) {
 		}
 		ctx := response.Ctx.GetAny("ctx").(*Context)
 		ctx.CrawlTime = time.Now()
-		go func() {
-			defer func() {
-				if r := recover(); r != nil {
-					Sugar.Debug(r)
-				}
-			}()
-
-			if !ctx.process(w.Test) {
-				Sugar.Debugw("Empty Page", spread(*ctx)...)
-				if w.Test == nil {
-					newCtx := newContext(urlData{URL: response.Request.URL, PageType: ctx.PageType}, w)
-					response.Ctx.Put("ctx", &newCtx)
+		if !ctx.process(w.Test) {
+			Sugar.Debugw("Empty Page", spread(*ctx)...)
+			if w.Test == nil {
+				newCtx := newContext(urlData{URL: response.Request.URL, PageType: ctx.PageType}, w)
+				response.Ctx.Put("ctx", &newCtx)
+				w.Runner.Go(func() {
 					RetryRequest(response.Request, nil, w)
-				}
-			} else {
-				_ = w.bar.Add(1)
-				w.WG.Done()
+				})
 			}
-		}()
+		} else {
+			_ = w.bar.Add(1)
+		}
 	})
 
 	go func() {
@@ -271,14 +240,13 @@ func (w *WebsiteEngine) processURL() (err error) {
 
 			newCtx := newContext(k, w)
 			ctx.Put("ctx", &newCtx)
-			err := c.Request("GET", k.URL.String(), nil, ctx, nil)
-			if err != nil {
-				continue
-			}
+			w.Runner.Go(func() {
+				_ = c.Request("GET", k.URL.String(), nil, ctx, nil)
+			})
+
 			if w.Test != nil && w.Test.Done {
 				return
 			}
-			w.WG.Add(1)
 			w.bar.ChangeMax64(w.bar.GetMax64() + 1)
 		}
 	}()
@@ -288,17 +256,15 @@ func (w *WebsiteEngine) processURL() (err error) {
 	}
 
 	if w.Collector.launchHandler != nil {
-		w.WG.Add(1)
-
-		go func() {
+		w.Runner.Go(func() {
 			w.Collector.launchHandler()
 			defer func() {
 				if r := recover(); r != nil {
 					Sugar.Debug(r)
 				}
 			}()
-			w.WG.Done()
-		}()
+		})
+
 	}
 
 	if w.Collector.robotTxt != "" {
@@ -326,7 +292,7 @@ func (w *WebsiteEngine) processURL() (err error) {
 	}
 
 	time.Sleep(5 * time.Second)
-	w.WG.Wait()
+	w.Runner.Wait()
 	if w.Test != nil && !w.Test.Done {
 		w.Test.WG.Done()
 		w.Test.Done = true
@@ -397,13 +363,12 @@ func (w *WebsiteEngine) toJSON() (b []byte, err error) {
 
 func NewEngine(id string, baseURL tld.URL) (we *WebsiteEngine) {
 	we = &WebsiteEngine{
-		WG:         &sync.WaitGroup{},
 		ID:         id,
 		BaseURL:    baseURL,
 		LastUpdate: time.Unix(0, 0),
 		Collector: CollectorConstructor{
 			domainGlob:    baseURL.String(),
-			parallelLimit: 1,
+			parallelLimit: &Threads,
 			timeout:       10 * time.Second,
 			htmlHandlers:  []CollyHTMLPair{},
 			xmlHandlers:   []XMLPair{},
@@ -427,17 +392,3 @@ func NewEngine(id string, baseURL tld.URL) (we *WebsiteEngine) {
 	}
 	return
 }
-
-// 美国媒体：
-//1.Radio Free Asia：https://www.rfa.org/
-//2.Benar News：https://www.benarnews.org/
-//3.The Defense Post: https://www.thedefensepost.com
-//英国媒体：
-//1.Reuters：https://www.reuters.com/
-//美国智库：
-//1.USNI News：https://news.usni.org/
-//2.The Maritime Executive：https://maritime-executive.com/
-//3..Navy Recognition：https://navyrecognition.com/
-//日本媒体：
-//1.Kyodo：https://english.kyodonews.net/
-//2.The Yomiuri Shimbun：https://japannews.yomiuri.co.jp/

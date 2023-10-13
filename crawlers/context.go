@@ -194,13 +194,14 @@ func (ctx *Context) process(tester *tester.Tester) (success bool) {
 	}
 
 	for _, context := range ctx.SubContext {
-		go context.process(tester)
+		context.process(tester)
 	}
 
 	switch ctx.PageType {
 	case Index:
 		if tester != nil {
 			tester.Index.Add(1)
+			tester.Index.AddFilled(1)
 		}
 		return
 	case News:
