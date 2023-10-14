@@ -126,7 +126,7 @@ func CalculateBestNode(dom *goquery.Selection, language string) *goquery.Selecti
 		node.Parent().Each(func(i int, selection *goquery.Selection) {
 			err := updateScore(selection, upScore)
 			if err != nil {
-				fmt.Println(err)
+				crawlers.Sugar.Error(err)
 			}
 			if !crawlers.Contain(parentNodes, selection) {
 				parentNodes = append(parentNodes, selection)

@@ -61,6 +61,9 @@ func TestTester(t *testing.T) {
 
 	crawlers.Sugar = logger.Sugar()
 
+	completed := 0
+	max := len(targets)
+
 	handle := func(target string) {
 		c, ok := crawlers.WebMap[target]
 		if !ok {
@@ -84,14 +87,14 @@ func TestTester(t *testing.T) {
 			Report: tester.Status{
 				Name: "Report",
 			},
+			Sugar: crawlers.Sugar,
 		}
 		c.Test.WG.Add(1)
 
 		go func() {
 			time.Sleep(2 * time.Minute)
 			if !c.Test.Done {
-				c.Test.WG.Done()
-				c.Test.Done = true
+				c.Test.Complete("timeout", c.ID)
 			}
 		}()
 		go crawlers.StartEngine(c, true)
@@ -106,18 +109,19 @@ func TestTester(t *testing.T) {
 		c.Test.Report.FillTable(table)
 
 		bufMutex.Lock()
-		_, _ = buf.WriteString(target + ":\n")
+		_, _ = buf.WriteString(target + "; " + c.Test.Reason + ":\n")
 		table.Render()
 		_, err := buf.WriteString("\n")
 		if err != nil {
 			_, _ = fmt.Fprintf(buf, "Writing Table Errored: %s", err)
 		}
 		bufMutex.Unlock()
+		completed += 1
+		t.Log("Completed "+target, "(", completed, "/", max, ")")
 	}
 
 	runner := pool.New().WithMaxGoroutines(16)
 	n := 0
-	max := len(targets)
 	for _, target := range targets {
 		n += 1
 		tar := target

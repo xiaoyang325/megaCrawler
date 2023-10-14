@@ -213,7 +213,7 @@ func (w *WebsiteEngine) processURL() (err error) {
 		}
 		ctx := response.Ctx.GetAny("ctx").(*Context)
 		ctx.CrawlTime = time.Now()
-		if !ctx.process(w.Test) {
+		if !ctx.process(w.Test, w.ID) {
 			Sugar.Debugw("Empty Page", spread(*ctx)...)
 			if w.Test == nil {
 				newCtx := newContext(urlData{URL: response.Request.URL, PageType: ctx.PageType}, w)
@@ -294,9 +294,7 @@ func (w *WebsiteEngine) processURL() (err error) {
 	time.Sleep(5 * time.Second)
 	w.Runner.Wait()
 	if w.Test != nil && !w.Test.Done {
-		w.Test.WG.Done()
-		w.Test.Done = true
-		Sugar.Infof("w.Test finished, all urls processed")
+		w.Test.Complete("all processed", w.ID)
 	}
 	return
 }

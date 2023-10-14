@@ -1,7 +1,6 @@
 package production
 
 import (
-	"fmt"
 	"strings"
 
 	"megaCrawler/crawlers"
@@ -24,7 +23,6 @@ func init() {
 
 	// 访问 下一页 Index
 	w.OnHTML(`li[class="pager__item pager__item--next"] > a`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		fmt.Println(element.Attr("href"))
 		w.Visit("https://www.demos.org/resources"+element.Attr("href"), crawlers.Index)
 	})
 

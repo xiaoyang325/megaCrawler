@@ -180,21 +180,19 @@ func (ctx *Context) CreateSubContext() (k *Context) {
 	return k
 }
 
-func (ctx *Context) process(tester *tester.Tester) (success bool) {
+func (ctx *Context) process(tester *tester.Tester, engine string) (success bool) {
 	var err error
 	var marshal []byte
 	now := time.Now()
 	success = true
 
 	if tester != nil && tester.Report.Count+tester.News.Count+tester.Expert.Count > 100 && !tester.Done {
-		tester.Done = true
-		Sugar.Info("tester finished, limit reached")
-		tester.WG.Done()
+		tester.Complete("limit reached", engine)
 		return false
 	}
 
 	for _, context := range ctx.SubContext {
-		context.process(tester)
+		context.process(tester, engine)
 	}
 
 	switch ctx.PageType {

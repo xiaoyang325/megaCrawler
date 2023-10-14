@@ -12,7 +12,7 @@ import (
 func init() {
 	engine := crawlers.Register("1272", "国际应用系统分析研究所", "https://iiasa.ac.at")
 
-	engine.SetStartingURLs([]string{})
+	engine.SetStartingURLs([]string{"https://iiasa.ac.at/sitemap.xml"})
 
 	extractorConfig := extractors.Config{
 		Author:       true,

@@ -2,6 +2,7 @@
 package tester
 
 import (
+	"go.uber.org/zap"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -16,12 +17,21 @@ type Status struct {
 }
 
 type Tester struct {
+	Sugar  *zap.SugaredLogger
 	Done   bool
 	WG     *sync.WaitGroup
 	News   Status
 	Index  Status
 	Expert Status
 	Report Status
+	Reason string
+}
+
+func (t *Tester) Complete(reason string, engine string) {
+	t.WG.Done()
+	t.Done = true
+	t.Reason = reason
+	t.Sugar.Infow("Test Completed", "reason", reason, "engine", engine)
 }
 
 func (s *Status) AddFilled(delta int64) *Status {

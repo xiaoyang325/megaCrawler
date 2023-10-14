@@ -19,10 +19,6 @@ func init() {
 		"https://ari.nus.edu.sg/media/news/",
 	})
 
-	w.OnResponse(func(response *colly.Response, ctx *crawlers.Context) {
-		println(string(response.Body))
-	})
-
 	// index
 	w.OnHTML("a.page-link", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		w.Visit(element.Attr("href"), crawlers.Index)
