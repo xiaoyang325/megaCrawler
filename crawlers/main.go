@@ -98,9 +98,8 @@ func Start() {
 
 	Debug = *debugFlag
 	Threads = *threadFlag
-
 	w := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   "./log/debug.jsonl",
+		Filename:   strings.TrimSuffix(os.TempDir(), "/") + "/log/debug.jsonl",
 		MaxSize:    500, // megabytes
 		MaxBackups: 3,
 		MaxAge:     28, // days
