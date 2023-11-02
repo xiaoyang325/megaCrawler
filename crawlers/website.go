@@ -2,7 +2,6 @@ package crawlers
 
 import (
 	"encoding/json"
-	"github.com/sourcegraph/conc/pool"
 	"io"
 	"math/rand"
 	"net/http"
@@ -33,7 +32,7 @@ type WebsiteEngine struct {
 	Collector   CollectorConstructor
 	Config      *config.Config
 	ProgressBar string
-	Runner      *pool.Pool
+	Runner      *Pool
 	URLChannel  chan urlData
 	Test        *tester.Tester
 }
@@ -123,7 +122,7 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 		DomainGlob:  cc.domainGlob,
 	})
 
-	w.Runner = pool.New().WithMaxGoroutines(*cc.parallelLimit)
+	w.Runner = NewPool().WithMaxGoroutines(*cc.parallelLimit)
 
 	c.SetRequestTimeout(cc.timeout)
 	if err != nil {
