@@ -2,6 +2,7 @@ package crawlers
 
 import (
 	"crypto/sha256"
+	"log"
 	"math"
 	"math/rand"
 	"os"
@@ -50,6 +51,9 @@ var (
 )
 
 func getProducer() (newsChannel chan string, reportChannel chan string, expertChannel chan string) {
+	if Debug {
+		sarama.Logger = log.New(os.Stdout, "[Sarama] ", log.LstdFlags)
+	}
 	conf := sarama.NewConfig()
 	conf.Producer.Retry.Max = 10
 	conf.Producer.Retry.BackoffFunc = func(retries, maxRetries int) time.Duration {
