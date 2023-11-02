@@ -129,8 +129,8 @@ func getProducer() (newsChannel chan string, reportChannel chan string, expertCh
 	}
 
 	go f("mks_news", newsChannel)
-	go f("mks_expert", expertChannel)
-	go f("mks_report", reportChannel)
+	go f("mks_news", expertChannel)
+	go f("mks_news", reportChannel)
 	go func() {
 		wg.Wait()
 		_ = syncProducer.Close()
