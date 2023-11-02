@@ -42,7 +42,7 @@ func (x *XDGSCRAMClient) Done() bool {
 }
 
 var (
-	userName      = "bdd_user_stu"
+	userName      = "xzh"
 	passwd        = ""
 	newsChannel   chan string
 	reportChannel chan string
@@ -82,7 +82,15 @@ func getProducer() (newsChannel chan string, reportChannel chan string, expertCh
 	reportChannel = make(chan string)
 	expertChannel = make(chan string)
 
-	syncProducer, err := sarama.NewSyncProducer([]string{"42.157.195.140:11003"}, conf)
+	syncProducer, err := sarama.NewSyncProducer([]string{
+		"HW-kafka-01.bdd-o.jnu.edu.cn:19092",
+		"HW-kafka-02.bdd-o.jnu.edu.cn:19092",
+		"HW-kafka-03.bdd-o.jnu.edu.cn:19092",
+		"HW-kafka-04.bdd-o.jnu.edu.cn:19092",
+		"HW-kafka-05.bdd-o.jnu.edu.cn:19092",
+		"HW-kafka-06.bdd-o.jnu.edu.cn:19092",
+	}, conf)
+
 	if err != nil {
 		Sugar.Panic("Failed to create producer: ", err)
 	}
@@ -116,9 +124,9 @@ func getProducer() (newsChannel chan string, reportChannel chan string, expertCh
 		wg.Done()
 	}
 
-	go f("hykj_news", newsChannel)
-	go f("hykj_expert", expertChannel)
-	go f("hykj_report", reportChannel)
+	go f("mks_news", newsChannel)
+	go f("mks_expert", expertChannel)
+	go f("mks_report", reportChannel)
 	go func() {
 		wg.Wait()
 		_ = syncProducer.Close()

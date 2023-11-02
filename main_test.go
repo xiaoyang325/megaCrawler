@@ -17,6 +17,13 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
+func TestWebMap(t *testing.T) {
+	crawlers.Threads = 64
+	for _, v := range crawlers.WebMap {
+		println(v.BaseURL.Hostname())
+	}
+}
+
 func TestTester(t *testing.T) {
 	buf, err := os.Create("table.txt")
 	bufMutex := sync.Mutex{}
