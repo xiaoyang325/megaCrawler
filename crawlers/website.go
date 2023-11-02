@@ -2,6 +2,8 @@ package crawlers
 
 import (
 	"encoding/json"
+	"github.com/eapache/go-resiliency/semaphore"
+	"github.com/sourcegraph/conc"
 	"io"
 	"math/rand"
 	"net/http"
@@ -32,7 +34,7 @@ type WebsiteEngine struct {
 	Collector   CollectorConstructor
 	Config      *config.Config
 	ProgressBar string
-	Runner      *Pool
+	Runner      *conc.WaitGroup
 	URLChannel  chan urlData
 	Test        *tester.Tester
 }
@@ -122,7 +124,7 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 		DomainGlob:  cc.domainGlob,
 	})
 
-	w.Runner = NewPool().WithMaxGoroutines(*cc.parallelLimit)
+	w.Runner = conc.NewWaitGroup()
 
 	c.SetRequestTimeout(cc.timeout)
 	if err != nil {
@@ -181,12 +183,16 @@ func RetryRequest(r *colly.Request, err error, w *WebsiteEngine) {
 	}
 }
 
+const maxDuration time.Duration = 1<<63 - 1
+
 func (w *WebsiteEngine) processURL() (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			Sugar.Debug(r)
 		}
 	}()
+
+	sem := semaphore.New(*w.Collector.parallelLimit, maxDuration)
 
 	c, err := w.getCollector()
 	if err != nil {
@@ -217,9 +223,7 @@ func (w *WebsiteEngine) processURL() (err error) {
 			if w.Test == nil {
 				newCtx := newContext(urlData{URL: response.Request.URL, PageType: ctx.PageType}, w)
 				response.Ctx.Put("ctx", &newCtx)
-				w.Runner.Go(func() {
-					RetryRequest(response.Request, nil, w)
-				})
+				RetryRequest(response.Request, nil, w)
 			}
 		} else {
 			_ = w.bar.Add(1)
@@ -240,7 +244,9 @@ func (w *WebsiteEngine) processURL() (err error) {
 			newCtx := newContext(k, w)
 			ctx.Put("ctx", &newCtx)
 			w.Runner.Go(func() {
+				_ = sem.Acquire()
 				_ = c.Request("GET", k.URL.String(), nil, ctx, nil)
+				sem.Release()
 			})
 
 			if w.Test != nil && w.Test.Done {
