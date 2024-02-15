@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	w := crawlers.Register("com", "com", "https://tribune.com.pk/")
+	w := crawlers.Register("tribune", "tribune", "https://tribune.com.pk/")
 
 	w.SetStartingURLs([]string{
 		"https://tribune.com.pk/",

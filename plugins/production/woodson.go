@@ -1,8 +1,9 @@
 package production
 
 import (
-	"megaCrawler/extractors"
 	"strings"
+
+	"megaCrawler/extractors"
 
 	"megaCrawler/crawlers"
 

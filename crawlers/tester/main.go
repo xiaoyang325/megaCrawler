@@ -2,10 +2,11 @@
 package tester
 
 import (
-	"go.uber.org/zap"
 	"strconv"
 	"sync"
 	"sync/atomic"
+
+	"go.uber.org/zap"
 
 	"github.com/olekukonko/tablewriter"
 )

@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/sourcegraph/conc/pool"
-	"megaCrawler/crawlers"
-	"megaCrawler/crawlers/tester"
 	"os"
 	"strings"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/sourcegraph/conc/pool"
+
+	"megaCrawler/crawlers"
+	"megaCrawler/crawlers/tester"
 
 	"github.com/olekukonko/tablewriter"
 	"go.uber.org/zap"

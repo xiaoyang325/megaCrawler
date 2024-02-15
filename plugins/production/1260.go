@@ -35,4 +35,8 @@ func init() {
 			engine.Visit(element.Text, crawlers.News)
 		}
 	})
+
+	engine.OnHTML(".td-post-content", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		ctx.Content = element.Text
+	})
 }

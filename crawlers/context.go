@@ -249,10 +249,14 @@ func (ctx *Context) process(tester *tester.Tester, engine string) (success bool)
 			Sugar.Error(err)
 			return
 		}
-		if !Kafka {
-			Sugar.Debugw("Got News Type", spread(n)...)
-		} else {
+		if Kafka {
 			newsChannel <- string(marshal)
+		}
+		if Elastic {
+			rawNewsChannel <- n
+		}
+		if !Elastic && !Kafka {
+			Sugar.Debugw("Got News Type", spread(n)...)
 		}
 		return
 	case Report:
@@ -299,10 +303,14 @@ func (ctx *Context) process(tester *tester.Tester, engine string) (success bool)
 			Sugar.Error(err)
 			return
 		}
-		if !Kafka {
-			Sugar.Debugw("Got Report type", spread(n)...)
-		} else {
+		if Kafka {
 			reportChannel <- string(marshal)
+		}
+		if Elastic {
+			rawReportChannel <- n
+		}
+		if !Elastic && !Kafka {
+			Sugar.Debugw("Got Report Type", spread(n)...)
 		}
 		return
 	case Expert:
@@ -355,10 +363,14 @@ func (ctx *Context) process(tester *tester.Tester, engine string) (success bool)
 			Sugar.Error(err)
 			return
 		}
-		if !Kafka {
-			Sugar.Debugw("Got Expert type", spread(n)...)
-		} else {
+		if Kafka {
 			expertChannel <- string(marshal)
+		}
+		if Elastic {
+			rawExpertChannel <- n
+		}
+		if !Elastic && !Kafka {
+			Sugar.Debugw("Got Expert Type", spread(n)...)
 		}
 		return
 	}

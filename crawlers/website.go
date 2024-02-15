@@ -2,14 +2,15 @@ package crawlers
 
 import (
 	"encoding/json"
-	"github.com/eapache/go-resiliency/semaphore"
-	"github.com/sourcegraph/conc"
 	"io"
 	"math/rand"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/eapache/go-resiliency/semaphore"
+	"github.com/sourcegraph/conc"
 
 	"megaCrawler/crawlers/commands"
 	"megaCrawler/crawlers/config"
@@ -60,7 +61,6 @@ func (w *WebsiteEngine) Visit(url string, pageType PageType) {
 	if topLevel.Domain != w.BaseURL.Domain || topLevel.TLD != w.BaseURL.TLD {
 		return
 	}
-	Sugar.Debug("Visiting " + url)
 	w.URLChannel <- urlData{URL: u, PageType: pageType}
 }
 
@@ -149,6 +149,9 @@ func (w *WebsiteEngine) getCollector() (c *colly.Collector, ok error) {
 			handler(response, response.Ctx.GetAny("ctx").(*Context))
 		})
 	}
+	c.OnRequest(func(r *colly.Request) {
+		Sugar.Debug("Visiting " + r.URL.String())
+	})
 
 	c.OnError(func(r *colly.Response, err error) {
 		if err.Error() == "Too many requests" {
@@ -168,19 +171,16 @@ func RetryRequest(r *colly.Request, err error, w *WebsiteEngine) {
 	if w.Test != nil && w.Test.Done {
 		return
 	}
-	left := retryRequest(r, 10)
+	go func() {
+		left := retryRequest(r, 10)
 
-	if left == 0 {
-		_ = w.bar.Add(1)
-		if err != nil {
+		if left == 0 {
+			_ = w.bar.Add(1)
 			Sugar.Errorf("Max retries exceed for %s: %s", r.URL.String(), err.Error())
-		}
-	} else {
-		time.Sleep(time.Duration(rand.Intn(10)) * time.Second)
-		if err != nil {
+		} else {
 			Sugar.Debugf("Website error tries %d for %s: %s", left, r.URL.String(), err.Error())
 		}
-	}
+	}()
 }
 
 const maxDuration time.Duration = 1<<63 - 1
@@ -217,14 +217,19 @@ func (w *WebsiteEngine) processURL() (err error) {
 			return
 		}
 		ctx := response.Ctx.GetAny("ctx").(*Context)
+		if ctx.Type == "Index" {
+			Sugar.Debug("Indexed " + response.Request.URL.String())
+		} else {
+			Sugar.Debug("Scraped " + response.Request.URL.String())
+		}
 		ctx.CrawlTime = time.Now()
 		if !ctx.process(w.Test, w.ID) {
 			Sugar.Debugw("Empty Page", spread(*ctx)...)
-			if w.Test == nil {
-				newCtx := newContext(urlData{URL: response.Request.URL, PageType: ctx.PageType}, w)
-				response.Ctx.Put("ctx", &newCtx)
-				RetryRequest(response.Request, nil, w)
-			}
+			// if w.Test == nil {
+			// 	newCtx := newContext(urlData{URL: response.Request.URL, PageType: ctx.PageType}, w)
+			// 	response.Ctx.Put("ctx", &newCtx)
+			// 	RetryRequest(response.Request, nil, w)
+			// }
 		} else {
 			_ = w.bar.Add(1)
 		}
@@ -269,7 +274,6 @@ func (w *WebsiteEngine) processURL() (err error) {
 				}
 			}()
 		})
-
 	}
 
 	if w.Collector.robotTxt != "" {

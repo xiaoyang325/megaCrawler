@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/gocolly/colly/v2"
-	"github.com/gocolly/colly/v2/proxy"
 	"log"
 	"net/http"
 	"os"
@@ -14,6 +12,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/gocolly/colly/v2"
+	"github.com/gocolly/colly/v2/proxy"
 
 	"megaCrawler/crawlers/commands"
 	"megaCrawler/crawlers/config"
@@ -30,6 +31,7 @@ var Sugar *zap.SugaredLogger
 var Debug bool
 var Threads int
 var Kafka bool
+var Elastic bool
 var Proxy colly.ProxyFunc
 var Shard struct {
 	Total  int
@@ -89,6 +91,7 @@ func Start() {
 	threadFlag := flag.Int("thread", 16, "Number of networking thread")
 	totalShardFlag := flag.Int("totalShard", 1, "Total number of shard")
 	shardFlag := flag.Int("shard", 0, "The shard number")
+	elasticFlag := flag.Bool("elastic", false, "If choice to use elasticsearch directly")
 	poolFlag := flag.String("proxy_pool", "", "Specify a proxy pool file path")
 
 	flag.Parse()
@@ -260,8 +263,13 @@ func Start() {
 	passwd = *passwordFlag
 
 	if *passwordFlag != "" {
-		newsChannel, reportChannel, expertChannel = getProducer()
-		Kafka = true
+		if *elasticFlag {
+			rawNewsChannel, rawReportChannel, rawExpertChannel = getElasticConsumerChannel()
+			Elastic = true
+		} else {
+			newsChannel, reportChannel, expertChannel = getKafkaComsumerChannel()
+			Kafka = true
+		}
 	}
 
 	if *poolFlag != "" {

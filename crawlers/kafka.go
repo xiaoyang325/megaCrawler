@@ -50,7 +50,7 @@ var (
 	expertChannel chan string
 )
 
-func getProducer() (newsChannel chan string, reportChannel chan string, expertChannel chan string) {
+func getKafkaComsumerChannel() (newsChannel chan string, reportChannel chan string, expertChannel chan string) {
 	if Debug {
 		sarama.Logger = log.New(os.Stdout, "[Sarama] ", log.LstdFlags)
 	}
