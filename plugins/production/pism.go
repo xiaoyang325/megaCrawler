@@ -39,7 +39,7 @@ func init() {
 	})
 	// report.publish time
 	w.OnHTML("div.date", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime = element.Text
+		ctx.PublicationTime = strings.Replace(strings.TrimSpace(element.Text), "  ", "\n", -1)
 	})
 	// report.description
 	w.OnHTML("div.lead>p", func(element *colly.HTMLElement, ctx *crawlers.Context) {

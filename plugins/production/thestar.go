@@ -16,10 +16,10 @@ func init() {
 	w.OnHTML(".credit__authors>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Authors = append(ctx.Authors, element.Text)
 	})
-	w.OnHTML("#story-body", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+	w.OnHTML("#story-body > p", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content += element.Text
 	})
-	w.OnHTML("article.story-content", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+	w.OnHTML("article.story-content > p", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Content += element.Text
 	})
 	w.OnHTML("a#loadMorestories", func(element *colly.HTMLElement, ctx *crawlers.Context) {
@@ -52,7 +52,7 @@ func init() {
 	w.OnHTML("h2>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		w.Visit(element.Attr("href"), crawlers.News)
 	})
-	w.OnHTML("#sideNote", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+	w.OnHTML("#sideNote > li:nth-child(2)", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime += element.Text
 	})
 	w.OnHTML(".articleDetails>.headline", func(element *colly.HTMLElement, ctx *crawlers.Context) {

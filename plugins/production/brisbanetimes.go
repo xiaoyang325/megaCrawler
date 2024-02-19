@@ -32,7 +32,10 @@ func init() {
 		w.Visit(element.Attr("href"), crawlers.News)
 	})
 	w.OnHTML("time[data-testid=\"datetime\"]", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime += element.Text
+		var datetime = element.Attr("datetime")
+		if len(datetime) > len(ctx.PublicationTime) {
+			ctx.PublicationTime = datetime
+		}
 	})
 	w.OnHTML("h1[data-testid=\"headline\"]", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text

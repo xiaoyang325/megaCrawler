@@ -41,7 +41,7 @@ func init() {
 	})
 
 	// 报告时间
-	w.OnHTML("div.l2", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+	w.OnHTML("article > div.row.topRow > div.medium-7.column > div.metasCnt > div:nth-child(1) > div.l2", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = element.Text
 	})
 
