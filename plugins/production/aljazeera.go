@@ -25,8 +25,8 @@ func init() {
 	w.OnHTML("a.u-clickable-card__link", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		w.Visit(element.Attr("href"), crawlers.News)
 	})
-	w.OnHTML("div.date-simple", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime += element.Text
+	w.OnHTML("div.date-simple > span:nth-child(2)", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		ctx.PublicationTime = element.Text
 	})
 	w.OnHTML("header.article-header", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text

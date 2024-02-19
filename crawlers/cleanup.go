@@ -20,12 +20,15 @@ var replacer = strings.NewReplacer(
 	"|", "",
 	"—", "",
 	".", " ",
+	" de ", " ",
+	"/", " ",
 )
 
 var template = []string{
 	"03:04 PM Jan 2, 2006",
 	"15:04 02/01/2006",
 	"Monday January 2 2006",
+	"15:04 PM EDT Mon January 2 2006",
 }
 
 func TimeCleanup(timeStr string) time.Time {
