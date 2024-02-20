@@ -85,7 +85,7 @@ func init() {
 
 	// report.publish time
 	w.OnHTML("div.block-date", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime = element.Text
+		ctx.PublicationTime = strings.TrimSpace(strings.Split(element.Text, "-")[0])
 	})
 	// report.author
 	w.OnHTML("div.staff-person-name>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
