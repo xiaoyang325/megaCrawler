@@ -127,7 +127,14 @@ func init() {
 
 	// 获取 CategoryText
 	w.OnHTML(`#block-dgappagetitle > div > div > div > div > footer > h4`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.CategoryText = strings.TrimSpace(element.Text)
+		text := ""
+		split := strings.Split(element.Text, "-")
+		if len(split) == 1 {
+			text = split[0]
+		} else {
+			text = split[1]
+		}
+		ctx.CategoryText = strings.ToLower(text)
 	})
 
 	// 获取 CategoryText
