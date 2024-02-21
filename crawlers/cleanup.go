@@ -2,11 +2,13 @@ package crawlers
 
 import (
 	"github.com/araddon/dateparse"
+	"strconv"
 	"strings"
 	"time"
 )
 
 var replacer = strings.NewReplacer(
+	// Italian
 	"gennaio", "january",
 	"febbraio", "february",
 	"marzo", "march",
@@ -20,6 +22,7 @@ var replacer = strings.NewReplacer(
 	"novembre", "november",
 	"dicembre", "december",
 
+	// Spanish
 	"enero", "january",
 	"febrero", "february",
 	"marzo", "march",
@@ -33,6 +36,7 @@ var replacer = strings.NewReplacer(
 	"noviembre", "november",
 	"diciembre", "december",
 
+	// German
 	"januar", "january",
 	"februar", "february",
 	"märz", "march",
@@ -91,6 +95,38 @@ var template = []string{
 	"2 1 2006 15:4",
 	"2006 1 2 15:4",
 	"2 January 2006 15:4",
+}
+
+func ParseRelativeTime(element string) (time.Time, bool) {
+	split := strings.Split(strings.TrimSpace(element), " ")
+	if len(split) < 2 {
+		return time.Time{}, true
+	}
+	now := time.Now()
+	unit := split[1]
+	number, err := strconv.Atoi(split[0])
+	if err != nil {
+		return time.Time{}, true
+	}
+	switch unit {
+	case "second", "seconds":
+		now = now.Add(time.Duration(-number) * time.Second)
+	case "minute", "minutes":
+		now = now.Add(time.Duration(-number) * time.Minute)
+	case "hour", "hours":
+		now = now.Add(time.Duration(-number) * time.Hour)
+	case "day", "days":
+		now = now.AddDate(0, 0, -number)
+	case "week", "weeks":
+		now = now.AddDate(0, 0, -number*7)
+	case "month", "months":
+		now = now.AddDate(0, -number, 0)
+	case "year", "years":
+		now = now.AddDate(-number, 0, 0)
+	default:
+		return time.Time{}, true
+	}
+	return now, false
 }
 
 func TimeCleanup(timeStr string) time.Time {

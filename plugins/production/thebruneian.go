@@ -2,6 +2,7 @@ package production
 
 import (
 	"megaCrawler/crawlers"
+	"time"
 
 	"github.com/gocolly/colly/v2"
 )
@@ -32,7 +33,11 @@ func init() {
 		w.Visit(element.Attr("href"), crawlers.News)
 	})
 	w.OnHTML("div.evo-post-date", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime += element.Text
+		now, done := crawlers.ParseRelativeTime(element.Text)
+		if done {
+			return
+		}
+		ctx.PublicationTime = now.Format(time.RFC3339)
 	})
 	w.OnHTML("h1.evo-entry-title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text

@@ -1,7 +1,6 @@
 package production
 
 import (
-	"strconv"
 	"strings"
 	"time"
 
@@ -38,32 +37,8 @@ func init() {
 
 	// 获取 PublicationTime
 	w.OnHTML(`.entry-header [class="date meta-item fa-before"]`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		split := strings.Split(strings.TrimSpace(element.Text), " ")
-		if len(split) < 2 {
-			return
-		}
-		now := time.Now()
-		unit := split[1]
-		number, err := strconv.Atoi(split[0])
-		if err != nil {
-			return
-		}
-		switch unit {
-		case "second", "seconds":
-			now = now.Add(time.Duration(-number) * time.Second)
-		case "minute", "minutes":
-			now = now.Add(time.Duration(-number) * time.Minute)
-		case "hour", "hours":
-			now = now.Add(time.Duration(-number) * time.Hour)
-		case "day", "days":
-			now = now.AddDate(0, 0, -number)
-		case "week", "weeks":
-			now = now.AddDate(0, 0, -number*7)
-		case "month", "months":
-			now = now.AddDate(0, -number, 0)
-		case "year", "years":
-			now = now.AddDate(-number, 0, 0)
-		default:
+		now, done := crawlers.ParseRelativeTime(element.Text)
+		if done {
 			return
 		}
 
