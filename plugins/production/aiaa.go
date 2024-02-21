@@ -56,7 +56,11 @@ func init() {
 	w.OnHTML(".page-title > small:nth-child(2)", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		str := strings.Split(strings.Replace(element.Text, "Written", "", 1), "-")
 		if len(str) > 1 {
-			ctx.PublicationTime = strings.TrimSpace(str[1])
+			if strings.Contains(element.Text, "UTC") || strings.Contains(element.Text, "Standard Time") || strings.Contains(element.Text, "Standard Time") {
+				ctx.PublicationTime = strings.TrimSpace(str[0])
+			} else {
+				ctx.PublicationTime = strings.TrimSpace(str[1])
+			}
 		} else {
 			ctx.PublicationTime = strings.TrimSpace(str[0])
 		}
