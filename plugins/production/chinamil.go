@@ -34,8 +34,8 @@ func init() {
 	w.OnHTML("#main-news-list>li>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		w.Visit(element.Attr("href"), crawlers.News)
 	})
-	w.OnHTML("dl.float-right", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime += element.Text
+	w.OnHTML(".pub-info > dl.float-right > dd", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		ctx.PublicationTime = element.Text
 	})
 	w.OnHTML("div.title>h1", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
