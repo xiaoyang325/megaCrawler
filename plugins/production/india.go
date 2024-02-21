@@ -26,8 +26,10 @@ func init() {
 	w.OnHTML("div.news_description>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		w.Visit(element.Attr("href"), crawlers.News)
 	})
-	w.OnHTML("div.articleauthor_details", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime = strings.Split(element.Text, "|")[0]
+	w.OnHTML("div.articleauthor_details > span", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		if strings.Contains(element.Text, "IST") {
+			ctx.PublicationTime = element.Text
+		}
 	})
 	w.OnHTML("body > section.main-container.articledetails-page > div.container > div > div > div:nth-child(3)", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
