@@ -47,7 +47,7 @@ func init() {
 
 	// new .publish time [time中含有评论，是否删除？]
 	w.OnHTML("#main_wrapper > section > div > div:nth-child(2) > div.col-md-9 > p:nth-child(3)", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime = element.Text
+		ctx.PublicationTime = strings.Split(element.Text, "·")[0]
 	})
 	// new description
 	w.OnHTML("#main_wrapper > section > div > div:nth-child(2) > div.col-md-9 > p:nth-child(6)", func(element *colly.HTMLElement, ctx *crawlers.Context) {

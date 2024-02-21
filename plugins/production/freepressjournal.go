@@ -52,8 +52,13 @@ func init() {
 	})
 	w.OnHTML("div.updated-time", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		var split = strings.Split(element.Text, ":")
-		if len(split) > 1 {
+		if len(split) == 2 {
 			ctx.PublicationTime = strings.TrimSpace(split[1])
+			return
+		}
+		if len(split) > 2 {
+			ctx.PublicationTime = strings.TrimSpace(split[1] + ":" + split[2])
+			return
 		}
 	})
 	w.OnHTML("h1.article-heading", func(element *colly.HTMLElement, ctx *crawlers.Context) {
