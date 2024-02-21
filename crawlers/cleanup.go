@@ -20,7 +20,6 @@ var replacer = strings.NewReplacer(
 	"— updated on", "\n",
 	"|", " ",
 	"—", " ",
-	"-", " ",
 	".", " ",
 	" de ", " ",
 	"/", " ",
