@@ -29,7 +29,7 @@ func init() {
 		w.Visit(element.Attr("href"), crawlers.News)
 	})
 	w.OnHTML("header > div.meta", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime += element.Text
+		ctx.PublicationTime = element.Attr("datetime")
 	})
 	w.OnHTML("div.entry-title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
