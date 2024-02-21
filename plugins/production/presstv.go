@@ -40,8 +40,8 @@ func init() {
 	w.OnHTML("div.topnews-title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		w.Visit(element.Attr("href"), crawlers.News)
 	})
-	w.OnHTML("div.news-detail", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime += element.Text
+	w.OnHTML("time.news-detail", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		ctx.PublicationTime = element.Attr("datetime")
 	})
 	w.OnHTML("h1.news-title-container", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
