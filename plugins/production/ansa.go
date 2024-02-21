@@ -13,10 +13,8 @@ func init() {
 		"https://www.ansa.it/?refresh_ce", "https://www.ansa.it/abruzzo/", "https://www.ansa.it/",
 	})
 
-	w.OnHTML(".content-news", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.Content += element.Text
-	})
-	w.OnHTML(".news-txt", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+	w.OnHTML(".news-txt > p", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		ctx.Content += "\n"
 		ctx.Content += element.Text
 	})
 	w.OnHTML(".nav-menu>li>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
@@ -35,10 +33,7 @@ func init() {
 		w.Visit(element.Attr("href"), crawlers.News)
 	})
 	w.OnHTML(".news-time", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime += element.Text
-	})
-	w.OnHTML(".news-date", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime += element.Text
+		ctx.PublicationTime = element.Text
 	})
 	w.OnHTML(".header-news>.news-title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
