@@ -48,18 +48,25 @@ func init() {
 		if err != nil {
 			return
 		}
-		if unit == "day" || unit == "days" {
+		switch unit {
+		case "second", "seconds":
+			now = now.Add(time.Duration(-number) * time.Second)
+		case "minute", "minutes":
+			now = now.Add(time.Duration(-number) * time.Minute)
+		case "hour", "hours":
+			now = now.Add(time.Duration(-number) * time.Hour)
+		case "day", "days":
 			now = now.AddDate(0, 0, -number)
-		}
-		if unit == "week" || unit == "weeks" {
-			now = now.AddDate(0, 0, -number*14)
-		}
-		if unit == "month" || unit == "months" {
+		case "week", "weeks":
+			now = now.AddDate(0, 0, -number*7)
+		case "month", "months":
 			now = now.AddDate(0, -number, 0)
-		}
-		if unit == "year" || unit == "years" {
+		case "year", "years":
 			now = now.AddDate(-number, 0, 0)
+		default:
+			return
 		}
+
 		ctx.PublicationTime = now.Format(time.RFC3339)
 	})
 
