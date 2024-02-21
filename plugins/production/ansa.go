@@ -32,7 +32,7 @@ func init() {
 	w.OnHTML(".news-more>li>a", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		w.Visit(element.Attr("href"), crawlers.News)
 	})
-	w.OnHTML(".news-time", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+	w.OnHTML(".news-time > time > em", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = element.Text
 	})
 	w.OnHTML(".header-news>.news-title", func(element *colly.HTMLElement, ctx *crawlers.Context) {
