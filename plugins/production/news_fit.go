@@ -1,7 +1,9 @@
 package production
 
 import (
+	"strconv"
 	"strings"
+	"time"
 
 	"megaCrawler/crawlers"
 
@@ -36,7 +38,29 @@ func init() {
 
 	// 获取 PublicationTime
 	w.OnHTML(`.entry-header [class="date meta-item fa-before"]`, func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime = strings.TrimSpace(element.Text)
+		split := strings.Split(strings.TrimSpace(element.Text), " ")
+		if len(split) < 2 {
+			return
+		}
+		now := time.Now()
+		unit := split[1]
+		number, err := strconv.Atoi(split[0])
+		if err != nil {
+			return
+		}
+		if unit == "day" || unit == "days" {
+			now = now.AddDate(0, 0, -number)
+		}
+		if unit == "week" || unit == "weeks" {
+			now = now.AddDate(0, 0, -number*14)
+		}
+		if unit == "month" || unit == "months" {
+			now = now.AddDate(0, -number, 0)
+		}
+		if unit == "year" || unit == "years" {
+			now = now.AddDate(-number, 0, 0)
+		}
+		ctx.PublicationTime = now.Format(time.RFC3339)
 	})
 
 	// 获取 Authors
