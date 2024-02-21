@@ -29,6 +29,7 @@ var template = []string{
 	"15:04 02/01/2006",
 	"Monday January 2 2006",
 	"15:04 PM EDT Mon January 2 2006",
+	"Monday January 2 2006 15:04 PM IST",
 }
 
 func TimeCleanup(timeStr string) time.Time {

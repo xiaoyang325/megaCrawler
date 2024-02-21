@@ -2,6 +2,7 @@ package production
 
 import (
 	"megaCrawler/crawlers"
+	"strings"
 
 	"github.com/gocolly/colly/v2"
 )
@@ -50,7 +51,10 @@ func init() {
 		w.Visit(element.Attr("href"), crawlers.News)
 	})
 	w.OnHTML("div.updated-time", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime += element.Text
+		var split = strings.Split(element.Text, ":")
+		if len(split) > 1 {
+			ctx.PublicationTime = strings.TrimSpace(split[1])
+		}
 	})
 	w.OnHTML("h1.article-heading", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title += element.Text
