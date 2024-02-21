@@ -37,6 +37,7 @@ var replacer = strings.NewReplacer(
 	"Reuters/", "",
 	"Entertainment Desk", "",
 	"REUTERS", "",
+	"Last Updated:", "",
 	"Posted on", "",
 	"Posted at:", "",
 	"Published:", "",
