@@ -22,7 +22,7 @@ func init() {
 		}
 	})
 
-	w.OnHTML("h1", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+	w.OnHTML("div.article-column > h2", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.Title = element.Text
 	})
 
@@ -34,7 +34,7 @@ func init() {
 		ctx.Content = element.Text
 	})
 
-	w.OnHTML(".news-article-date", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime = element.ChildText("span")
+	w.OnHTML(".news-article-date > span", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		ctx.PublicationTime += element.Text + " "
 	})
 }
