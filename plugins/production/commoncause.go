@@ -35,7 +35,7 @@ func init() {
 		ctx.Title = element.Text
 	})
 	// report.publish time
-	w.OnHTML("div.post-info", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+	w.OnHTML("div.post-info > span", func(element *colly.HTMLElement, ctx *crawlers.Context) {
 		ctx.PublicationTime = element.Text
 	})
 	// report.author
