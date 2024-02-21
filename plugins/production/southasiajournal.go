@@ -89,8 +89,8 @@ func init() {
 		ctx.Title = element.Text
 	})
 
-	w.OnHTML(".td-post-date", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		ctx.PublicationTime = element.Text
+	w.OnHTML("header time", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		ctx.PublicationTime = element.Attr("datetime")
 	})
 
 	w.OnHTML("meta[property=\"og:description\"]", func(element *colly.HTMLElement, ctx *crawlers.Context) {
