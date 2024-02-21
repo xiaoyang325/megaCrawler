@@ -66,6 +66,7 @@ var template = []string{
 	"Monday 2 January 2006",
 	"03:04 PM EDT Mon January 2 2006",
 	"Monday January 2 2006 03:04 PM",
+	"Monday January 2 2006",
 	"1 2 2006 3:4 PM",
 	"1 2 2006",
 	"2 1 2006",
