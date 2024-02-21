@@ -53,9 +53,13 @@ func init() {
 	})
 
 	// 获取 Publication Time
-	w.OnHTML(".page-title > small", func(element *colly.HTMLElement, ctx *crawlers.Context) {
-		str := strings.Replace(element.Text, "Written", "", 1)
-		ctx.PublicationTime = strings.TrimSpace(str)
+	w.OnHTML(".page-title > small:nth-child(2)", func(element *colly.HTMLElement, ctx *crawlers.Context) {
+		str := strings.Split(strings.Replace(element.Text, "Written", "", 1), "-")
+		if len(str) > 1 {
+			ctx.PublicationTime = strings.TrimSpace(str[1])
+		} else {
+			ctx.PublicationTime = strings.TrimSpace(str[0])
+		}
 	})
 
 	// 获取 Content

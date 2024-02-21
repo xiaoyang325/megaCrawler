@@ -15,6 +15,7 @@ var replacer = strings.NewReplacer(
 	"Published:", "",
 	"am", "AM",
 	"pm", "PM",
+	"Sept.", "Sep",
 	",", "",
 	"— updated on", "\n",
 	"|", "",
@@ -30,6 +31,7 @@ var template = []string{
 	"Monday January 2 2006",
 	"15:04 PM EDT Mon January 2 2006",
 	"Monday January 2 2006 15:04 PM IST",
+	"02 01 2006",
 }
 
 func TimeCleanup(timeStr string) time.Time {
