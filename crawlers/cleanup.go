@@ -29,16 +29,18 @@ var template = []string{
 	"03:04 PM Jan 2, 2006",
 	"15:04 02/01/2006",
 	"Monday January 2 2006",
-	"15:04 PM EDT Mon January 2 2006",
-	"Monday January 2 2006 15:04 PM IST",
+	"03:04 PM EDT Mon January 2 2006",
+	"Monday January 2 2006 03:04 PM IST",
 	"02 01 2006",
+	"02 01 2006 03:04 PM",
 }
 
 func TimeCleanup(timeStr string) time.Time {
 	timeStr = replacer.Replace(timeStr)
 	timeStr = strings.TrimSpace(timeStr)
 	for _, subStr := range strings.Split(timeStr, "\n") {
-		subStr = strings.TrimSpace(subStr)
+		subStr = StandardizeSpaces(strings.TrimSpace(subStr))
+		println(subStr)
 		parse, err := dateparse.ParseAny(subStr)
 		if err == nil {
 			return parse
