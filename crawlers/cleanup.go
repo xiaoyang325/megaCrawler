@@ -33,6 +33,7 @@ var template = []string{
 	"Monday January 2 2006 03:04 PM IST",
 	"02 01 2006",
 	"02 01 2006 03:04 PM",
+	"2006 01 02 15:04",
 }
 
 func TimeCleanup(timeStr string) time.Time {
@@ -40,7 +41,6 @@ func TimeCleanup(timeStr string) time.Time {
 	timeStr = strings.TrimSpace(timeStr)
 	for _, subStr := range strings.Split(timeStr, "\n") {
 		subStr = StandardizeSpaces(strings.TrimSpace(subStr))
-		println(subStr)
 		parse, err := dateparse.ParseAny(subStr)
 		if err == nil {
 			return parse
