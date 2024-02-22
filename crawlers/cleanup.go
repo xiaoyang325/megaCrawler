@@ -109,11 +109,11 @@ func ParseRelativeTime(element string) (time.Time, bool) {
 		return time.Time{}, true
 	}
 	switch unit {
-	case "second", "seconds":
+	case "second", "seconds", "sec", "secs":
 		now = now.Add(time.Duration(-number) * time.Second)
-	case "minute", "minutes":
+	case "minute", "minutes", "min", "mins":
 		now = now.Add(time.Duration(-number) * time.Minute)
-	case "hour", "hours":
+	case "hour", "hours", "hr", "hrs":
 		now = now.Add(time.Duration(-number) * time.Hour)
 	case "day", "days":
 		now = now.AddDate(0, 0, -number)
