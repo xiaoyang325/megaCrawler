@@ -12,9 +12,9 @@ import (
 )
 
 func init() {
-	engine := crawlers.Register("1001", "欧洲外交关系委员会", "https://ecfr.eu/")
+	engine := crawlers.Register("1001", "欧洲外交关系委员会", "https://ecfr.eu/events/")
 	
-	engine.SetStartingURLs([]string{"https://ecfr.eu/"})
+	engine.SetStartingURLs([]string{"https://ecfr.eu/events/"})
 	
 	extractorConfig := extractors.Config{
 		Author:       true,
@@ -33,7 +33,11 @@ engine.OnHTML("post-title",func(element *colly.HTMLElement, ctx *crawlers.Contex
     engine.Visit(element.Attr("href"), crawlers.News)
 })
 
-engine.OnHTML("mega-menu-link",func(element *colly.HTMLElement, ctx *crawlers.Context){
+engine.OnHTML("page-number page-numbers",func(element *colly.HTMLElement, ctx *crawlers.Context){
+    engine.Visit(element.Attr("href"), crawlers.Index)
+})
+
+engine.OnHTML("li",func(element *colly.HTMLElement, ctx *crawlers.Context){
     engine.Visit(element.Attr("href"), crawlers.Index)
 })
 
